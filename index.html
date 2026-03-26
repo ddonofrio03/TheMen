@@ -811,21 +811,50 @@ async function fetchScores() {
 
   const newMap = {};
   const comp = event.competitions?.[0];
-  comp?.competitors?.forEach(p => {
-    const name  = p.athlete?.displayName;
-    const isCut = p.status?.type?.name?.includes("CUT") ||
-                  p.status?.type?.name?.includes("ELIM");
-    const isWD  = p.status?.type?.name?.includes("WITHDRAWN");
+  if (!comp) throw new Error("No competition data");
+
+  // Sort by order (leaderboard position)
+  const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
+
+  sorted.forEach((p, idx) => {
+    const name = p.athlete?.displayName;
+    if (!name) return;
+
+    // ESPN golf API has no status object — detect CUT by score field
+    const isCut = p.score === "CUT" || p.score === "cut";
+    const isWD  = p.score === "WD"  || p.score === "wd";
+
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
-    const today = p.linescores?.[p.linescores.length - 1]?.displayValue || "--";
-    const thru  = isCut ? "CUT" : isWD ? "WD"
-                : p.status?.thru != null ? "Thru " + p.status.thru
-                : p.status?.displayValue || "--";
-    const pos   = isCut ? "CUT" : isWD ? "WD" : (p.status?.position?.displayName || "--");
-    const r1    = p.linescores?.[0]?.displayValue || "--";
-    const r2    = p.linescores?.[1]?.displayValue || "--";
-    const r3    = p.linescores?.[2]?.displayValue || "--";
-    const r4    = p.linescores?.[3]?.displayValue || "--";
+
+    // Rounds: top-level linescores array, one entry per round
+    const ls = p.linescores || [];
+    const r1 = ls[0]?.displayValue || "--";
+    const r2 = ls[1]?.displayValue || "--";
+    const r3 = ls[2]?.displayValue || "--";
+    const r4 = ls[3]?.displayValue || "--";
+
+    // Today = most recent round's to-par score
+    const currentRoundData = ls[ls.length - 1];
+    const today = (isCut || isWD || !currentRoundData) ? "--" : (currentRoundData.displayValue || "--");
+
+    // Thru: count hole-by-hole entries inside the current round
+    let thru = "--";
+    if (isCut || isWD) {
+      thru = "CUT";
+    } else if (currentRoundData) {
+      const holes = currentRoundData.linescores || [];
+      if (holes.length === 18) {
+        thru = "F";
+      } else if (holes.length > 0) {
+        thru = String(holes.length); // currently on this hole number
+      } else {
+        // No hole data yet — round may not have started
+        thru = ls.length > 1 ? "F" : "--";
+      }
+    }
+
+    // Position from sort order (1-based)
+    const pos = (isCut || isWD) ? "CUT" : String(idx + 1);
 
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4, isCut, isWD };
   });
@@ -885,14 +914,14 @@ function renderScoreboard() {
       const todayParsed = parseRelScore(todayVal);
       const todayCls = relClass(todayParsed);
 
-      // Format thru: strip "Thru " prefix, show as "Hole N" or "F" for finished
+      // Format thru for display
       let holeDisplay = "";
-      if (isCut) {
-        holeDisplay = "CUT";
-      } else if (thru) {
-        const thruClean = thru.replace(/thru\s*/i, "").trim();
-        if (thruClean === "F" || thruClean === "Final") holeDisplay = "Final";
-        else if (thruClean && thruClean !== "--") holeDisplay = "Hole " + thruClean;
+      if (isCut || isWD) {
+        holeDisplay = isCut ? "CUT" : "WD";
+      } else if (thru === "F") {
+        holeDisplay = "Finished";
+      } else if (thru && thru !== "--") {
+        holeDisplay = "Hole " + thru;
       }
 
       // Today's score formatted
