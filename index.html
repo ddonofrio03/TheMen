@@ -904,8 +904,9 @@ function renderScoreboard() {
 
     picks.forEach((player, i) => {
       const info = scoreMap[player] || {};
-      const isCut = info.isCut || info.isWD;
-      const scoreVal = isCut ? "CUT" : (info.score || "--");
+      const isWD  = !!info.isWD;
+      const isCut = !!(info.isCut || info.isWD);
+      const scoreVal = isWD ? "WD" : isCut ? "CUT" : (info.score || "--");
       const scoreParsed = parseRelScore(isCut ? null : info.score);
       const cls = isCut ? "cut" : relClass(scoreParsed);
       const pos = info.pos || "--";
@@ -916,8 +917,10 @@ function renderScoreboard() {
 
       // Format thru for display
       let holeDisplay = "";
-      if (isCut || isWD) {
-        holeDisplay = isCut ? "CUT" : "WD";
+      if (isWD) {
+        holeDisplay = "WD";
+      } else if (isCut) {
+        holeDisplay = "CUT";
       } else if (thru === "F") {
         holeDisplay = "Finished";
       } else if (thru && thru !== "--") {
