@@ -23,16 +23,16 @@
     --white: #ffffff;
     --cut: #9a9a94;
   }
-
+ 
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
+ 
   body {
     font-family: 'DM Sans', sans-serif;
     background: var(--surface);
     color: var(--ink);
     min-height: 100vh;
   }
-
+ 
   /* ── HEADER ── */
   header {
     background: var(--ink);
@@ -43,7 +43,7 @@
     z-index: 100;
     border-bottom: 3px solid var(--green-mid);
   }
-
+ 
   .header-inner {
     max-width: 1100px;
     margin: 0 auto;
@@ -54,13 +54,13 @@
     gap: 16px;
     flex-wrap: wrap;
   }
-
+ 
   .wordmark {
     display: flex;
     align-items: baseline;
     gap: 10px;
   }
-
+ 
   .wordmark-title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 28px;
@@ -68,7 +68,7 @@
     color: var(--white);
     line-height: 1;
   }
-
+ 
   .wordmark-event {
     font-size: 12px;
     font-weight: 300;
@@ -76,13 +76,13 @@
     letter-spacing: 1px;
     text-transform: uppercase;
   }
-
+ 
   .header-right {
     display: flex;
     align-items: center;
     gap: 16px;
   }
-
+ 
   .live-dot {
     display: flex;
     align-items: center;
@@ -92,7 +92,7 @@
     color: #6be08a;
     font-family: 'DM Mono', monospace;
   }
-
+ 
   .live-dot::before {
     content: '';
     width: 7px;
@@ -101,12 +101,12 @@
     background: #6be08a;
     animation: pulse 2s ease-in-out infinite;
   }
-
+ 
   @keyframes pulse {
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(0.8); }
   }
-
+ 
   .refresh-btn {
     font-family: 'DM Sans', sans-serif;
     font-size: 12px;
@@ -120,16 +120,16 @@
     transition: all 0.15s;
     letter-spacing: 0.3px;
   }
-
+ 
   .refresh-btn:hover { border-color: #888; color: #fff; }
   .refresh-btn:disabled { opacity: 0.4; cursor: default; }
-
+ 
   .last-update {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: #666;
   }
-
+ 
   /* ── COUNTDOWN BAR ── */
   .countdown-bar {
     background: var(--ink);
@@ -140,22 +140,22 @@
     font-size: 11px;
     color: #555;
   }
-
+ 
   #countdown { color: #888; }
-
+ 
   /* ── TABS ── */
   .tabs-wrap {
     max-width: 1100px;
     margin: 0 auto;
     padding: 20px 24px 0;
   }
-
+ 
   .tabs {
     display: flex;
     gap: 0;
     border-bottom: 1px solid var(--border);
   }
-
+ 
   .tab {
     font-family: 'DM Sans', sans-serif;
     font-size: 13px;
@@ -170,20 +170,20 @@
     transition: all 0.15s;
     letter-spacing: 0.2px;
   }
-
+ 
   .tab:hover { color: var(--ink-mid); }
   .tab.active { color: var(--ink); border-bottom-color: var(--green-mid); }
-
+ 
   /* ── MAIN ── */
   main {
     max-width: 1100px;
     margin: 0 auto;
     padding: 24px 24px 60px;
   }
-
+ 
   .section { display: none; }
   .section.active { display: block; }
-
+ 
   /* ── STATUS BAR ── */
   .status-msg {
     font-size: 13px;
@@ -191,23 +191,23 @@
     padding: 12px 0 20px;
     font-family: 'DM Mono', monospace;
   }
-
+ 
   .status-msg.error { color: var(--red); }
-
+ 
   /* ── SCOREBOARD GRID ── */
   .board-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
     gap: 14px;
   }
-
+ 
   .bettor-card {
     background: var(--white);
     border: 1px solid var(--border);
     border-radius: 8px;
     overflow: hidden;
   }
-
+ 
   .card-header {
     display: flex;
     align-items: center;
@@ -216,25 +216,25 @@
     background: var(--ink);
     color: var(--white);
   }
-
+ 
   .card-name {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 20px;
     letter-spacing: 1px;
   }
-
+ 
   .card-total {
     font-family: 'DM Mono', monospace;
     font-size: 18px;
     font-weight: 500;
   }
-
+ 
   .card-total.under { color: #6be08a; }
   .card-total.over  { color: #ff8080; }
   .card-total.even  { color: #aaa; }
-
+ 
   .card-body { padding: 0; }
-
+ 
   .pick-row {
     display: flex;
     align-items: center;
@@ -242,20 +242,20 @@
     border-bottom: 1px solid var(--border);
     gap: 10px;
   }
-
+ 
   .pick-row:last-child { border-bottom: none; }
-
+ 
   .pick-row.cut-row { opacity: 0.55; background: #fafaf7; }
-
+ 
   .pick-num {
     font-family: 'DM Mono', monospace;
     font-size: 11px;
     color: var(--ink-light);
     min-width: 14px;
   }
-
+ 
   .pick-info { flex: 1; min-width: 0; }
-
+ 
   .pick-name {
     font-size: 13px;
     font-weight: 500;
@@ -264,14 +264,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
+ 
   .pick-detail {
     font-size: 11px;
     color: var(--ink-light);
     font-family: 'DM Mono', monospace;
     margin-top: 1px;
   }
-
+ 
   .pick-score {
     font-family: 'DM Mono', monospace;
     font-size: 15px;
@@ -279,13 +279,13 @@
     min-width: 38px;
     text-align: right;
   }
-
+ 
   .pick-score.under { color: var(--green); }
   .pick-score.over  { color: var(--red); }
   .pick-score.even  { color: var(--ink-mid); }
   .pick-score.cut   { color: var(--cut); font-size: 12px; }
   .pick-score.ns    { color: var(--ink-light); }
-
+ 
   .penalty-tag {
     font-size: 10px;
     padding: 1px 5px;
@@ -295,14 +295,14 @@
     font-family: 'DM Mono', monospace;
     margin-left: 4px;
   }
-
+ 
   /* ── ROUND ROW ── */
   .card-rounds {
     display: flex;
     border-top: 2px solid var(--border);
     background: #f5f5f2;
   }
-
+ 
   .round-cell {
     flex: 1;
     text-align: center;
@@ -310,9 +310,9 @@
     border-right: 1px solid var(--border);
     font-family: 'DM Mono', monospace;
   }
-
+ 
   .round-cell:last-child { border-right: none; }
-
+ 
   .round-label {
     font-size: 9px;
     text-transform: uppercase;
@@ -320,7 +320,7 @@
     color: var(--ink-light);
     display: block;
   }
-
+ 
   .round-val {
     font-size: 13px;
     font-weight: 500;
@@ -328,11 +328,11 @@
     display: block;
     margin-top: 1px;
   }
-
+ 
   .round-val.under { color: var(--green); }
   .round-val.over  { color: var(--red); }
   .round-val.best  { color: var(--gold); font-weight: 600; }
-
+ 
   /* ── POINTS TABLE ── */
   .pts-wrap {
     background: var(--white);
@@ -340,13 +340,13 @@
     border-radius: 8px;
     overflow: hidden;
   }
-
+ 
   .pts-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
   }
-
+ 
   .pts-table th {
     padding: 10px 14px;
     font-size: 11px;
@@ -358,9 +358,9 @@
     border-bottom: 1px solid var(--border);
     text-align: center;
   }
-
+ 
   .pts-table th:first-child { text-align: left; }
-
+ 
   .pts-table td {
     padding: 11px 14px;
     border-bottom: 1px solid var(--border);
@@ -369,9 +369,9 @@
     font-size: 13px;
     color: var(--ink-mid);
   }
-
+ 
   .pts-table tr:last-child td { border-bottom: none; }
-
+ 
   .pts-table td:first-child {
     text-align: left;
     font-family: 'DM Sans', sans-serif;
@@ -379,27 +379,27 @@
     font-size: 14px;
     color: var(--ink);
   }
-
+ 
   .pts-table td.winner-col {
     color: var(--gold);
     font-weight: 500;
   }
-
+ 
   .pts-total-col {
     font-weight: 600 !important;
     color: var(--ink) !important;
     font-size: 15px !important;
   }
-
+ 
   .pts-win {
     background: #f5fbf7 !important;
   }
-
+ 
   .pts-table td.pts-earned {
     color: var(--green);
     font-weight: 500;
   }
-
+ 
   .rank-badge {
     display: inline-flex;
     align-items: center;
@@ -412,12 +412,12 @@
     font-family: 'DM Mono', monospace;
     margin-right: 8px;
   }
-
+ 
   .rank-1 { background: var(--gold-light); color: var(--gold); }
   .rank-2 { background: #f0f0ee; color: var(--ink-mid); }
   .rank-3 { background: #fdf0ee; color: #b0634a; }
   .rank-n { background: var(--surface); color: var(--ink-light); }
-
+ 
   /* ── LEADERBOARD ── */
   .lb-wrap {
     background: var(--white);
@@ -425,13 +425,13 @@
     border-radius: 8px;
     overflow: hidden;
   }
-
+ 
   .lb-table {
     width: 100%;
     border-collapse: collapse;
     font-size: 13px;
   }
-
+ 
   .lb-table th {
     padding: 10px 14px;
     font-size: 11px;
@@ -443,24 +443,24 @@
     border-bottom: 1px solid var(--border);
     text-align: left;
   }
-
+ 
   .lb-table th.right { text-align: right; }
-
+ 
   .lb-table td {
     padding: 9px 14px;
     border-bottom: 1px solid #f0f0ec;
     color: var(--ink);
     font-size: 13px;
   }
-
+ 
   .lb-table td.mono { font-family: 'DM Mono', monospace; }
   .lb-table td.right { text-align: right; }
   .lb-table td.muted { color: var(--ink-light); font-family: 'DM Mono', monospace; }
-
+ 
   .lb-table tr.tracked { background: #f7fdf9; }
   .lb-table tr.tracked td:nth-child(2) { font-weight: 500; }
   .lb-table tr.cut-row { opacity: 0.5; }
-
+ 
   .owner-pill {
     display: inline-block;
     font-size: 10px;
@@ -472,7 +472,7 @@
     margin-left: 6px;
     font-weight: 500;
   }
-
+ 
   /* ── PENALTY NOTE ── */
   .penalty-note {
     margin-top: 10px;
@@ -484,7 +484,7 @@
     color: #7a6020;
     font-family: 'DM Mono', monospace;
   }
-
+ 
   /* ── LOADING STATE ── */
   .loading-overlay {
     text-align: center;
@@ -492,7 +492,7 @@
     color: var(--ink-light);
     font-size: 14px;
   }
-
+ 
   .loader {
     display: inline-block;
     width: 20px;
@@ -504,9 +504,9 @@
     margin-right: 10px;
     vertical-align: middle;
   }
-
+ 
   @keyframes spin { to { transform: rotate(360deg); } }
-
+ 
   /* ── RESPONSIVE ── */
   @media (max-width: 600px) {
     .header-inner { padding: 12px 16px; }
@@ -517,7 +517,7 @@
 </style>
 </head>
 <body>
-
+ 
 <header>
   <div class="header-inner">
     <div class="wordmark">
@@ -531,11 +531,11 @@
     </div>
   </div>
 </header>
-
+ 
 <div class="countdown-bar">
   Next auto-refresh in <span id="countdown">60s</span>
 </div>
-
+ 
 <div class="tabs-wrap">
   <div class="tabs">
     <button class="tab active" onclick="showTab('scoreboard')">Scoreboard</button>
@@ -543,15 +543,15 @@
     <button class="tab" onclick="showTab('leaderboard')">Full Field</button>
   </div>
 </div>
-
+ 
 <main>
   <div id="status-msg" class="status-msg"></div>
-
+ 
   <div id="scoreboard" class="section active"></div>
   <div id="cash" class="section"></div>
   <div id="leaderboard" class="section"></div>
 </main>
-
+ 
 <script>
 // ═══════════════════════════════════════════════
 // CONFIG — update picks here each tournament
@@ -575,7 +575,7 @@ const CONFIG = {
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
   refreshInterval: 60 // seconds
 };
-
+ 
 // ═══════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════
@@ -583,7 +583,7 @@ let scoreMap = {};
 let countdown = CONFIG.refreshInterval;
 let countdownTimer = null;
 let fetching = false;
-
+ 
 // ═══════════════════════════════════════════════
 // SCORE UTILITIES
 // ═══════════════════════════════════════════════
@@ -593,20 +593,20 @@ function parseRelScore(s) {
   const n = parseInt(s.replace("+", ""));
   return isNaN(n) ? null : n;
 }
-
+ 
 function fmtRel(n) {
   if (n === null || n === undefined) return "--";
   if (n === 0) return "E";
   return n > 0 ? "+" + n : String(n);
 }
-
+ 
 function relClass(n) {
   if (n === null) return "ns";
   if (n < 0) return "under";
   if (n > 0) return "over";
   return "even";
 }
-
+ 
 // Compute penalty score for a CUT player:
 // +2 of the worst score (to-par) of any non-team player still active in the round
 function penaltyScore(roundKey, teamPlayers) {
@@ -623,7 +623,7 @@ function penaltyScore(roundKey, teamPlayers) {
   if (worst === null) return null;
   return worst + 2;
 }
-
+ 
 // Get a player's effective score for a round (penalty if CUT)
 function effectiveRoundScore(player, roundKey) {
   const info = scoreMap[player];
@@ -632,13 +632,13 @@ function effectiveRoundScore(player, roundKey) {
   const val = parseRelScore(info[roundKey]);
   return val;
 }
-
+ 
 // Team round total: sum of 4 picks, CUT players replaced by penalty
 function teamRoundTotal(bettor, roundKey) {
   const players = CONFIG.picks[bettor];
   let total = 0;
   let hasAny = false;
-
+ 
   players.forEach(player => {
     const info = scoreMap[player];
     if (!info) return;
@@ -650,16 +650,16 @@ function teamRoundTotal(bettor, roundKey) {
       if (val !== null) { total += val; hasAny = true; }
     }
   });
-
+ 
   return hasAny ? total : null;
 }
-
+ 
 // Team overall total: sum of cumulative to-par scores, CUT = penalty
 function teamOverallTotal(bettor) {
   const players = CONFIG.picks[bettor];
   let total = 0;
   let hasAny = false;
-
+ 
   players.forEach(player => {
     const info = scoreMap[player];
     if (!info) return;
@@ -674,10 +674,10 @@ function teamOverallTotal(bettor) {
       if (val !== null) { total += val; hasAny = true; }
     }
   });
-
+ 
   return hasAny ? total : null;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
@@ -690,13 +690,13 @@ function isRoundComplete(roundKey) {
   if (!active.length) return false;
   return active.every(p => parseRelScore(p[roundKey]) !== null);
 }
-
+ 
 // Returns true if tournament is officially over:
 // all 4 rounds complete and ESPN status shows "post" or "closed"
 function isTournamentFinal() {
   return isRoundComplete("r4");
 }
-
+ 
 // Award $12 to winner(s) of a category; split evenly on ties, round to cents
 function awardPot(winners, pot) {
   if (!winners.length) return {};
@@ -705,37 +705,37 @@ function awardPot(winners, pot) {
   winners.forEach(b => result[b] = share);
   return result;
 }
-
+ 
 function calcPoints() {
   const pts = {};
   CONFIG.bettors.forEach(b => {
     pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0, Total: 0,
                R1locked: false, R2locked: false, R3locked: false, R4locked: false };
   });
-
+ 
   const roundDefs = [
     { label: "R1", key: "r1" },
     { label: "R2", key: "r2" },
     { label: "R3", key: "r3" },
     { label: "R4", key: "r4" },
   ];
-
+ 
   roundDefs.forEach(({ label, key }) => {
     if (!isRoundComplete(key)) return; // only pay out finished rounds
     pts[CONFIG.bettors[0]][label + "locked"] !== undefined &&
       CONFIG.bettors.forEach(b => pts[b][label + "locked"] = true);
-
+ 
     const totals = {};
     CONFIG.bettors.forEach(b => { totals[b] = teamRoundTotal(b, key); });
     const valid = Object.values(totals).filter(n => n !== null);
     if (!valid.length) return;
-
+ 
     const best = Math.min(...valid);
     const winners = CONFIG.bettors.filter(b => totals[b] === best);
     const awards = awardPot(winners, CONFIG.points[label]);
     CONFIG.bettors.forEach(b => { if (awards[b]) pts[b][label] = awards[b]; });
   });
-
+ 
   // Overall — only pay when tournament is final (R4 complete)
   if (isTournamentFinal()) {
     const overalls = {};
@@ -747,7 +747,7 @@ function calcPoints() {
       const awardsO = awardPot(winnersO, CONFIG.points.Overall);
       CONFIG.bettors.forEach(b => { if (awardsO[b]) pts[b].Overall = awardsO[b]; });
     }
-
+ 
     // Tournament winner bonus — who has the R4 leader on their team?
     // Find the player(s) at position "1" or lowest overall score
     let tournWinner = null;
@@ -760,7 +760,7 @@ function calcPoints() {
         tournWinner = name;
       }
     });
-
+ 
     if (tournWinner) {
       const bettorsWithWinner = CONFIG.bettors.filter(b =>
         CONFIG.picks[b].includes(tournWinner)
@@ -769,7 +769,7 @@ function calcPoints() {
       CONFIG.bettors.forEach(b => { if (awardsW[b]) pts[b].Winner = awardsW[b]; });
     }
   }
-
+ 
   // Net cash: earned minus buy-in per active category
   // Each bettor pays $12 into each pot (R1-R4 + Overall + Winner = 6 pots max)
   // Only count pots that have been paid out
@@ -778,7 +778,7 @@ function calcPoints() {
   const winnerPot  = isTournamentFinal() ? 1 : 0;
   const totalPots  = activePots + overallPot + winnerPot;
   const buyIn      = totalPots * CONFIG.points.R1; // $12 per pot per bettor
-
+ 
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
                    pts[b].Overall + pts[b].Winner;
@@ -787,10 +787,10 @@ function calcPoints() {
     pts[b].Net    = earned - buyIn;
     pts[b].Total  = earned; // keep Total as gross earned for sorting
   });
-
+ 
   return pts;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // ESPN FETCH
 // ═══════════════════════════════════════════════
@@ -798,17 +798,17 @@ async function fetchScores() {
   const url = "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard";
   const res  = await fetch(url);
   const data = await res.json();
-
+ 
   let event = data.events?.find(e => e.id === CONFIG.tournamentId);
   if (!event) event = data.events?.find(e =>
     e.status?.type?.state === "in" || e.status?.type?.state === "pre"
   );
   if (!event) event = data.events?.[0];
   if (!event) throw new Error("No event found");
-
+ 
   // Update event name in header
   document.getElementById("event-name").textContent = event.name || CONFIG.eventName;
-
+ 
   const newMap = {};
   const comp = event.competitions?.[0];
   comp?.competitors?.forEach(p => {
@@ -826,20 +826,20 @@ async function fetchScores() {
     const r2    = p.linescores?.[1]?.displayValue || "--";
     const r3    = p.linescores?.[2]?.displayValue || "--";
     const r4    = p.linescores?.[3]?.displayValue || "--";
-
+ 
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4, isCut, isWD };
   });
-
+ 
   return newMap;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // RENDER SCOREBOARD
 // ═══════════════════════════════════════════════
 function renderScoreboard() {
   const el  = document.getElementById("scoreboard");
   const pts = calcPoints();
-
+ 
   // Sort by overall total ascending
   const sorted = [...CONFIG.bettors].sort((a, b) => {
     const oa = teamOverallTotal(a), ob = teamOverallTotal(b);
@@ -848,31 +848,31 @@ function renderScoreboard() {
     if (ob === null) return -1;
     return oa - ob;
   });
-
+ 
   let html = '<div class="board-grid">';
-
+ 
   sorted.forEach(bettor => {
     const picks   = CONFIG.picks[bettor];
     const overall = teamOverallTotal(bettor);
     const overallFmt = fmtRel(overall);
     const overallCls = relClass(overall);
-
+ 
     const r1t = teamRoundTotal(bettor, "r1");
     const r2t = teamRoundTotal(bettor, "r2");
     const r3t = teamRoundTotal(bettor, "r3");
     const r4t = teamRoundTotal(bettor, "r4");
-
+ 
     // Find best round across all bettors (for gold highlight)
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
     const bestR1 = r1s.length ? Math.min(...r1s) : null;
-
+ 
     html += `<div class="bettor-card">
       <div class="card-header">
         <span class="card-name">${bettor}</span>
         <span class="card-total ${overallCls}">${overallFmt}</span>
       </div>
       <div class="card-body">`;
-
+ 
     picks.forEach((player, i) => {
       const info = scoreMap[player] || {};
       const isCut = info.isCut || info.isWD;
@@ -880,24 +880,44 @@ function renderScoreboard() {
       const scoreParsed = parseRelScore(isCut ? null : info.score);
       const cls = isCut ? "cut" : relClass(scoreParsed);
       const pos = info.pos || "--";
-      const thru = info.thru || "--";
-
+      const thru = info.thru || "";
+      const todayVal = isCut ? "" : (info.today || "");
+      const todayParsed = parseRelScore(todayVal);
+      const todayCls = relClass(todayParsed);
+ 
+      // Format thru: strip "Thru " prefix, show as "Hole N" or "F" for finished
+      let holeDisplay = "";
+      if (isCut) {
+        holeDisplay = "CUT";
+      } else if (thru) {
+        const thruClean = thru.replace(/thru\s*/i, "").trim();
+        if (thruClean === "F" || thruClean === "Final") holeDisplay = "Final";
+        else if (thruClean && thruClean !== "--") holeDisplay = "Hole " + thruClean;
+      }
+ 
+      // Today's score formatted
+      const todayDisplay = todayVal && todayVal !== "--"
+        ? (todayParsed === 0 ? "E today" : (todayParsed > 0 ? "+" + todayParsed + " today" : todayParsed + " today"))
+        : "";
+ 
       let penNote = "";
       if (isCut) {
-        const pen = penaltyScore("r1", picks); // just show concept
+        const pen = penaltyScore("r1", picks);
         if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
       }
-
+ 
       html += `<div class="pick-row${isCut ? " cut-row" : ""}">
         <span class="pick-num">${i+1}</span>
         <div class="pick-info">
           <div class="pick-name">${player}${penNote}</div>
-          <div class="pick-detail">${pos} · ${thru}</div>
+          <div class="pick-detail">
+            ${pos !== "--" ? pos + " &nbsp;·&nbsp; " : ""}${holeDisplay ? `<span style="color:var(--ink-mid);font-weight:500">${holeDisplay}</span>` : ""}${todayDisplay ? ` &nbsp;·&nbsp; <span class="${todayCls}">${todayDisplay}</span>` : ""}
+          </div>
         </div>
         <span class="pick-score ${cls}">${scoreVal}</span>
       </div>`;
     });
-
+ 
     // Alt pick if exists
     const alt = CONFIG.alts[bettor];
     if (alt) {
@@ -913,7 +933,7 @@ function renderScoreboard() {
         <span class="pick-score ${ac}" style="font-size:13px">${as}</span>
       </div>`;
     }
-
+ 
     html += `</div>
       <div class="card-rounds">
         <div class="round-cell">
@@ -939,12 +959,12 @@ function renderScoreboard() {
       </div>
     </div>`;
   });
-
+ 
   html += '</div>';
   html += `<div class="penalty-note">Penalty rule: CUT players score +2 beyond the worst active non-team score that round.</div>`;
   el.innerHTML = html;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // RENDER POINTS TABLE
 // ═══════════════════════════════════════════════
@@ -952,29 +972,29 @@ function renderPoints() {
   const el  = document.getElementById("cash");
   const pts = calcPoints();
   const sorted = [...CONFIG.bettors].sort((a, b) => pts[b].Net - pts[a].Net);
-
+ 
   const r1done = isRoundComplete("r1");
   const r2done = isRoundComplete("r2");
   const r3done = isRoundComplete("r3");
   const r4done = isRoundComplete("r4");
   const done   = isTournamentFinal();
-
+ 
   function roundHeader(label, complete) {
     const lock = complete ? ' <span style="font-size:10px;opacity:0.5">&#x2713;</span>' : '';
     return `<th>${label}${lock} <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   }
-
+ 
   function fmtCash(v) {
     if (!v) return '<span style="color:var(--ink-light)">—</span>';
     return `<span style="color:var(--green);font-weight:500">$${v % 1 === 0 ? v : v.toFixed(2)}</span>`;
   }
-
+ 
   function fmtNet(v) {
     if (v === 0) return '<span style="color:var(--ink-light)">$0</span>';
     if (v > 0)   return `<span style="color:var(--green);font-weight:500">+$${v % 1 === 0 ? v : v.toFixed(2)}</span>`;
     return `<span style="color:var(--red);font-weight:500">-$${Math.abs(v) % 1 === 0 ? Math.abs(v) : Math.abs(v).toFixed(2)}</span>`;
   }
-
+ 
   let html = '<div class="pts-wrap"><table class="pts-table"><thead><tr>';
   html += `<th>Bettor</th>`;
   html += roundHeader("R1", r1done);
@@ -985,7 +1005,7 @@ function renderPoints() {
   html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
   html += '</tr></thead><tbody>';
-
+ 
   sorted.forEach((b, i) => {
     const p = pts[b];
     const rankCls = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "rank-n";
@@ -1003,18 +1023,18 @@ function renderPoints() {
       <td class="pts-total-col">${fmtNet(p.Net)}</td>
     </tr>`;
   });
-
+ 
   html += '</tbody></table></div>';
-
+ 
   // Status note
   const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
     ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12/pot buy-in &nbsp;·&nbsp; ties split evenly &nbsp;·&nbsp; winner bonus paid on final results only
   </p>`;
-
+ 
   el.innerHTML = html;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // RENDER FULL FIELD
 // ═══════════════════════════════════════════════
@@ -1024,27 +1044,27 @@ function renderLeaderboard() {
   const ownerOf  = {};
   Object.entries(CONFIG.picks).forEach(([b, ps]) => ps.forEach(p => ownerOf[p] = b));
   Object.entries(CONFIG.alts).forEach(([b, p]) => ownerOf[p] = b);
-
+ 
   const players = Object.entries(scoreMap);
   if (!players.length) {
     el.innerHTML = '<p class="status-msg">No leaderboard data yet.</p>';
     return;
   }
-
+ 
   let html = '<div class="lb-wrap"><table class="lb-table">';
   html += `<thead><tr>
     <th>Pos</th><th>Player</th>
     <th class="right">Score</th><th class="right">Today</th>
     <th>Thru</th><th class="right">R1</th><th class="right">R2</th><th class="right">R3</th><th class="right">R4</th>
   </tr></thead><tbody>`;
-
+ 
   players.forEach(([name, info]) => {
     const tracked = allPicks.has(name);
     const owner   = ownerOf[name];
     const sc = parseRelScore(info.score);
     const td = parseRelScore(info.today);
     const isCut = info.isCut || info.isWD;
-
+ 
     html += `<tr class="${tracked ? "tracked" : ""}${isCut ? " cut-row" : ""}">
       <td class="muted">${info.pos || "—"}</td>
       <td>${name}${owner ? `<span class="owner-pill">${owner}</span>` : ""}</td>
@@ -1057,23 +1077,23 @@ function renderLeaderboard() {
       <td class="mono right muted">${info.r4 || "--"}</td>
     </tr>`;
   });
-
+ 
   html += '</tbody></table></div>';
   el.innerHTML = html;
 }
-
+ 
 // ═══════════════════════════════════════════════
 // MAIN REFRESH LOOP
 // ═══════════════════════════════════════════════
 async function refresh() {
   if (fetching) return;
   fetching = true;
-
+ 
   const btn = document.getElementById("refresh-btn");
   btn.disabled = true;
   btn.textContent = "Loading...";
   document.getElementById("status-msg").textContent = "";
-
+ 
   try {
     scoreMap = await fetchScores();
     renderScoreboard();
@@ -1094,7 +1114,7 @@ async function refresh() {
     btn.textContent = "Refresh";
   }
 }
-
+ 
 function resetCountdown() {
   countdown = CONFIG.refreshInterval;
   clearInterval(countdownTimer);
@@ -1107,7 +1127,7 @@ function resetCountdown() {
     }
   }, 1000);
 }
-
+ 
 function showTab(id) {
   document.querySelectorAll(".tab").forEach(t =>
     t.classList.toggle("active", t.getAttribute("onclick").includes("'" + id + "'"))
@@ -1116,7 +1136,7 @@ function showTab(id) {
     s.classList.toggle("active", s.id === id)
   );
 }
-
+ 
 // ── BOOT ──
 refresh();
 </script>
