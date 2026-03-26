@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Men — Golf Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a6b3a;
+    --green-light: #e8f5ee;
+    --green-mid: #2d8a52;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --gold: #b8963e;
+    --gold-light: #fdf6e3;
+    --ink: #1a1a18;
+    --ink-mid: #4a4a46;
+    --ink-light: #8a8a84;
+    --border: #e0dfd8;
+    --surface: #fafaf7;
+    --white: #ffffff;
+    --cut: #9a9a94;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--surface);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--ink);
+    color: var(--white);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 3px solid var(--green-mid);
+  }
+
+  .header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .wordmark {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+
+  .wordmark-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    color: var(--white);
+    line-height: 1;
+  }
+
+  .wordmark-event {
+    font-size: 12px;
+    font-weight: 300;
+    color: #aaa;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .live-dot {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #6be08a;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .live-dot::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #6be08a;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  .refresh-btn {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 6px 14px;
+    border: 1px solid #444;
+    border-radius: 4px;
+    background: transparent;
+    color: #ccc;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.3px;
+  }
+
+  .refresh-btn:hover { border-color: #888; color: #fff; }
+  .refresh-btn:disabled { opacity: 0.4; cursor: default; }
+
+  .last-update {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #666;
+  }
+
+  /* ── COUNTDOWN BAR ── */
+  .countdown-bar {
+    background: var(--ink);
+    border-bottom: 1px solid #2a2a28;
+    padding: 4px 24px;
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: #555;
+  }
+
+  #countdown { color: #888; }
+
+  /* ── TABS ── */
+  .tabs-wrap {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px 24px 0;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: none;
+    background: none;
+    color: var(--ink-light);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: all 0.15s;
+    letter-spacing: 0.2px;
+  }
+
+  .tab:hover { color: var(--ink-mid); }
+  .tab.active { color: var(--ink); border-bottom-color: var(--green-mid); }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 24px 60px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* ── STATUS BAR ── */
+  .status-msg {
+    font-size: 13px;
+    color: var(--ink-light);
+    padding: 12px 0 20px;
+    font-family: 'DM Mono', monospace;
+  }
+
+  .status-msg.error { color: var(--red); }
+
+  /* ── SCOREBOARD GRID ── */
+  .board-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+    gap: 14px;
+  }
+
+  .bettor-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .card-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+
+  .card-total {
+    font-family: 'DM Mono', monospace;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .card-total.under { color: #6be08a; }
+  .card-total.over  { color: #ff8080; }
+  .card-total.even  { color: #aaa; }
+
+  .card-body { padding: 0; }
+
+  .pick-row {
+    display: flex;
+    align-items: center;
+    padding: 9px 16px;
+    border-bottom: 1px solid var(--border);
+    gap: 10px;
+  }
+
+  .pick-row:last-child { border-bottom: none; }
+
+  .pick-row.cut-row { opacity: 0.55; background: #fafaf7; }
+
+  .pick-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-light);
+    min-width: 14px;
+  }
+
+  .pick-info { flex: 1; min-width: 0; }
+
+  .pick-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pick-detail {
+    font-size: 11px;
+    color: var(--ink-light);
+    font-family: 'DM Mono', monospace;
+    margin-top: 1px;
+  }
+
+  .pick-score {
+    font-family: 'DM Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    min-width: 38px;
+    text-align: right;
+  }
+
+  .pick-score.under { color: var(--green); }
+  .pick-score.over  { color: var(--red); }
+  .pick-score.even  { color: var(--ink-mid); }
+  .pick-score.cut   { color: var(--cut); font-size: 12px; }
+  .pick-score.ns    { color: var(--ink-light); }
+
+  .penalty-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: #fff3cd;
+    color: #856404;
+    font-family: 'DM Mono', monospace;
+    margin-left: 4px;
+  }
+
+  /* ── ROUND ROW ── */
+  .card-rounds {
+    display: flex;
+    border-top: 2px solid var(--border);
+    background: #f5f5f2;
+  }
+
+  .round-cell {
+    flex: 1;
+    text-align: center;
+    padding: 6px 4px;
+    border-right: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+  }
+
+  .round-cell:last-child { border-right: none; }
+
+  .round-label {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--ink-light);
+    display: block;
+  }
+
+  .round-val {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-mid);
+    display: block;
+    margin-top: 1px;
+  }
+
+  .round-val.under { color: var(--green); }
+  .round-val.over  { color: var(--red); }
+  .round-val.best  { color: var(--gold); font-weight: 600; }
+
+  /* ── POINTS TABLE ── */
+  .pts-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .pts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .pts-table th {
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    background: #f5f5f2;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+  }
+
+  .pts-table th:first-child { text-align: left; }
+
+  .pts-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid var(--border);
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    color: var(--ink-mid);
+  }
+
+  .pts-table tr:last-child td { border-bottom: none; }
+
+  .pts-table td:first-child {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  .pts-table td.winner-col {
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  .pts-total-col {
+    font-weight: 600 !important;
+    color: var(--ink) !important;
+    font-size: 15px !important;
+  }
+
+  .pts-win {
+    background: #f5fbf7 !important;
+  }
+
+  .pts-table td.pts-earned {
+    color: var(--green);
+    font-weight: 500;
+  }
+
+  .rank-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: 'DM Mono', monospace;
+    margin-right: 8px;
+  }
+
+  .rank-1 { background: var(--gold-light); color: var(--gold); }
+  .rank-2 { background: #f0f0ee; color: var(--ink-mid); }
+  .rank-3 { background: #fdf0ee; color: #b0634a; }
+  .rank-n { background: var(--surface); color: var(--ink-light); }
+
+  /* ── LEADERBOARD ── */
+  .lb-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .lb-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .lb-table th {
+    padding: 10px 14px;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    background: #f5f5f2;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+
+  .lb-table th.right { text-align: right; }
+
+  .lb-table td {
+    padding: 9px 14px;
+    border-bottom: 1px solid #f0f0ec;
+    color: var(--ink);
+    font-size: 13px;
+  }
+
+  .lb-table td.mono { font-family: 'DM Mono', monospace; }
+  .lb-table td.right { text-align: right; }
+  .lb-table td.muted { color: var(--ink-light); font-family: 'DM Mono', monospace; }
+
+  .lb-table tr.tracked { background: #f7fdf9; }
+  .lb-table tr.tracked td:nth-child(2) { font-weight: 500; }
+  .lb-table tr.cut-row { opacity: 0.5; }
+
+  .owner-pill {
+    display: inline-block;
+    font-size: 10px;
+    padding: 1px 6px;
+    border-radius: 10px;
+    background: var(--green-light);
+    color: var(--green);
+    font-family: 'DM Mono', monospace;
+    margin-left: 6px;
+    font-weight: 500;
+  }
+
+  /* ── PENALTY NOTE ── */
+  .penalty-note {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: #fffbf0;
+    border: 1px solid #f0e0a0;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #7a6020;
+    font-family: 'DM Mono', monospace;
+  }
+
+  /* ── LOADING STATE ── */
+  .loading-overlay {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--ink-light);
+    font-size: 14px;
+  }
+
+  .loader {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--green-mid);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 10px;
+    vertical-align: middle;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 600px) {
+    .header-inner { padding: 12px 16px; }
+    main, .tabs-wrap { padding-left: 16px; padding-right: 16px; }
+    .board-grid { grid-template-columns: 1fr; }
+    .wordmark-event { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="wordmark">
+      <span class="wordmark-title">The Men</span>
+      <span class="wordmark-event" id="event-name">Golf Tracker</span>
+    </div>
+    <div class="header-right">
+      <span class="live-dot" id="live-indicator">LIVE</span>
+      <span class="last-update" id="last-update">--</span>
+      <button class="refresh-btn" id="refresh-btn" onclick="refresh()">Refresh</button>
+    </div>
+  </div>
+</header>
+
+<div class="countdown-bar">
+  Next auto-refresh in <span id="countdown">60s</span>
+</div>
+
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('scoreboard')">Scoreboard</button>
+    <button class="tab" onclick="showTab('cash')">Cash Won</button>
+    <button class="tab" onclick="showTab('leaderboard')">Full Field</button>
+  </div>
+</div>
+
+<main>
+  <div id="status-msg" class="status-msg"></div>
+
+  <div id="scoreboard" class="section active"></div>
+  <div id="cash" class="section"></div>
+  <div id="leaderboard" class="section"></div>
+</main>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG — update picks here each tournament
+// ═══════════════════════════════════════════════
+const CONFIG = {
+  tournamentId: "401811930", // Houston Open (test) — swap for Masters: 401811941
+  eventName: "Houston Open",
+  bettors: ["Dave","TJ","Billy","Nick","Ry","Alex"],
+  picks: {
+    Dave:  ["Jason Day",      "Chad Ramey",      "Nick Dunlap",    "Andrew Putnam"],
+    TJ:    ["Chris Gotterup", "Wyndham Clark",   "Sam Burns",      "Harry Hall"],
+    Billy: ["Tom Hoge",       "Jackson Suber",   "Chris Kirk",     "Jhonattan Vegas"],
+    Nick:  ["Danny Willett",  "Michael Brennan", "Jeffrey Kang",   "Adrien Saddier"],
+    Ry:    ["Rickie Fowler",  "Shane Lowry",     "Brian Campbell", "Casey Russell"],
+    Alex:  ["Kurt Kitayama",  "Marco Penge",     "Dan Brown",      "Lee Hodges"]
+  },
+  alts: {
+    Dave: "Min Woo Lee"
+  },
+  // Points per category (winner takes all, ties split)
+  points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
+  refreshInterval: 60 // seconds
+};
+
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let scoreMap = {};
+let countdown = CONFIG.refreshInterval;
+let countdownTimer = null;
+let fetching = false;
+
+// ═══════════════════════════════════════════════
+// SCORE UTILITIES
+// ═══════════════════════════════════════════════
+function parseRelScore(s) {
+  if (!s || s === "--" || s === "CUT" || s === "WD") return null;
+  if (s === "E") return 0;
+  const n = parseInt(s.replace("+", ""));
+  return isNaN(n) ? null : n;
+}
+
+function fmtRel(n) {
+  if (n === null || n === undefined) return "--";
+  if (n === 0) return "E";
+  return n > 0 ? "+" + n : String(n);
+}
+
+function relClass(n) {
+  if (n === null) return "ns";
+  if (n < 0) return "under";
+  if (n > 0) return "over";
+  return "even";
+}
+
+// Compute penalty score for a CUT player:
+// +2 of the worst score (to-par) of any non-team player still active in the round
+function penaltyScore(roundKey, teamPlayers) {
+  const teamSet = new Set(teamPlayers);
+  let worst = null;
+  Object.entries(scoreMap).forEach(([name, info]) => {
+    if (teamSet.has(name)) return;
+    if (info.isCut || info.isWD) return;
+    const val = parseRelScore(info[roundKey]);
+    if (val !== null) {
+      if (worst === null || val > worst) worst = val;
+    }
+  });
+  if (worst === null) return null;
+  return worst + 2;
+}
+
+// Get a player's effective score for a round (penalty if CUT)
+function effectiveRoundScore(player, roundKey) {
+  const info = scoreMap[player];
+  if (!info) return null;
+  if (info.isCut || info.isWD) return null; // handled at team level
+  const val = parseRelScore(info[roundKey]);
+  return val;
+}
+
+// Team round total: sum of 4 picks, CUT players replaced by penalty
+function teamRoundTotal(bettor, roundKey) {
+  const players = CONFIG.picks[bettor];
+  let total = 0;
+  let hasAny = false;
+
+  players.forEach(player => {
+    const info = scoreMap[player];
+    if (!info) return;
+    if (info.isCut || info.isWD) {
+      const pen = penaltyScore(roundKey, players);
+      if (pen !== null) { total += pen; hasAny = true; }
+    } else {
+      const val = parseRelScore(info[roundKey]);
+      if (val !== null) { total += val; hasAny = true; }
+    }
+  });
+
+  return hasAny ? total : null;
+}
+
+// Team overall total: sum of cumulative to-par scores, CUT = penalty
+function teamOverallTotal(bettor) {
+  const players = CONFIG.picks[bettor];
+  let total = 0;
+  let hasAny = false;
+
+  players.forEach(player => {
+    const info = scoreMap[player];
+    if (!info) return;
+    if (info.isCut || info.isWD) {
+      // Use R1+R2 actual scores + penalty for rounds played on cut day
+      const r1 = parseRelScore(info.r1);
+      const r2 = parseRelScore(info.r2);
+      if (r1 !== null) { total += r1; hasAny = true; }
+      if (r2 !== null) { total += r2; hasAny = true; }
+    } else {
+      const val = parseRelScore(info.score);
+      if (val !== null) { total += val; hasAny = true; }
+    }
+  });
+
+  return hasAny ? total : null;
+}
+
+// ═══════════════════════════════════════════════
+// POINTS CALCULATION
+// ═══════════════════════════════════════════════
+// Returns true if every player in the field has a completed score for this round key
+// i.e. round is finished when all active (non-CUT/WD) players have a numeric score
+function isRoundComplete(roundKey) {
+  const entries = Object.values(scoreMap);
+  if (!entries.length) return false;
+  const active = entries.filter(p => !p.isCut && !p.isWD);
+  if (!active.length) return false;
+  return active.every(p => parseRelScore(p[roundKey]) !== null);
+}
+
+// Returns true if tournament is officially over:
+// all 4 rounds complete and ESPN status shows "post" or "closed"
+function isTournamentFinal() {
+  return isRoundComplete("r4");
+}
+
+// Award $12 to winner(s) of a category; split evenly on ties, round to cents
+function awardPot(winners, pot) {
+  if (!winners.length) return {};
+  const share = Math.round((pot / winners.length) * 100) / 100;
+  const result = {};
+  winners.forEach(b => result[b] = share);
+  return result;
+}
+
+function calcPoints() {
+  const pts = {};
+  CONFIG.bettors.forEach(b => {
+    pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0, Total: 0,
+               R1locked: false, R2locked: false, R3locked: false, R4locked: false };
+  });
+
+  const roundDefs = [
+    { label: "R1", key: "r1" },
+    { label: "R2", key: "r2" },
+    { label: "R3", key: "r3" },
+    { label: "R4", key: "r4" },
+  ];
+
+  roundDefs.forEach(({ label, key }) => {
+    if (!isRoundComplete(key)) return; // only pay out finished rounds
+    pts[CONFIG.bettors[0]][label + "locked"] !== undefined &&
+      CONFIG.bettors.forEach(b => pts[b][label + "locked"] = true);
+
+    const totals = {};
+    CONFIG.bettors.forEach(b => { totals[b] = teamRoundTotal(b, key); });
+    const valid = Object.values(totals).filter(n => n !== null);
+    if (!valid.length) return;
+
+    const best = Math.min(...valid);
+    const winners = CONFIG.bettors.filter(b => totals[b] === best);
+    const awards = awardPot(winners, CONFIG.points[label]);
+    CONFIG.bettors.forEach(b => { if (awards[b]) pts[b][label] = awards[b]; });
+  });
+
+  // Overall — only pay when tournament is final (R4 complete)
+  if (isTournamentFinal()) {
+    const overalls = {};
+    CONFIG.bettors.forEach(b => { overalls[b] = teamOverallTotal(b); });
+    const validO = Object.values(overalls).filter(n => n !== null);
+    if (validO.length) {
+      const bestO = Math.min(...validO);
+      const winnersO = CONFIG.bettors.filter(b => overalls[b] === bestO);
+      const awardsO = awardPot(winnersO, CONFIG.points.Overall);
+      CONFIG.bettors.forEach(b => { if (awardsO[b]) pts[b].Overall = awardsO[b]; });
+    }
+
+    // Tournament winner bonus — who has the R4 leader on their team?
+    // Find the player(s) at position "1" or lowest overall score
+    let tournWinner = null;
+    let lowestScore = null;
+    Object.entries(scoreMap).forEach(([name, info]) => {
+      if (info.isCut || info.isWD) return;
+      const s = parseRelScore(info.score);
+      if (s !== null && (lowestScore === null || s < lowestScore)) {
+        lowestScore = s;
+        tournWinner = name;
+      }
+    });
+
+    if (tournWinner) {
+      const bettorsWithWinner = CONFIG.bettors.filter(b =>
+        CONFIG.picks[b].includes(tournWinner)
+      );
+      const awardsW = awardPot(bettorsWithWinner, CONFIG.points.Winner);
+      CONFIG.bettors.forEach(b => { if (awardsW[b]) pts[b].Winner = awardsW[b]; });
+    }
+  }
+
+  // Net cash: earned minus buy-in per active category
+  // Each bettor pays $12 into each pot (R1-R4 + Overall + Winner = 6 pots max)
+  // Only count pots that have been paid out
+  const activePots = roundDefs.filter(({ key }) => isRoundComplete(key)).length;
+  const overallPot = isTournamentFinal() ? 1 : 0;
+  const winnerPot  = isTournamentFinal() ? 1 : 0;
+  const totalPots  = activePots + overallPot + winnerPot;
+  const buyIn      = totalPots * CONFIG.points.R1; // $12 per pot per bettor
+
+  CONFIG.bettors.forEach(b => {
+    const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
+                   pts[b].Overall + pts[b].Winner;
+    pts[b].Earned = earned;
+    pts[b].BuyIn  = buyIn;
+    pts[b].Net    = earned - buyIn;
+    pts[b].Total  = earned; // keep Total as gross earned for sorting
+  });
+
+  return pts;
+}
+
+// ═══════════════════════════════════════════════
+// ESPN FETCH
+// ═══════════════════════════════════════════════
+async function fetchScores() {
+  const url = "https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard";
+  const res  = await fetch(url);
+  const data = await res.json();
+
+  let event = data.events?.find(e => e.id === CONFIG.tournamentId);
+  if (!event) event = data.events?.find(e =>
+    e.status?.type?.state === "in" || e.status?.type?.state === "pre"
+  );
+  if (!event) event = data.events?.[0];
+  if (!event) throw new Error("No event found");
+
+  // Update event name in header
+  document.getElementById("event-name").textContent = event.name || CONFIG.eventName;
+
+  const newMap = {};
+  const comp = event.competitions?.[0];
+  comp?.competitors?.forEach(p => {
+    const name  = p.athlete?.displayName;
+    const isCut = p.status?.type?.name?.includes("CUT") ||
+                  p.status?.type?.name?.includes("ELIM");
+    const isWD  = p.status?.type?.name?.includes("WITHDRAWN");
+    const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
+    const today = p.linescores?.[p.linescores.length - 1]?.displayValue || "--";
+    const thru  = isCut ? "CUT" : isWD ? "WD"
+                : p.status?.thru != null ? "Thru " + p.status.thru
+                : p.status?.displayValue || "--";
+    const pos   = isCut ? "CUT" : isWD ? "WD" : (p.status?.position?.displayName || "--");
+    const r1    = p.linescores?.[0]?.displayValue || "--";
+    const r2    = p.linescores?.[1]?.displayValue || "--";
+    const r3    = p.linescores?.[2]?.displayValue || "--";
+    const r4    = p.linescores?.[3]?.displayValue || "--";
+
+    newMap[name] = { score, today, thru, pos, r1, r2, r3, r4, isCut, isWD };
+  });
+
+  return newMap;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER SCOREBOARD
+// ═══════════════════════════════════════════════
+function renderScoreboard() {
+  const el  = document.getElementById("scoreboard");
+  const pts = calcPoints();
+
+  // Sort by overall total ascending
+  const sorted = [...CONFIG.bettors].sort((a, b) => {
+    const oa = teamOverallTotal(a), ob = teamOverallTotal(b);
+    if (oa === null && ob === null) return 0;
+    if (oa === null) return 1;
+    if (ob === null) return -1;
+    return oa - ob;
+  });
+
+  let html = '<div class="board-grid">';
+
+  sorted.forEach(bettor => {
+    const picks   = CONFIG.picks[bettor];
+    const overall = teamOverallTotal(bettor);
+    const overallFmt = fmtRel(overall);
+    const overallCls = relClass(overall);
+
+    const r1t = teamRoundTotal(bettor, "r1");
+    const r2t = teamRoundTotal(bettor, "r2");
+    const r3t = teamRoundTotal(bettor, "r3");
+    const r4t = teamRoundTotal(bettor, "r4");
+
+    // Find best round across all bettors (for gold highlight)
+    const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
+    const bestR1 = r1s.length ? Math.min(...r1s) : null;
+
+    html += `<div class="bettor-card">
+      <div class="card-header">
+        <span class="card-name">${bettor}</span>
+        <span class="card-total ${overallCls}">${overallFmt}</span>
+      </div>
+      <div class="card-body">`;
+
+    picks.forEach((player, i) => {
+      const info = scoreMap[player] || {};
+      const isCut = info.isCut || info.isWD;
+      const scoreVal = isCut ? "CUT" : (info.score || "--");
+      const scoreParsed = parseRelScore(isCut ? null : info.score);
+      const cls = isCut ? "cut" : relClass(scoreParsed);
+      const pos = info.pos || "--";
+      const thru = info.thru || "--";
+
+      let penNote = "";
+      if (isCut) {
+        const pen = penaltyScore("r1", picks); // just show concept
+        if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
+      }
+
+      html += `<div class="pick-row${isCut ? " cut-row" : ""}">
+        <span class="pick-num">${i+1}</span>
+        <div class="pick-info">
+          <div class="pick-name">${player}${penNote}</div>
+          <div class="pick-detail">${pos} · ${thru}</div>
+        </div>
+        <span class="pick-score ${cls}">${scoreVal}</span>
+      </div>`;
+    });
+
+    // Alt pick if exists
+    const alt = CONFIG.alts[bettor];
+    if (alt) {
+      const ai = scoreMap[alt] || {};
+      const as = ai.isCut ? "CUT" : (ai.score || "--");
+      const ac = ai.isCut ? "cut" : relClass(parseRelScore(ai.score));
+      html += `<div class="pick-row" style="background:#fafaf9">
+        <span class="pick-num" style="color:#bbb">A</span>
+        <div class="pick-info">
+          <div class="pick-name" style="color:var(--ink-light);font-size:12px">${alt} <span style="font-size:10px;background:#f0f0ee;padding:1px 5px;border-radius:3px">alt</span></div>
+          <div class="pick-detail">${ai.pos || "--"} · ${ai.thru || "--"}</div>
+        </div>
+        <span class="pick-score ${ac}" style="font-size:13px">${as}</span>
+      </div>`;
+    }
+
+    html += `</div>
+      <div class="card-rounds">
+        <div class="round-cell">
+          <span class="round-label">R1</span>
+          <span class="round-val ${r1t !== null ? (r1t === bestR1 ? "best" : relClass(r1t)) : ""}">${r1t !== null ? fmtRel(r1t) : "--"}</span>
+        </div>
+        <div class="round-cell">
+          <span class="round-label">R2</span>
+          <span class="round-val ${r2t !== null ? relClass(r2t) : ""}">${r2t !== null ? fmtRel(r2t) : "--"}</span>
+        </div>
+        <div class="round-cell">
+          <span class="round-label">R3</span>
+          <span class="round-val ${r3t !== null ? relClass(r3t) : ""}">${r3t !== null ? fmtRel(r3t) : "--"}</span>
+        </div>
+        <div class="round-cell">
+          <span class="round-label">R4</span>
+          <span class="round-val ${r4t !== null ? relClass(r4t) : ""}">${r4t !== null ? fmtRel(r4t) : "--"}</span>
+        </div>
+        <div class="round-cell">
+          <span class="round-label">Cash</span>
+          <span class="round-val ${pts[bettor].Net > 0 ? "best" : pts[bettor].Net < 0 ? "over" : ""}">${pts[bettor].Net > 0 ? "+$"+pts[bettor].Net : pts[bettor].Net < 0 ? "-$"+Math.abs(pts[bettor].Net) : "$0"}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  html += '</div>';
+  html += `<div class="penalty-note">Penalty rule: CUT players score +2 beyond the worst active non-team score that round.</div>`;
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER POINTS TABLE
+// ═══════════════════════════════════════════════
+function renderPoints() {
+  const el  = document.getElementById("cash");
+  const pts = calcPoints();
+  const sorted = [...CONFIG.bettors].sort((a, b) => pts[b].Net - pts[a].Net);
+
+  const r1done = isRoundComplete("r1");
+  const r2done = isRoundComplete("r2");
+  const r3done = isRoundComplete("r3");
+  const r4done = isRoundComplete("r4");
+  const done   = isTournamentFinal();
+
+  function roundHeader(label, complete) {
+    const lock = complete ? ' <span style="font-size:10px;opacity:0.5">&#x2713;</span>' : '';
+    return `<th>${label}${lock} <span style="opacity:.5;font-size:10px">($12)</span></th>`;
+  }
+
+  function fmtCash(v) {
+    if (!v) return '<span style="color:var(--ink-light)">—</span>';
+    return `<span style="color:var(--green);font-weight:500">$${v % 1 === 0 ? v : v.toFixed(2)}</span>`;
+  }
+
+  function fmtNet(v) {
+    if (v === 0) return '<span style="color:var(--ink-light)">$0</span>';
+    if (v > 0)   return `<span style="color:var(--green);font-weight:500">+$${v % 1 === 0 ? v : v.toFixed(2)}</span>`;
+    return `<span style="color:var(--red);font-weight:500">-$${Math.abs(v) % 1 === 0 ? Math.abs(v) : Math.abs(v).toFixed(2)}</span>`;
+  }
+
+  let html = '<div class="pts-wrap"><table class="pts-table"><thead><tr>';
+  html += `<th>Bettor</th>`;
+  html += roundHeader("R1", r1done);
+  html += roundHeader("R2", r2done);
+  html += roundHeader("R3", r3done);
+  html += roundHeader("R4", r4done);
+  html += roundHeader("Overall", done);
+  html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
+  html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
+  html += '</tr></thead><tbody>';
+
+  sorted.forEach((b, i) => {
+    const p = pts[b];
+    const rankCls = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "rank-n";
+    const isWin = p.Net > 0;
+    html += `<tr class="${isWin ? "pts-win" : ""}">
+      <td><span class="rank-badge ${rankCls}">${i+1}</span>${b}</td>
+      <td>${fmtCash(p.R1)}</td>
+      <td>${fmtCash(p.R2)}</td>
+      <td>${fmtCash(p.R3)}</td>
+      <td>${fmtCash(p.R4)}</td>
+      <td>${fmtCash(p.Overall)}</td>
+      <td>${fmtCash(p.Winner)}</td>
+      <td style="font-weight:500">$${p.Earned || 0}</td>
+      <td style="color:var(--ink-light)">$${p.BuyIn || 0}</td>
+      <td class="pts-total-col">${fmtNet(p.Net)}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+
+  // Status note
+  const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
+  html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
+    ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12/pot buy-in &nbsp;·&nbsp; ties split evenly &nbsp;·&nbsp; winner bonus paid on final results only
+  </p>`;
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// RENDER FULL FIELD
+// ═══════════════════════════════════════════════
+function renderLeaderboard() {
+  const el = document.getElementById("leaderboard");
+  const allPicks = new Set(Object.values(CONFIG.picks).flat().concat(Object.values(CONFIG.alts)));
+  const ownerOf  = {};
+  Object.entries(CONFIG.picks).forEach(([b, ps]) => ps.forEach(p => ownerOf[p] = b));
+  Object.entries(CONFIG.alts).forEach(([b, p]) => ownerOf[p] = b);
+
+  const players = Object.entries(scoreMap);
+  if (!players.length) {
+    el.innerHTML = '<p class="status-msg">No leaderboard data yet.</p>';
+    return;
+  }
+
+  let html = '<div class="lb-wrap"><table class="lb-table">';
+  html += `<thead><tr>
+    <th>Pos</th><th>Player</th>
+    <th class="right">Score</th><th class="right">Today</th>
+    <th>Thru</th><th class="right">R1</th><th class="right">R2</th><th class="right">R3</th><th class="right">R4</th>
+  </tr></thead><tbody>`;
+
+  players.forEach(([name, info]) => {
+    const tracked = allPicks.has(name);
+    const owner   = ownerOf[name];
+    const sc = parseRelScore(info.score);
+    const td = parseRelScore(info.today);
+    const isCut = info.isCut || info.isWD;
+
+    html += `<tr class="${tracked ? "tracked" : ""}${isCut ? " cut-row" : ""}">
+      <td class="muted">${info.pos || "—"}</td>
+      <td>${name}${owner ? `<span class="owner-pill">${owner}</span>` : ""}</td>
+      <td class="mono right ${relClass(sc)}">${info.score || "--"}</td>
+      <td class="mono right ${relClass(td)}">${info.today || "--"}</td>
+      <td class="muted">${info.thru || "--"}</td>
+      <td class="mono right muted">${info.r1 || "--"}</td>
+      <td class="mono right muted">${info.r2 || "--"}</td>
+      <td class="mono right muted">${info.r3 || "--"}</td>
+      <td class="mono right muted">${info.r4 || "--"}</td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
+// MAIN REFRESH LOOP
+// ═══════════════════════════════════════════════
+async function refresh() {
+  if (fetching) return;
+  fetching = true;
+
+  const btn = document.getElementById("refresh-btn");
+  btn.disabled = true;
+  btn.textContent = "Loading...";
+  document.getElementById("status-msg").textContent = "";
+
+  try {
+    scoreMap = await fetchScores();
+    renderScoreboard();
+    renderPoints();
+    renderLeaderboard();
+    const now = new Date();
+    document.getElementById("last-update").textContent =
+      now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
+    document.getElementById("live-indicator").textContent = "LIVE";
+    resetCountdown();
+  } catch(e) {
+    document.getElementById("status-msg").textContent = "Error fetching scores: " + e.message;
+    document.getElementById("status-msg").classList.add("error");
+    document.getElementById("live-indicator").textContent = "ERROR";
+  } finally {
+    fetching = false;
+    btn.disabled = false;
+    btn.textContent = "Refresh";
+  }
+}
+
+function resetCountdown() {
+  countdown = CONFIG.refreshInterval;
+  clearInterval(countdownTimer);
+  countdownTimer = setInterval(() => {
+    countdown--;
+    document.getElementById("countdown").textContent = countdown + "s";
+    if (countdown <= 0) {
+      clearInterval(countdownTimer);
+      refresh();
+    }
+  }, 1000);
+}
+
+function showTab(id) {
+  document.querySelectorAll(".tab").forEach(t =>
+    t.classList.toggle("active", t.getAttribute("onclick").includes("'" + id + "'"))
+  );
+  document.querySelectorAll(".section").forEach(s =>
+    s.classList.toggle("active", s.id === id)
+  );
+}
+
+// ── BOOT ──
+refresh();
+</script>
+</body>
+</html>
