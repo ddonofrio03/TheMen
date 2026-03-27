@@ -876,11 +876,19 @@ function renderScoreboard() {
 
   // Sort by overall total ascending
   const sorted = [...CONFIG.bettors].sort((a, b) => {
-    const oa = teamOverallTotal(a), ob = teamOverallTotal(b);
-    if (oa === null && ob === null) return 0;
-    if (oa === null) return 1;
-    if (ob === null) return -1;
-    return oa - ob;
+    // Sort by today's active round score (lowest first = leader on top)
+    const getRoundScore = (bettor) => {
+      const r4 = teamRoundTotal(bettor, "r4");
+      const r3 = teamRoundTotal(bettor, "r3");
+      const r2 = teamRoundTotal(bettor, "r2");
+      const r1 = teamRoundTotal(bettor, "r1");
+      return r4 !== null ? r4 : r3 !== null ? r3 : r2 !== null ? r2 : r1;
+    };
+    const sa = getRoundScore(a), sb = getRoundScore(b);
+    if (sa === null && sb === null) return 0;
+    if (sa === null) return 1;
+    if (sb === null) return -1;
+    return sa - sb;
   });
 
   let html = '<div class="board-grid">';
@@ -1090,7 +1098,7 @@ function renderPoints() {
 
   // Status note
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
-    ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12 to lowest team total each round · Overall paid on final result · ties split evenly
+    $12 buy-in &nbsp;·&nbsp; $12 to lowest team total each round · Overall paid on final result · ties split evenly
   </p>`;
 
   el.innerHTML = html;
