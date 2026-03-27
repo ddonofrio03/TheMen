@@ -590,7 +590,7 @@ let fetching = false;
 // SCORE UTILITIES
 // ═══════════════════════════════════════════════
 function parseRelScore(s) {
-  if (!s || s === "--" || s === "CUT" || s === "WD") return null;
+  if (!s || s === "--" || s === "-" || s === "CUT" || s === "WD") return null;
   if (s === "E") return 0;
   const n = parseInt(s.replace("+", ""));
   return isNaN(n) ? null : n;
@@ -688,9 +688,11 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const active = entries.filter(p => !p.isCut && !p.isWD);
-  if (!active.length) return false;
-  return active.every(p => parseRelScore(p[roundKey]) !== null);
+  // Only check players who have started the tournament (have an R1 score or are active)
+  // Ignore players with no data at all (WD before tournament, missing entries)
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && p.r1 && p.r1 !== "--" && p.r1 !== "-");
+  if (!relevant.length) return false;
+  return relevant.every(p => parseRelScore(p[roundKey]) !== null);
 }
 
 // Returns true if tournament is officially over:
@@ -715,66 +717,22 @@ function calcPoints() {
                Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
   });
 
-  // Cumulative team total through N rounds
-  // Each round winner = lowest cumulative total THROUGH that round
-  // R1 = R1 only, R2 = R1+R2, R3 = R1+R2+R3, R4 = R1+R2+R3+R4
-  function cumulativeTotal(bettor, throughRounds) {
-    const players = CONFIG.picks[bettor];
-    let total = 0;
-    let hasAny = false;
-
-    // The cut happens after R2 — CUT players always have R1 and R2 scores.
-    // Penalties only apply to R3 and R4 for CUT players.
-    const penaltyRounds = new Set(["r3", "r4"]);
-
-    players.forEach(player => {
-      const info = scoreMap[player];
-      if (!info) return;
-
-      throughRounds.forEach(key => {
-        const actual = parseRelScore(info[key]);
-
-        if (actual !== null) {
-          // Player has a real score for this round — always use it
-          total += actual;
-          hasAny = true;
-        } else if ((info.isCut || info.isWD) && penaltyRounds.has(key)) {
-          // CUT/WD player, round is R3 or R4 — apply penalty
-          const pen = penaltyScore(key, players);
-          if (pen !== null) {
-            total += pen;
-            hasAny = true;
-          }
-        }
-        // If active player has no score yet for this round, skip (round not complete)
-      });
-    });
-
-    return hasAny ? total : null;
-  }
+  // Each round: lowest team total FOR THAT ROUND ONLY wins $12
+  // Overall: lowest cumulative team total across all completed rounds
+  // Penalty: CUT players in R3/R4 get +2 beyond worst active non-team score that round
 
   const roundDefs = [
-    { label: "R1", through: ["r1"] },
-    { label: "R2", through: ["r1","r2"] },
-    { label: "R3", through: ["r1","r2","r3"] },
-    { label: "R4", through: ["r1","r2","r3","r4"] },
+    { label: "R1", key: "r1" },
+    { label: "R2", key: "r2" },
+    { label: "R3", key: "r3" },
+    { label: "R4", key: "r4" },
   ];
 
-  // A round is payable once everyone has a score for that round key
-  function roundComplete(key) {
-    const entries = Object.values(scoreMap);
-    if (!entries.length) return false;
-    const active = entries.filter(p => !p.isCut && !p.isWD);
-    if (!active.length) return false;
-    return active.every(p => parseRelScore(p[key]) !== null);
-  }
-
-  roundDefs.forEach(({ label, through }) => {
-    const lastKey = through[through.length - 1];
-    if (!roundComplete(lastKey)) return; // only pay settled rounds
+  roundDefs.forEach(({ label, key }) => {
+    if (!isRoundComplete(key)) return;
 
     const totals = {};
-    CONFIG.bettors.forEach(b => { totals[b] = cumulativeTotal(b, through); });
+    CONFIG.bettors.forEach(b => { totals[b] = teamRoundTotal(b, key); });
     const valid = Object.values(totals).filter(n => n !== null);
     if (!valid.length) return;
 
@@ -784,12 +742,16 @@ function calcPoints() {
     winners.forEach(b => pts[b][label] = share);
   });
 
-  // Overall = cumulative through all completed rounds (same as R4 when final)
-  // Only pay when tournament is final (R4 complete)
+  // Overall: sum of all completed rounds, lowest team total wins
   if (isTournamentFinal()) {
     const overalls = {};
     CONFIG.bettors.forEach(b => {
-      overalls[b] = cumulativeTotal(b, ["r1","r2","r3","r4"]);
+      let total = 0, hasAny = false;
+      roundDefs.forEach(({ key }) => {
+        const v = teamRoundTotal(b, key);
+        if (v !== null) { total += v; hasAny = true; }
+      });
+      overalls[b] = hasAny ? total : null;
     });
     const validO = Object.values(overalls).filter(n => n !== null);
     if (validO.length) {
@@ -819,10 +781,8 @@ function calcPoints() {
     }
   }
 
-  // Net cash calculation
-  const completedRounds = roundDefs.filter(({ through }) =>
-    roundComplete(through[through.length - 1])
-  ).length;
+  // Net cash: earned minus buy-in ($12 per settled pot)
+  const completedRounds = roundDefs.filter(({ key }) => isRoundComplete(key)).length;
   const overallPot = isTournamentFinal() ? 1 : 0;
   const winnerPot  = isTournamentFinal() ? 1 : 0;
   const totalPots  = completedRounds + overallPot + winnerPot;
@@ -935,11 +895,10 @@ function renderScoreboard() {
     const overallFmt = fmtRel(overall);
     const overallCls = relClass(overall);
 
-    // Card shows cumulative totals (matches how round winners are determined)
     const r1t = teamRoundTotal(bettor, "r1");
-    const r2t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"); return (a!==null&&b!==null) ? a+b : null; })();
-    const r3t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"); return (a!==null&&b!==null&&c!==null) ? a+b+c : null; })();
-    const r4t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"), d = teamRoundTotal(bettor,"r4"); return (a!==null&&b!==null&&c!==null&&d!==null) ? a+b+c+d : null; })();
+    const r2t = teamRoundTotal(bettor, "r2");
+    const r3t = teamRoundTotal(bettor, "r3");
+    const r4t = teamRoundTotal(bettor, "r4");
 
     // Find best round across all bettors (for gold highlight)
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
@@ -1096,10 +1055,10 @@ function renderPoints() {
 
   let html = '<div class="pts-wrap"><table class="pts-table"><thead><tr>';
   html += `<th>Bettor</th>`;
-  html += roundHeader("Thru R1", r1done);
-  html += roundHeader("Thru R2", r2done);
-  html += roundHeader("Thru R3", r3done);
-  html += roundHeader("Thru R4", r4done);
+  html += roundHeader("R1", r1done);
+  html += roundHeader("R2", r2done);
+  html += roundHeader("R3", r3done);
+  html += roundHeader("R4", r4done);
   html += roundHeader("Overall", done);
   html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
@@ -1128,7 +1087,7 @@ function renderPoints() {
   // Status note
   const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
-    ${potsOpen}/6 pots settled &nbsp;·&nbsp; Winner = lowest cumulative team total through each round &nbsp;·&nbsp; $12/pot &nbsp;·&nbsp; ties split &nbsp;·&nbsp; bonus on final result
+    ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12 to lowest team total each round · Overall paid on final result · ties split evenly
   </p>`;
 
   el.innerHTML = html;
