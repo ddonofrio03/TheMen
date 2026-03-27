@@ -98,7 +98,7 @@ Masters2026 livescores
 GS 
 Does Claude have a safari extension?
 
-10:43 AM
+Mar 26
 Yes! Claude has a Safari extension called Claude in Chrome — though despite the name, it actually works across browsers including Safari. It's currently listed as a beta product.
 
 That said, I'd want to give you accurate current details rather than rely on my training data for something like this. Let me check the latest.
@@ -123,7 +123,7 @@ If you're primarily a Chrome user, the official Claude in Chrome extension is th
 
 OK, let's build a test run of this golf tracker.
 
-11:06 AM
+Mar 26
 Before I build it, I need to know what picks to load in — since the 2026 Masters field isn't set yet, do you want me to use your existing picks from the Valspar spreadsheet, or do you have new Masters picks ready?
 
 
@@ -132,7 +132,7 @@ xlsx
 
 Here is the list of players each of the 6 of us have
 
-11:07 AM
+Mar 26
 
 Read the Houston Open test spreadsheet
 Read the Houston Open test spreadsheet
@@ -143,8 +143,9 @@ Used 2 tools
 Used 2 tools
 Good — confirmed the Houston Open is live right now. I'll build the tracker as an artifact that calls the ESPN API directly to pull live scores.
 
+V
 
-
+Connecting to visualize...
 There's your live tracker. Three tabs:
 
 Picks — each bettor's 4 players with live scores, position, and thru holes. Best score highlighted per team.
@@ -154,7 +155,7 @@ It auto-refreshes every 5 minutes. Hit the "Refresh scores" button anytime for a
 
 So for the points we go by total score per round and then overall. Can you make me a live scoreboard that updates every 60 seconds and that I can store on GitHub?
 
-11:10 AM
+Mar 26
 Let me make sure I understand the scoring before building. Looking at your Valspar spreadsheet, it looked like points were awarded for the lowest team total each round (sum of all 4 picks), not just the best single pick. Can you confirm?
 
 Q: How is each round scored?
@@ -166,7 +167,7 @@ A: Sum of all 4 picks' cumulative scores (lowest team total)
 Q: What happens when picks miss the cut?
 A: The cut player's score is +2 of the worst score of the day that wasn't one of their team
 
-11:10 AM
+Mar 26
 Got it. Now I have everything I need. Let me build a clean, self-contained HTML file you can host on GitHub Pages.
 
 
@@ -199,13 +200,13 @@ Index
 Code · HTML 
 Ok, so change the "points" to "Cash Won". Does this refresh ever 60 seconds?
 
-11:15 AM
+Mar 26
 Quick answers first: yes, it does refresh every 60 seconds — there's a live countdown in the bar under the header. But let me fix the label and also confirm the cash amounts since your spreadsheet showed 12 points per category, not dollar amounts.
 
 Q: What is the cash value per category win?
 A: $12 per category (same as the points)
 
-11:15 AM
+Mar 26
 Got it. Simple label swap throughout — "Points" becomes "Cash Won" and values display as dollars.
 
 
@@ -227,7 +228,7 @@ Index
 Code · HTML 
 I am getting an error: "Error fetching scores: null is not an object (evaluating 'el.innerHTML = html')"
 
-11:19 AM
+Mar 26
 That error means one of the render functions is running before the tab's DOM element exists, or the id got mismatched when we renamed points to cash. Let me check the file and fix it.
 
 
@@ -251,7 +252,7 @@ Index
 Code · HTML 
 So don't count alternates into the score unless I tell you to. On the front tab what is the "PTS" total?
 
-11:32 AM
+Mar 26
 Good catches. The "Pts" showing in the round cells at the bottom of each bettor card is the cash won total — that's redundant since the score is already shown in the card header. I'll remove it and replace it with something more useful, and strip alts from all scoring logic.
 
 Let me ask one quick question first:
@@ -259,7 +260,7 @@ Let me ask one quick question first:
 Q: What should replace the 'Pts' cell in the round row at the bottom of each card?
 A: Cash won so far
 
-11:33 AM
+Mar 26
 Got it. Let me make both fixes cleanly.
 
 
@@ -283,7 +284,7 @@ Index
 Code · HTML 
 OK, so can you save this for future use, call it "GolfBet Template"
 
-11:36 AM
+Mar 26
 
 Used 3 tools
 Used 3 tools
@@ -295,7 +296,7 @@ eventName: "Masters Tournament",
 picks: { ... }              // new picks
 Oh so i had figures in the "cash won" section. I actually want you to be able to automatically calculate the winner each round with a equal bonus if the winner of the tournament is on a person's team. Can you calculate that in real time (at the end of each round)?
 
-11:40 AM
+Mar 26
 A few quick questions to make sure the math is right:
 
 Q: If two bettors tie for lowest team total in a round, how is the $12 split?
@@ -307,7 +308,7 @@ A: $12 bonus — same as a round win
 Q: When does the tournament winner bonus get awarded?
 A: Only after the tournament is officially final
 
-11:41 AM
+Mar 26
 Perfect, that's all I need. Let me rebuild the cash logic cleanly.
 
 
@@ -350,7 +351,7 @@ Index
 Code · HTML 
 OK cool, rename this template "GolfBets The Men"
 
-11:48 AM
+Mar 26
 
 Used 2 tools
 Used 2 tools
@@ -358,14 +359,14 @@ Done — saved as "GolfBets The Men."
 
 For each player in this can you add what hole they are on?
 
-1:15 PM
+Mar 26
 That's already being pulled from ESPN — the "Thru" field on each pick row shows it (e.g. "Thru 10"). But if you mean you want it displayed more prominently or as "Hole 10" instead of "Thru 10", I can reformat that. Or if the thru data isn't showing up for some players, that's a data availability issue from ESPN.
 
 What are you seeing on your end — is the thru info missing, or just not formatted the way you want?
 
 on my individual scoreboard i don't see that. how do i get it on that main scoreboard?
 
-3:20 PM
+Mar 26
 Got it — the pick detail line on each card shows position and thru, but it's pretty small and easy to miss. Let me make hole/thru info more visible on each pick row, and also add today's round score alongside it.
 
 
@@ -383,7 +384,7 @@ Code · HTML
 1774553109542_image.png
 So on the main scoreboard I am still not seeing it. Underneath each player's score for today please add "Thru Hole #" and "Overall". In this image I'd like to see what hole Tom Hoge has finished and what his overall score is
 
-3:25 PM
+Mar 26
 Got it — I can see the issue. The detail line under the name isn't rendering visibly enough. Let me restructure each pick row so hole and overall are clearly shown beneath the score.
 
 
@@ -400,7 +401,7 @@ Index
 Code · HTML 
 flip overall and today's score. I want today's score on top.
 
-3:26 PM
+Mar 26
 
 Edited 2 files, ran a command, read a file
 Edited 2 files, ran a command, read a file
@@ -413,7 +414,7 @@ Index
 Code · HTML 
 Go to https://ddonofrio03.github.io/TheMenHouston26/ it still isn't showing up
 
-3:27 PM
+Mar 26
 Let me fetch the live page to see what's actually rendering.
 
 
@@ -443,7 +444,7 @@ Upload the new index.html to your GitHub repo and it should show the hole/round 
 
 Continue
 
-3:32 PM
+Mar 26
 Let me reload your live site with the latest file to verify it's working — you'll need to push the new index.html to GitHub first, then I can check it.
 
 In the meantime, let me look at what the API is actually returning right now during Round 2 to make sure the hole detection will work.
@@ -474,7 +475,7 @@ Index
 Code · HTML 
 Getting this error now: "Error fetching scores: Can't find variable: isWD"
 
-3:36 PM
+Mar 26
 The error means isWD is being referenced in the render function before it's defined — it's a scoping issue where the render code runs outside the loop where isWD is declared. Let me find and fix it.
 
 
@@ -496,7 +497,7 @@ Index
 Code · HTML 
 In GitHub how do I find the public facing webpage once I make a repository public
 
-3:43 PM
+Mar 26
 Simple answer — once your repo is public and GitHub Pages is enabled, your URL is always:
 
 https://[your-username].github.io/[repo-name]/
@@ -512,7 +513,7 @@ GitHub will show you the live URL right there on that Pages settings screen once
 
 Can I create multiple pages in each repository?
 
-3:44 PM
+Mar 26
 Yes — a few different ways depending on what you want:
 
 Option 1: Multiple HTML files in one repo (simplest) Just add more .html files alongside index.html. Each gets its own URL automatically:
@@ -535,7 +536,7 @@ ddonofrio03.github.io/the-men-golf/masters → Masters tracker
 ddonofrio03.github.io/the-men-golf/houston → Houston Open
 Update the last code for preparation for the Masters, use the tournament ID: 401811941 and include a Masters Logo in the header
 
-8:14 PM
+Mar 26
 Let me first check what Masters logo assets are available online, then update the file.
 
 
@@ -626,6 +627,51 @@ Ran a command, read a file
 Upload this houston.html to your TheMen repo, replacing the existing file. The core fix is that this version reads today and thru directly from the nested linescores data instead of relying on the status object that ESPN doesn't return for this tournament. Round 2 scores should show up immediately once you push it.
 
 Houston
+Code · HTML 
+when you determine each Round's winner it is based on their R1 score then their R2 score, the R3, then R 4 then overall with a bonus for winner.
+
+3:31 PM
+Got it — so the round winner is determined by each bettor's cumulative team total through that round, not just that single round's score. So:
+
+R1 winner = lowest team total after Round 1
+R2 winner = lowest team total after Rounds 1+2
+R3 winner = lowest team total after Rounds 1+2+3
+R4 winner = lowest team total after all 4 rounds
+Overall = same as R4 (cumulative)
+Bonus = tournament winner on your team
+Let me fix calcPoints() and update both files.
+
+
+Ran 2 commands
+Ran 2 commands
+Good. Now also update the scoreboard card's round cells to show cumulative totals instead of per-round totals:
+
+
+Ran 2 commands
+Ran 2 commands
+Now update the Cash Won table headers to reflect cumulative meaning, and update the status note:
+
+
+Update Cash Won table headers and footer note
+Update Cash Won table headers and footer note
+Now generate both files:
+
+
+Ran a command, read a file
+Ran a command, read a file
+Both files are ready. The key scoring fix:
+
+Before (wrong): R2 winner = lowest single-round R2 score After (correct): R2 winner = lowest cumulative team total through R1+R2
+
+So the round columns in the Cash Won tab now show "Thru R1", "Thru R2", "Thru R3", "Thru R4" to make it clear these are cumulative. The card footer totals also show cumulative so they match exactly what determines the winner.
+
+Upload both to your TheMen repo:
+
+houston.html → ddonofrio03.github.io/TheMen/houston
+masters.html → ddonofrio03.github.io/TheMen/masters
+Houston
+Code · HTML 
+Masters
 Code · HTML 
 
 
@@ -1366,83 +1412,131 @@ function awardPot(winners, pot) {
 function calcPoints() {
   const pts = {};
   CONFIG.bettors.forEach(b => {
-    pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0, Total: 0,
-               R1locked: false, R2locked: false, R3locked: false, R4locked: false };
+    pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0,
+               Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
   });
  
+  // Cumulative team total through N rounds
+  // Each round winner = lowest cumulative total THROUGH that round
+  // R1 = R1 only, R2 = R1+R2, R3 = R1+R2+R3, R4 = R1+R2+R3+R4
+  function cumulativeTotal(bettor, throughRounds) {
+    const players = CONFIG.picks[bettor];
+    let total = 0;
+    let hasAny = false;
+ 
+    players.forEach(player => {
+      const info = scoreMap[player];
+      if (!info) return;
+ 
+      let playerTotal = 0;
+      let playerHasAny = false;
+ 
+      throughRounds.forEach(key => {
+        if (info.isCut || info.isWD) {
+          // CUT: use actual round scores they played + penalty for rounds after cut
+          const val = parseRelScore(info[key]);
+          if (val !== null) {
+            playerTotal += val;
+            playerHasAny = true;
+          } else {
+            // Round after cut — apply penalty
+            const pen = penaltyScore(key, players);
+            if (pen !== null) { playerTotal += pen; playerHasAny = true; }
+          }
+        } else {
+          const val = parseRelScore(info[key]);
+          if (val !== null) { playerTotal += val; playerHasAny = true; }
+        }
+      });
+ 
+      if (playerHasAny) { total += playerTotal; hasAny = true; }
+    });
+ 
+    return hasAny ? total : null;
+  }
+ 
   const roundDefs = [
-    { label: "R1", key: "r1" },
-    { label: "R2", key: "r2" },
-    { label: "R3", key: "r3" },
-    { label: "R4", key: "r4" },
+    { label: "R1", through: ["r1"] },
+    { label: "R2", through: ["r1","r2"] },
+    { label: "R3", through: ["r1","r2","r3"] },
+    { label: "R4", through: ["r1","r2","r3","r4"] },
   ];
  
-  roundDefs.forEach(({ label, key }) => {
-    if (!isRoundComplete(key)) return; // only pay out finished rounds
-    pts[CONFIG.bettors[0]][label + "locked"] !== undefined &&
-      CONFIG.bettors.forEach(b => pts[b][label + "locked"] = true);
+  // A round is payable once everyone has a score for that round key
+  function roundComplete(key) {
+    const entries = Object.values(scoreMap);
+    if (!entries.length) return false;
+    const active = entries.filter(p => !p.isCut && !p.isWD);
+    if (!active.length) return false;
+    return active.every(p => parseRelScore(p[key]) !== null);
+  }
+ 
+  roundDefs.forEach(({ label, through }) => {
+    const lastKey = through[through.length - 1];
+    if (!roundComplete(lastKey)) return; // only pay settled rounds
  
     const totals = {};
-    CONFIG.bettors.forEach(b => { totals[b] = teamRoundTotal(b, key); });
+    CONFIG.bettors.forEach(b => { totals[b] = cumulativeTotal(b, through); });
     const valid = Object.values(totals).filter(n => n !== null);
     if (!valid.length) return;
  
     const best = Math.min(...valid);
     const winners = CONFIG.bettors.filter(b => totals[b] === best);
-    const awards = awardPot(winners, CONFIG.points[label]);
-    CONFIG.bettors.forEach(b => { if (awards[b]) pts[b][label] = awards[b]; });
+    const share = Math.round((CONFIG.points[label] / winners.length) * 100) / 100;
+    winners.forEach(b => pts[b][label] = share);
   });
  
-  // Overall — only pay when tournament is final (R4 complete)
+  // Overall = cumulative through all completed rounds (same as R4 when final)
+  // Only pay when tournament is final (R4 complete)
   if (isTournamentFinal()) {
     const overalls = {};
-    CONFIG.bettors.forEach(b => { overalls[b] = teamOverallTotal(b); });
+    CONFIG.bettors.forEach(b => {
+      overalls[b] = cumulativeTotal(b, ["r1","r2","r3","r4"]);
+    });
     const validO = Object.values(overalls).filter(n => n !== null);
     if (validO.length) {
       const bestO = Math.min(...validO);
       const winnersO = CONFIG.bettors.filter(b => overalls[b] === bestO);
-      const awardsO = awardPot(winnersO, CONFIG.points.Overall);
-      CONFIG.bettors.forEach(b => { if (awardsO[b]) pts[b].Overall = awardsO[b]; });
+      const shareO = Math.round((CONFIG.points.Overall / winnersO.length) * 100) / 100;
+      winnersO.forEach(b => pts[b].Overall = shareO);
     }
  
-    // Tournament winner bonus — who has the R4 leader on their team?
-    // Find the player(s) at position "1" or lowest overall score
-    let tournWinner = null;
-    let lowestScore = null;
+    // Tournament winner bonus
+    let tournWinner = null, lowestScore = null;
     Object.entries(scoreMap).forEach(([name, info]) => {
       if (info.isCut || info.isWD) return;
       const s = parseRelScore(info.score);
       if (s !== null && (lowestScore === null || s < lowestScore)) {
-        lowestScore = s;
-        tournWinner = name;
+        lowestScore = s; tournWinner = name;
       }
     });
- 
     if (tournWinner) {
       const bettorsWithWinner = CONFIG.bettors.filter(b =>
         CONFIG.picks[b].includes(tournWinner)
       );
-      const awardsW = awardPot(bettorsWithWinner, CONFIG.points.Winner);
-      CONFIG.bettors.forEach(b => { if (awardsW[b]) pts[b].Winner = awardsW[b]; });
+      if (bettorsWithWinner.length) {
+        const shareW = Math.round((CONFIG.points.Winner / bettorsWithWinner.length) * 100) / 100;
+        bettorsWithWinner.forEach(b => pts[b].Winner = shareW);
+      }
     }
   }
  
-  // Net cash: earned minus buy-in per active category
-  // Each bettor pays $12 into each pot (R1-R4 + Overall + Winner = 6 pots max)
-  // Only count pots that have been paid out
-  const activePots = roundDefs.filter(({ key }) => isRoundComplete(key)).length;
+  // Net cash calculation
+  const completedRounds = roundDefs.filter(({ through }) =>
+    roundComplete(through[through.length - 1])
+  ).length;
   const overallPot = isTournamentFinal() ? 1 : 0;
   const winnerPot  = isTournamentFinal() ? 1 : 0;
-  const totalPots  = activePots + overallPot + winnerPot;
-  const buyIn      = totalPots * CONFIG.points.R1; // $12 per pot per bettor
+  const totalPots  = completedRounds + overallPot + winnerPot;
+  const buyIn      = totalPots * CONFIG.points.R1;
  
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
                    pts[b].Overall + pts[b].Winner;
     pts[b].Earned = earned;
     pts[b].BuyIn  = buyIn;
-    pts[b].Net    = earned - buyIn;
-    pts[b].Total  = earned; // keep Total as gross earned for sorting
+    pts[b].Net    = Math.round((earned - buyIn) * 100) / 100;
+    pts[b].Total  = earned;
   });
  
   return pts;
@@ -1543,10 +1637,11 @@ function renderScoreboard() {
     const overallFmt = fmtRel(overall);
     const overallCls = relClass(overall);
  
+    // Card shows cumulative totals (matches how round winners are determined)
     const r1t = teamRoundTotal(bettor, "r1");
-    const r2t = teamRoundTotal(bettor, "r2");
-    const r3t = teamRoundTotal(bettor, "r3");
-    const r4t = teamRoundTotal(bettor, "r4");
+    const r2t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"); return (a!==null&&b!==null) ? a+b : null; })();
+    const r3t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"); return (a!==null&&b!==null&&c!==null) ? a+b+c : null; })();
+    const r4t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"), d = teamRoundTotal(bettor,"r4"); return (a!==null&&b!==null&&c!==null&&d!==null) ? a+b+c+d : null; })();
  
     // Find best round across all bettors (for gold highlight)
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
@@ -1595,6 +1690,13 @@ function renderScoreboard() {
         if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
       }
  
+      // Today's round score is the primary display number
+      // Overall (cumulative) is the secondary line
+      const primaryVal  = isCut ? "CUT" : (isWD ? "WD" : (todayVal && todayVal !== "--" ? todayVal : "--"));
+      const primaryCls  = isCut ? "cut" : (isWD ? "cut" : todayCls);
+      const overallVal  = isCut ? "" : (isWD ? "" : (info.score && info.score !== "--" ? info.score + " overall" : ""));
+      const overallCls2 = relClass(parseRelScore(info.score));
+ 
       html += `<div class="pick-row${isCut ? " cut-row" : ""}">
         <span class="pick-num">${i+1}</span>
         <div class="pick-info">
@@ -1602,10 +1704,10 @@ function renderScoreboard() {
           <div class="pick-detail">${pos !== "--" ? pos : ""}</div>
         </div>
         <div style="text-align:right;min-width:70px">
-          <div class="pick-score ${todayCls}" style="display:block;margin-bottom:2px">${todayDisplay || scoreVal}</div>
+          <div class="pick-score ${primaryCls}" style="display:block;margin-bottom:2px">${primaryVal}</div>
           <div style="font-size:11px;font-family:'DM Mono',monospace;line-height:1.6">
             ${holeDisplay ? `<span style="color:var(--ink-mid)">${holeDisplay}</span><br>` : ""}
-            <span class="${cls}">${scoreVal} overall</span>
+            ${overallVal ? `<span class="${overallCls2}">${overallVal}</span>` : ""}
           </div>
         </div>
       </div>`;
@@ -1615,15 +1717,21 @@ function renderScoreboard() {
     const alt = CONFIG.alts[bettor];
     if (alt) {
       const ai = scoreMap[alt] || {};
-      const as = ai.isCut ? "CUT" : (ai.score || "--");
-      const ac = ai.isCut ? "cut" : relClass(parseRelScore(ai.score));
+      const altToday = ai.isCut ? "CUT" : (ai.today && ai.today !== "--" ? ai.today : "--");
+      const as = altToday;
+      const ac = ai.isCut ? "cut" : relClass(parseRelScore(ai.today));
+      const altOverall = ai.isCut ? "" : (ai.score && ai.score !== "--" ? ai.score + " overall" : "");
+      const altOverallCls = relClass(parseRelScore(ai.score));
       html += `<div class="pick-row" style="background:#fafaf9">
         <span class="pick-num" style="color:#bbb">A</span>
         <div class="pick-info">
           <div class="pick-name" style="color:var(--ink-light);font-size:12px">${alt} <span style="font-size:10px;background:#f0f0ee;padding:1px 5px;border-radius:3px">alt</span></div>
           <div class="pick-detail">${ai.pos || "--"} · ${ai.thru || "--"}</div>
         </div>
-        <span class="pick-score ${ac}" style="font-size:13px">${as}</span>
+        <div style="text-align:right;min-width:60px">
+          <span class="pick-score ${ac}" style="font-size:13px;display:block">${as}</span>
+          ${altOverall ? `<span style="font-size:11px;font-family:'DM Mono',monospace" class="${altOverallCls}">${altOverall}</span>` : ""}
+        </div>
       </div>`;
     }
  
@@ -1690,10 +1798,10 @@ function renderPoints() {
  
   let html = '<div class="pts-wrap"><table class="pts-table"><thead><tr>';
   html += `<th>Bettor</th>`;
-  html += roundHeader("R1", r1done);
-  html += roundHeader("R2", r2done);
-  html += roundHeader("R3", r3done);
-  html += roundHeader("R4", r4done);
+  html += roundHeader("Thru R1", r1done);
+  html += roundHeader("Thru R2", r2done);
+  html += roundHeader("Thru R3", r3done);
+  html += roundHeader("Thru R4", r4done);
   html += roundHeader("Overall", done);
   html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
@@ -1722,7 +1830,7 @@ function renderPoints() {
   // Status note
   const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
-    ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12/pot buy-in &nbsp;·&nbsp; ties split evenly &nbsp;·&nbsp; winner bonus paid on final results only
+    ${potsOpen}/6 pots settled &nbsp;·&nbsp; Winner = lowest cumulative team total through each round &nbsp;·&nbsp; $12/pot &nbsp;·&nbsp; ties split &nbsp;·&nbsp; bonus on final result
   </p>`;
  
   el.innerHTML = html;
