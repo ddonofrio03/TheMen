@@ -841,23 +841,40 @@ async function fetchScores() {
     const r3 = ls[2]?.displayValue || "--";
     const r4 = ls[3]?.displayValue || "--";
 
-    // Today = most recent round's to-par score
-    const currentRoundData = ls[ls.length - 1];
+    // Find the actual current round — last linescore that has a displayValue or hole data
+    // ESPN pre-creates empty future round slots, so we skip those
+    let currentRoundData = null;
+    for (let i = ls.length - 1; i >= 0; i--) {
+      const entry = ls[i];
+      if (entry && (entry.displayValue || (entry.linescores && entry.linescores.length > 0))) {
+        currentRoundData = entry;
+        break;
+      }
+    }
     const today = (isCut || isWD || !currentRoundData) ? "--" : (currentRoundData.displayValue || "--");
 
-    // Thru: count hole-by-hole entries inside the current round
+    // Thru: derived from hole-by-hole data inside the current round
+    // holes.length = number of holes completed by this player today
+    // If 0 holes: haven't started yet
+    // If 1-17 holes: currently playing, show hole number  
+    // If 18 holes: finished their round today
     let thru = "--";
     if (isCut || isWD) {
       thru = "CUT";
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
-      if (holes.length === 18) {
-        thru = "F";
-      } else if (holes.length > 0) {
-        thru = String(holes.length); // currently on this hole number
+      if (holes.length === 0) {
+        // No hole data — check if this is a completed prior round or not started
+        if (ls.length > 1) {
+          // Has multiple rounds — current round not started yet or no hole data
+          thru = "--";
+        } else {
+          thru = "--";
+        }
+      } else if (holes.length < 18) {
+        thru = String(holes.length); // on this hole right now
       } else {
-        // No hole data yet — round may not have started
-        thru = ls.length > 1 ? "F" : "--";
+        thru = "F"; // completed all 18 holes
       }
     }
 
