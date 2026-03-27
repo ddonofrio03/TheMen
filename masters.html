@@ -733,83 +733,131 @@ function awardPot(winners, pot) {
 function calcPoints() {
   const pts = {};
   CONFIG.bettors.forEach(b => {
-    pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0, Total: 0,
-               R1locked: false, R2locked: false, R3locked: false, R4locked: false };
+    pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0,
+               Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
   });
 
+  // Cumulative team total through N rounds
+  // Each round winner = lowest cumulative total THROUGH that round
+  // R1 = R1 only, R2 = R1+R2, R3 = R1+R2+R3, R4 = R1+R2+R3+R4
+  function cumulativeTotal(bettor, throughRounds) {
+    const players = CONFIG.picks[bettor];
+    let total = 0;
+    let hasAny = false;
+
+    players.forEach(player => {
+      const info = scoreMap[player];
+      if (!info) return;
+
+      let playerTotal = 0;
+      let playerHasAny = false;
+
+      throughRounds.forEach(key => {
+        if (info.isCut || info.isWD) {
+          // CUT: use actual round scores they played + penalty for rounds after cut
+          const val = parseRelScore(info[key]);
+          if (val !== null) {
+            playerTotal += val;
+            playerHasAny = true;
+          } else {
+            // Round after cut — apply penalty
+            const pen = penaltyScore(key, players);
+            if (pen !== null) { playerTotal += pen; playerHasAny = true; }
+          }
+        } else {
+          const val = parseRelScore(info[key]);
+          if (val !== null) { playerTotal += val; playerHasAny = true; }
+        }
+      });
+
+      if (playerHasAny) { total += playerTotal; hasAny = true; }
+    });
+
+    return hasAny ? total : null;
+  }
+
   const roundDefs = [
-    { label: "R1", key: "r1" },
-    { label: "R2", key: "r2" },
-    { label: "R3", key: "r3" },
-    { label: "R4", key: "r4" },
+    { label: "R1", through: ["r1"] },
+    { label: "R2", through: ["r1","r2"] },
+    { label: "R3", through: ["r1","r2","r3"] },
+    { label: "R4", through: ["r1","r2","r3","r4"] },
   ];
 
-  roundDefs.forEach(({ label, key }) => {
-    if (!isRoundComplete(key)) return; // only pay out finished rounds
-    pts[CONFIG.bettors[0]][label + "locked"] !== undefined &&
-      CONFIG.bettors.forEach(b => pts[b][label + "locked"] = true);
+  // A round is payable once everyone has a score for that round key
+  function roundComplete(key) {
+    const entries = Object.values(scoreMap);
+    if (!entries.length) return false;
+    const active = entries.filter(p => !p.isCut && !p.isWD);
+    if (!active.length) return false;
+    return active.every(p => parseRelScore(p[key]) !== null);
+  }
+
+  roundDefs.forEach(({ label, through }) => {
+    const lastKey = through[through.length - 1];
+    if (!roundComplete(lastKey)) return; // only pay settled rounds
 
     const totals = {};
-    CONFIG.bettors.forEach(b => { totals[b] = teamRoundTotal(b, key); });
+    CONFIG.bettors.forEach(b => { totals[b] = cumulativeTotal(b, through); });
     const valid = Object.values(totals).filter(n => n !== null);
     if (!valid.length) return;
 
     const best = Math.min(...valid);
     const winners = CONFIG.bettors.filter(b => totals[b] === best);
-    const awards = awardPot(winners, CONFIG.points[label]);
-    CONFIG.bettors.forEach(b => { if (awards[b]) pts[b][label] = awards[b]; });
+    const share = Math.round((CONFIG.points[label] / winners.length) * 100) / 100;
+    winners.forEach(b => pts[b][label] = share);
   });
 
-  // Overall — only pay when tournament is final (R4 complete)
+  // Overall = cumulative through all completed rounds (same as R4 when final)
+  // Only pay when tournament is final (R4 complete)
   if (isTournamentFinal()) {
     const overalls = {};
-    CONFIG.bettors.forEach(b => { overalls[b] = teamOverallTotal(b); });
+    CONFIG.bettors.forEach(b => {
+      overalls[b] = cumulativeTotal(b, ["r1","r2","r3","r4"]);
+    });
     const validO = Object.values(overalls).filter(n => n !== null);
     if (validO.length) {
       const bestO = Math.min(...validO);
       const winnersO = CONFIG.bettors.filter(b => overalls[b] === bestO);
-      const awardsO = awardPot(winnersO, CONFIG.points.Overall);
-      CONFIG.bettors.forEach(b => { if (awardsO[b]) pts[b].Overall = awardsO[b]; });
+      const shareO = Math.round((CONFIG.points.Overall / winnersO.length) * 100) / 100;
+      winnersO.forEach(b => pts[b].Overall = shareO);
     }
 
-    // Tournament winner bonus — who has the R4 leader on their team?
-    // Find the player(s) at position "1" or lowest overall score
-    let tournWinner = null;
-    let lowestScore = null;
+    // Tournament winner bonus
+    let tournWinner = null, lowestScore = null;
     Object.entries(scoreMap).forEach(([name, info]) => {
       if (info.isCut || info.isWD) return;
       const s = parseRelScore(info.score);
       if (s !== null && (lowestScore === null || s < lowestScore)) {
-        lowestScore = s;
-        tournWinner = name;
+        lowestScore = s; tournWinner = name;
       }
     });
-
     if (tournWinner) {
       const bettorsWithWinner = CONFIG.bettors.filter(b =>
         CONFIG.picks[b].includes(tournWinner)
       );
-      const awardsW = awardPot(bettorsWithWinner, CONFIG.points.Winner);
-      CONFIG.bettors.forEach(b => { if (awardsW[b]) pts[b].Winner = awardsW[b]; });
+      if (bettorsWithWinner.length) {
+        const shareW = Math.round((CONFIG.points.Winner / bettorsWithWinner.length) * 100) / 100;
+        bettorsWithWinner.forEach(b => pts[b].Winner = shareW);
+      }
     }
   }
 
-  // Net cash: earned minus buy-in per active category
-  // Each bettor pays $12 into each pot (R1-R4 + Overall + Winner = 6 pots max)
-  // Only count pots that have been paid out
-  const activePots = roundDefs.filter(({ key }) => isRoundComplete(key)).length;
+  // Net cash calculation
+  const completedRounds = roundDefs.filter(({ through }) =>
+    roundComplete(through[through.length - 1])
+  ).length;
   const overallPot = isTournamentFinal() ? 1 : 0;
   const winnerPot  = isTournamentFinal() ? 1 : 0;
-  const totalPots  = activePots + overallPot + winnerPot;
-  const buyIn      = totalPots * CONFIG.points.R1; // $12 per pot per bettor
+  const totalPots  = completedRounds + overallPot + winnerPot;
+  const buyIn      = totalPots * CONFIG.points.R1;
 
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
                    pts[b].Overall + pts[b].Winner;
     pts[b].Earned = earned;
     pts[b].BuyIn  = buyIn;
-    pts[b].Net    = earned - buyIn;
-    pts[b].Total  = earned; // keep Total as gross earned for sorting
+    pts[b].Net    = Math.round((earned - buyIn) * 100) / 100;
+    pts[b].Total  = earned;
   });
 
   return pts;
@@ -910,10 +958,11 @@ function renderScoreboard() {
     const overallFmt = fmtRel(overall);
     const overallCls = relClass(overall);
 
+    // Card shows cumulative totals (matches how round winners are determined)
     const r1t = teamRoundTotal(bettor, "r1");
-    const r2t = teamRoundTotal(bettor, "r2");
-    const r3t = teamRoundTotal(bettor, "r3");
-    const r4t = teamRoundTotal(bettor, "r4");
+    const r2t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"); return (a!==null&&b!==null) ? a+b : null; })();
+    const r3t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"); return (a!==null&&b!==null&&c!==null) ? a+b+c : null; })();
+    const r4t = (() => { const a = teamRoundTotal(bettor,"r1"), b = teamRoundTotal(bettor,"r2"), c = teamRoundTotal(bettor,"r3"), d = teamRoundTotal(bettor,"r4"); return (a!==null&&b!==null&&c!==null&&d!==null) ? a+b+c+d : null; })();
 
     // Find best round across all bettors (for gold highlight)
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
@@ -962,6 +1011,13 @@ function renderScoreboard() {
         if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
       }
 
+      // Today's round score is the primary display number
+      // Overall (cumulative) is the secondary line
+      const primaryVal  = isCut ? "CUT" : (isWD ? "WD" : (todayVal && todayVal !== "--" ? todayVal : "--"));
+      const primaryCls  = isCut ? "cut" : (isWD ? "cut" : todayCls);
+      const overallVal  = isCut ? "" : (isWD ? "" : (info.score && info.score !== "--" ? info.score + " overall" : ""));
+      const overallCls2 = relClass(parseRelScore(info.score));
+
       html += `<div class="pick-row${isCut ? " cut-row" : ""}">
         <span class="pick-num">${i+1}</span>
         <div class="pick-info">
@@ -969,10 +1025,10 @@ function renderScoreboard() {
           <div class="pick-detail">${pos !== "--" ? pos : ""}</div>
         </div>
         <div style="text-align:right;min-width:70px">
-          <div class="pick-score ${todayCls}" style="display:block;margin-bottom:2px">${todayDisplay || scoreVal}</div>
+          <div class="pick-score ${primaryCls}" style="display:block;margin-bottom:2px">${primaryVal}</div>
           <div style="font-size:11px;font-family:'DM Mono',monospace;line-height:1.6">
             ${holeDisplay ? `<span style="color:var(--ink-mid)">${holeDisplay}</span><br>` : ""}
-            <span class="${cls}">${scoreVal} overall</span>
+            ${overallVal ? `<span class="${overallCls2}">${overallVal}</span>` : ""}
           </div>
         </div>
       </div>`;
@@ -982,15 +1038,21 @@ function renderScoreboard() {
     const alt = CONFIG.alts[bettor];
     if (alt) {
       const ai = scoreMap[alt] || {};
-      const as = ai.isCut ? "CUT" : (ai.score || "--");
-      const ac = ai.isCut ? "cut" : relClass(parseRelScore(ai.score));
+      const altToday = ai.isCut ? "CUT" : (ai.today && ai.today !== "--" ? ai.today : "--");
+      const as = altToday;
+      const ac = ai.isCut ? "cut" : relClass(parseRelScore(ai.today));
+      const altOverall = ai.isCut ? "" : (ai.score && ai.score !== "--" ? ai.score + " overall" : "");
+      const altOverallCls = relClass(parseRelScore(ai.score));
       html += `<div class="pick-row" style="background:#fafaf9">
         <span class="pick-num" style="color:#bbb">A</span>
         <div class="pick-info">
           <div class="pick-name" style="color:var(--ink-light);font-size:12px">${alt} <span style="font-size:10px;background:#f0f0ee;padding:1px 5px;border-radius:3px">alt</span></div>
           <div class="pick-detail">${ai.pos || "--"} · ${ai.thru || "--"}</div>
         </div>
-        <span class="pick-score ${ac}" style="font-size:13px">${as}</span>
+        <div style="text-align:right;min-width:60px">
+          <span class="pick-score ${ac}" style="font-size:13px;display:block">${as}</span>
+          ${altOverall ? `<span style="font-size:11px;font-family:'DM Mono',monospace" class="${altOverallCls}">${altOverall}</span>` : ""}
+        </div>
       </div>`;
     }
 
@@ -1057,10 +1119,10 @@ function renderPoints() {
 
   let html = '<div class="pts-wrap"><table class="pts-table"><thead><tr>';
   html += `<th>Bettor</th>`;
-  html += roundHeader("R1", r1done);
-  html += roundHeader("R2", r2done);
-  html += roundHeader("R3", r3done);
-  html += roundHeader("R4", r4done);
+  html += roundHeader("Thru R1", r1done);
+  html += roundHeader("Thru R2", r2done);
+  html += roundHeader("Thru R3", r3done);
+  html += roundHeader("Thru R4", r4done);
   html += roundHeader("Overall", done);
   html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
@@ -1089,7 +1151,7 @@ function renderPoints() {
   // Status note
   const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
-    ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12/pot buy-in &nbsp;·&nbsp; ties split evenly &nbsp;·&nbsp; winner bonus paid on final results only
+    ${potsOpen}/6 pots settled &nbsp;·&nbsp; Winner = lowest cumulative team total through each round &nbsp;·&nbsp; $12/pot &nbsp;·&nbsp; ties split &nbsp;·&nbsp; bonus on final result
   </p>`;
 
   el.innerHTML = html;
