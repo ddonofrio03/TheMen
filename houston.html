@@ -691,11 +691,12 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  // Only check players who have started the tournament (have an R1 score or are active)
-  // Ignore players with no data at all (WD before tournament, missing entries)
+  // Only check players who have started the tournament (have R1 data)
   const relevant = entries.filter(p => !p.isCut && !p.isWD && p.r1 && p.r1 !== "--" && p.r1 !== "-");
   if (!relevant.length) return false;
-  return relevant.every(p => parseRelScore(p[roundKey]) !== null);
+  // A round is complete only when every active player has all 18 holes recorded
+  const holesKey = roundKey + "holes"; // e.g. "r2holes"
+  return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
 
 // Returns true if tournament is officially over:
@@ -840,6 +841,11 @@ async function fetchScores() {
     const r2 = ls[1]?.displayValue || "--";
     const r3 = ls[2]?.displayValue || "--";
     const r4 = ls[3]?.displayValue || "--";
+    // Store hole counts so isRoundComplete can check properly
+    const r1holes = ls[0]?.linescores?.length ?? 0;
+    const r2holes = ls[1]?.linescores?.length ?? 0;
+    const r3holes = ls[2]?.linescores?.length ?? 0;
+    const r4holes = ls[3]?.linescores?.length ?? 0;
 
     // Find the actual current round — last linescore that has a displayValue or hole data
     // ESPN pre-creates empty future round slots, so we skip those
@@ -881,7 +887,8 @@ async function fetchScores() {
     // Position from sort order (1-based)
     const pos = (isCut || isWD) ? "CUT" : String(idx + 1);
 
-    newMap[name] = { score, today, thru, pos, r1, r2, r3, r4, isCut, isWD };
+    newMap[name] = { score, today, thru, pos, r1, r2, r3, r4,
+                     r1holes, r2holes, r3holes, r4holes, isCut, isWD };
   });
 
   return newMap;
