@@ -781,12 +781,8 @@ function calcPoints() {
     }
   }
 
-  // Net cash: earned minus buy-in ($12 per settled pot)
-  const completedRounds = roundDefs.filter(({ key }) => isRoundComplete(key)).length;
-  const overallPot = isTournamentFinal() ? 1 : 0;
-  const winnerPot  = isTournamentFinal() ? 1 : 0;
-  const totalPots  = completedRounds + overallPot + winnerPot;
-  const buyIn      = totalPots * CONFIG.points.R1;
+  // Net cash: earned minus flat $12 buy-in for the whole tournament
+  const buyIn = CONFIG.points.R1; // $12 flat, paid once
 
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
@@ -891,8 +887,16 @@ function renderScoreboard() {
 
   sorted.forEach(bettor => {
     const picks   = CONFIG.picks[bettor];
-    const overall = teamOverallTotal(bettor);
-    const overallFmt = fmtRel(overall);
+    // Card header shows today's active round score
+    // Find the most recent round with data
+    const r1t_h = teamRoundTotal(bettor, "r1");
+    const r2t_h = teamRoundTotal(bettor, "r2");
+    const r3t_h = teamRoundTotal(bettor, "r3");
+    const r4t_h = teamRoundTotal(bettor, "r4");
+    const todayScore = r4t_h !== null ? r4t_h : r3t_h !== null ? r3t_h : r2t_h !== null ? r2t_h : r1t_h;
+    const todayRound = r4t_h !== null ? "R4" : r3t_h !== null ? "R3" : r2t_h !== null ? "R2" : "R1";
+    const overall = todayScore;
+    const overallFmt = todayScore !== null ? todayRound + " " + fmtRel(todayScore) : "--";
     const overallCls = relClass(overall);
 
     const r1t = teamRoundTotal(bettor, "r1");
@@ -1085,7 +1089,6 @@ function renderPoints() {
   html += '</tbody></table></div>';
 
   // Status note
-  const potsOpen = [r1done,r2done,r3done,r4done,done,done].filter(Boolean).length;
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
     ${potsOpen}/6 pots settled &nbsp;·&nbsp; $12 to lowest team total each round · Overall paid on final result · ties split evenly
   </p>`;
