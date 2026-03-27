@@ -522,8 +522,25 @@
   <div class="header-inner">
     <div class="wordmark">
       <span class="wordmark-title">The Men</span>
-      <span class="wordmark-event" id="event-name">Houston Open · Memorial Park</span>
-    </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-left:4px">
+        <!-- Masters-style logo: map + flag emblem -->
+        <svg width="36" height="36" viewBox="0 0 36 36" xmlns="https://zackprice.com/wp-content/uploads/2024/03/kisspng-2018-masters-tournament-augusta-national-golf-club-tcm-masters-5af16f9eac6a41.8148696115257721907062.jpg" style="flex-shrink:0">
+          <!-- Outer green circle -->
+          <circle cx="18" cy="18" r="17" fill="#1a5c2a" />
+          <!-- Yellow US map silhouette (simplified) -->
+          <path d="M6 13 L8 11 L11 11 L12 9 L15 9 L16 11 L18 10 L21 11 L23 10 L26 12 L28 14 L27 17 L29 19 L27 22 L24 23 L22 22 L20 24 L17 25 L14 24 L11 23 L9 21 L7 19 L6 16 Z" fill="#f0c040" />
+          <!-- Florida peninsula -->
+          <path d="M17 25 L16 27 L17 29 L18 27 L18 25 Z" fill="#f0c040" />
+          <!-- Golf flag at Georgia location -->
+          <line x1="21" y1="22" x2="21" y2="16" stroke="#1a5c2a" stroke-width="1.2"/>
+          <polygon points="21,16 25,17.5 21,19" fill="#cc2222"/>
+          <!-- White hole dot -->
+          <circle cx="21" cy="22" r="1.2" fill="white"/>
+        </svg>
+        <div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;color:#f0c040;line-height:1">THE MASTERS</div>
+          <div style="font-size:10px;color:#888;letter-spacing:1px;font-weight:300">Augusta National · Apr 9–12</div>
+        </div>
       </div>
     </div>
     <div class="header-right">
@@ -559,19 +576,24 @@
 // CONFIG — update picks here each tournament
 // ═══════════════════════════════════════════════
 const CONFIG = {
-  tournamentId: "401811930", // Houston Open (test) — swap for Masters: 401811941
-  eventName: "Houston Open",
+  tournamentId: "401811941", // Houston Open (test) — swap for Masters: 401811941
+  eventName: "Masters Tournament",
   bettors: ["Dave","TJ","Billy","Nick","Ry","Alex"],
   picks: {
-    Dave:  ["Jason Day",      "Chad Ramey",      "Nick Dunlap",    "Andrew Putnam"],
-    TJ:    ["Chris Gotterup", "Wyndham Clark",   "Sam Burns",      "Harry Hall"],
-    Billy: ["Tom Hoge",       "Jackson Suber",   "Chris Kirk",     "Jhonattan Vegas"],
-    Nick:  ["Danny Willett",  "Michael Brennan", "Jeffrey Kang",   "Adrien Saddier"],
-    Ry:    ["Rickie Fowler",  "Shane Lowry",     "Brian Campbell", "Casey Russell"],
-    Alex:  ["Kurt Kitayama",  "Marco Penge",     "Dan Brown",      "Lee Hodges"]
+    Dave:  ["Scottie Scheffler", "Tommy Fleetwood",   "Cameron Smith",    "Tom Kim"],
+    TJ:    ["Ludvig Aberg",      "Xander Schauffele", "Jordan Spieth",    "Patrick Cantlay"],
+    Billy: ["Rory McIlroy",      "Hideki Matsuyama",  "Brian Harman",     "Wyndham Clark"],
+    Nick:  ["Collin Morikawa",   "Justin Thomas",     "Joaquin Niemann",  "Shane Lowry"],
+    Ry:    ["Bryson DeChambeau", "Jon Rahm",          "Viktor Hovland",   "Tyrrell Hatton"],
+    Alex:  ["Brooks Koepka",     "Sahith Theegala",   "Will Zalatoris",   "Tony Finau"]
   },
   alts: {
-    Dave: "Min Woo Lee"
+    Dave:  "Min Woo Lee",
+    TJ:    "Max Homa",
+    Billy: "Lucas Glover",
+    Nick:  "Robert MacIntyre",
+    Ry:    "Russell Henley",
+    Alex:  "Keegan Bradley"
   },
   // Points per category (winner takes all, ties split)
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
@@ -735,18 +757,17 @@ function calcPoints() {
         const actual = parseRelScore(info[key]);
 
         if (actual !== null) {
-          // Player has a real score for this round — always use it
+          // Player has a real score — always use it
           total += actual;
           hasAny = true;
         } else if ((info.isCut || info.isWD) && penaltyRounds.has(key)) {
-          // CUT/WD player, round is R3 or R4 — apply penalty
+          // CUT/WD player in R3 or R4 — apply penalty
           const pen = penaltyScore(key, players);
           if (pen !== null) {
             total += pen;
             hasAny = true;
           }
         }
-        // If active player has no score yet for this round, skip (round not complete)
       });
     });
 
