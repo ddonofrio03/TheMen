@@ -626,8 +626,8 @@
 <div class="tabs-wrap">
   <div class="tabs">
     <button class="tab active" onclick="showTab('scoreboard')">Scoreboard</button>
-    <button class="tab" onclick="showTab('cash')">Cash Won</button>
     <button class="tab" onclick="showTab('teamscores')">Team Scores</button>
+    <button class="tab" onclick="showTab('cash')">Cash Won</button>
     <button class="tab" onclick="showTab('leaderboard')">Full Field</button>
   </div>
 </div>
@@ -766,7 +766,7 @@ function teamRoundTotal(bettor, roundKey) {
   return hasAny ? total : null;
 }
 
-// Team overall total: sum of cumulative to-par scores, CUT = penalty
+// Team overall total: sum of all rounds including penalties for CUT players
 function teamOverallTotal(bettor) {
   const players = CONFIG.picks[bettor];
   let total = 0;
@@ -775,12 +775,18 @@ function teamOverallTotal(bettor) {
   players.forEach(player => {
     const info = scoreMap[player];
     if (!info) return;
+
     if (info.isCut || info.isWD) {
-      // Use R1+R2 actual scores + penalty for rounds played on cut day
+      // R1+R2: use actual scores
       const r1 = parseRelScore(info.r1);
       const r2 = parseRelScore(info.r2);
       if (r1 !== null) { total += r1; hasAny = true; }
       if (r2 !== null) { total += r2; hasAny = true; }
+      // R3+R4: add penalty if those rounds have started
+      const r3started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
+      const r4started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
+      if (r3started) { const p = penaltyScore("r3", players); if (p !== null) { total += p; hasAny = true; } }
+      if (r4started) { const p = penaltyScore("r4", players); if (p !== null) { total += p; hasAny = true; } }
     } else {
       const val = parseRelScore(info.score);
       if (val !== null) { total += val; hasAny = true; }
@@ -1314,11 +1320,11 @@ function renderTeamScores() {
         ? (r4pen !== null ? `<span style='color:#c0392b;font-weight:500'>${fmtRel(r4pen)}</span><span style='color:var(--cut);font-size:10px;margin-left:3px'>pen</span>` : "<span style='color:var(--cut)'>--</span>")
         : (info.r4 || "--");
 
-      // Player total: for CUT players use R1+R2 only
+      // Player total: actual scores for R1+R2, penalty scores for R3/R4 if CUT
       const r1v = parseRelScore(info.r1);
       const r2v = parseRelScore(info.r2);
-      const r3v = isCut ? null : parseRelScore(info.r3);
-      const r4v = isCut ? null : parseRelScore(info.r4);
+      const r3v = isCut ? r3pen : parseRelScore(info.r3);
+      const r4v = isCut ? r4pen : parseRelScore(info.r4);
       const scores = [r1v, r2v, r3v, r4v].filter(v => v !== null);
       const playerTotal = scores.length ? scores.reduce((a,b) => a+b, 0) : null;
       const totalFmt = playerTotal !== null ? fmtRel(playerTotal) + (isCut ? `<br><span style="font-size:10px;color:#b03030">cut</span>` : "") : "--";
