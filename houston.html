@@ -423,6 +423,88 @@
   .rank-3 { background: #fdf0ee; color: #b0634a; }
   .rank-n { background: var(--surface); color: var(--ink-light); }
 
+  /* ── TEAM SCORES ── */
+  .ts-wrap {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .ts-bettor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .ts-bettor-name {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  .ts-bettor-total {
+    font-family: 'DM Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: #aaa;
+  }
+
+  .ts-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    table-layout: fixed;
+  }
+
+  .ts-table th {
+    padding: 8px 12px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--ink-light);
+    background: #f5f5f2;
+    border-bottom: 1px solid var(--border);
+    text-align: right;
+  }
+
+  .ts-table th:first-child { text-align: left; width: 35%; }
+  .ts-table th:last-child { background: #eeeee8; }
+
+  .ts-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid #f0f0ec;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    text-align: right;
+    color: var(--ink-mid);
+  }
+
+  .ts-table td:first-child {
+    text-align: left;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    color: var(--ink);
+    font-size: 13px;
+  }
+
+  .ts-table tr:last-child td { border-bottom: none; }
+  .ts-table tr.ts-totals td {
+    background: #f5f5f2;
+    font-weight: 600;
+    border-top: 2px solid var(--border);
+    border-bottom: none;
+  }
+  .ts-table tr.ts-totals td:first-child { color: var(--ink-mid); }
+  .ts-table td.ts-total-col { background: #eeeee8; font-weight: 600; }
+  .ts-table th.ts-total-col { background: #eeeee8; }
+  .ts-table tr.cut-row td:first-child { color: #b03030; }
+
   /* ── LEADERBOARD ── */
   .lb-wrap {
     background: var(--white);
@@ -545,6 +627,7 @@
   <div class="tabs">
     <button class="tab active" onclick="showTab('scoreboard')">Scoreboard</button>
     <button class="tab" onclick="showTab('cash')">Cash Won</button>
+    <button class="tab" onclick="showTab('teamscores')">Team Scores</button>
     <button class="tab" onclick="showTab('leaderboard')">Full Field</button>
   </div>
 </div>
@@ -554,6 +637,7 @@
 
   <div id="scoreboard" class="section active"></div>
   <div id="cash" class="section"></div>
+  <div id="teamscores" class="section"></div>
   <div id="leaderboard" class="section"></div>
 </main>
 
@@ -1154,6 +1238,86 @@ function renderPoints() {
 }
 
 // ═══════════════════════════════════════════════
+// RENDER TEAM SCORES
+// ═══════════════════════════════════════════════
+function renderTeamScores() {
+  const el = document.getElementById("teamscores");
+  if (!el) return;
+
+  let html = "";
+
+  CONFIG.bettors.forEach(bettor => {
+    const picks = CONFIG.picks[bettor];
+    const r1t = teamRoundTotal(bettor, "r1");
+    const r2t = teamRoundTotal(bettor, "r2");
+    const r3t = teamRoundTotal(bettor, "r3");
+    const r4t = teamRoundTotal(bettor, "r4");
+
+    // Overall = sum of completed rounds
+    let overallParts = [r1t, r2t, r3t, r4t].filter(v => v !== null);
+    const overall = overallParts.length ? overallParts.reduce((a,b) => a+b, 0) : null;
+
+    html += `<div class="ts-wrap">
+      <div class="ts-bettor-header">
+        <span class="ts-bettor-name">${bettor}</span>
+        <span class="ts-bettor-total">${overall !== null ? fmtRel(overall) + " overall" : "--"}</span>
+      </div>
+      <table class="ts-table">
+        <thead><tr>
+          <th>Player</th>
+          <th>R1</th><th>R2</th><th>R3</th><th>R4</th>
+          <th class="ts-total-col">Total</th>
+        </tr></thead>
+        <tbody>`;
+
+    picks.forEach(player => {
+      const info = scoreMap[player] || {};
+      const isCut = info.isCut || info.isWD;
+      const r1 = info.r1 || "--";
+      const r2 = info.r2 || "--";
+      const r3 = isCut ? (info.r3 && info.r3 !== "--" ? info.r3 : "<span style='color:var(--cut);font-size:11px'>CUT</span>") : (info.r3 || "--");
+      const r4 = isCut ? "<span style='color:var(--cut);font-size:11px'>CUT</span>" : (info.r4 || "--");
+
+      // Player total: sum of available round scores
+      const scores = [info.r1, info.r2, info.r3, info.r4]
+        .map(v => parseRelScore(v))
+        .filter(v => v !== null);
+      const playerTotal = scores.length ? scores.reduce((a,b) => a+b, 0) : null;
+      const totalFmt = playerTotal !== null ? fmtRel(playerTotal) : "--";
+      const totalCls = relClass(playerTotal);
+
+      const r1c = relClass(parseRelScore(info.r1));
+      const r2c = relClass(parseRelScore(info.r2));
+      const r3c = isCut ? "" : relClass(parseRelScore(info.r3));
+      const r4c = isCut ? "" : relClass(parseRelScore(info.r4));
+
+      html += `<tr class="${isCut ? "cut-row" : ""}">
+        <td>${player}${isCut ? ' <span style="font-size:10px;color:#b03030">CUT</span>' : ""}</td>
+        <td class="${r1c}">${r1}</td>
+        <td class="${r2c}">${r2}</td>
+        <td>${r3}</td>
+        <td>${r4}</td>
+        <td class="ts-total-col ${totalCls}">${totalFmt}</td>
+      </tr>`;
+    });
+
+    // Totals row
+    html += `<tr class="ts-totals">
+      <td>Team Total</td>
+      <td class="${relClass(r1t)}">${r1t !== null ? fmtRel(r1t) : "--"}</td>
+      <td class="${relClass(r2t)}">${r2t !== null ? fmtRel(r2t) : "--"}</td>
+      <td class="${relClass(r3t)}">${r3t !== null ? fmtRel(r3t) : "--"}</td>
+      <td class="${relClass(r4t)}">${r4t !== null ? fmtRel(r4t) : "--"}</td>
+      <td class="ts-total-col ${relClass(overall)}">${overall !== null ? fmtRel(overall) : "--"}</td>
+    </tr>`;
+
+    html += `</tbody></table></div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════
 // RENDER FULL FIELD
 // ═══════════════════════════════════════════════
 function renderLeaderboard() {
@@ -1216,6 +1380,7 @@ async function refresh() {
     scoreMap = await fetchScores();
     renderScoreboard();
     renderPoints();
+    renderTeamScores();
     renderLeaderboard();
     const now = new Date();
     document.getElementById("last-update").textContent =
