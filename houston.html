@@ -1102,19 +1102,23 @@ function renderScoreboard() {
         if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
       }
 
-      // Today's round score is the primary display number
-      // Overall (cumulative) is the secondary line
-      // For CUT players: show their R1+R2 total clearly labeled
-      let cutScoreDisplay = "";
+      // For CUT players: show their penalty score for the current/most recent round
+      // This is the score being used in the team total calculation
+      let cutPenaltyDisplay = "";
+      let cutPenaltyCls = "over";
       if (isCut) {
-        const r1v = parseRelScore(info.r1);
-        const r2v = parseRelScore(info.r2);
-        const cutTotal = (r1v !== null && r2v !== null) ? r1v + r2v
-                       : (r1v !== null ? r1v : (r2v !== null ? r2v : null));
-        cutScoreDisplay = cutTotal !== null ? fmtRel(cutTotal) : "--";
+        // Only show penalty for rounds that have actually started
+        // A round has started if any active player has a score for it
+        const r4started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
+        const r3started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
+        const pen = r4started ? penaltyScore("r4", picks)
+                  : r3started ? penaltyScore("r3", picks)
+                  : null;
+        cutPenaltyDisplay = pen !== null ? fmtRel(pen) : "--";
+        cutPenaltyCls = pen !== null ? relClass(pen) : "cut";
       }
-      const primaryVal  = isCut ? "CUT" : (isWD ? "WD" : (todayVal && todayVal !== "--" ? todayVal : "--"));
-      const primaryCls  = isCut ? "cut" : (isWD ? "cut" : todayCls);
+      const primaryVal  = isCut ? cutPenaltyDisplay : (isWD ? "WD" : (todayVal && todayVal !== "--" ? todayVal : "--"));
+      const primaryCls  = isCut ? cutPenaltyCls : (isWD ? "cut" : todayCls);
       const overallVal  = isCut ? "" : (isWD ? "" : (info.score && info.score !== "--" ? info.score + " overall" : ""));
       const overallCls2 = relClass(parseRelScore(info.score));
 
@@ -1127,7 +1131,7 @@ function renderScoreboard() {
         <div style="text-align:right;min-width:70px">
           <div class="pick-score ${primaryCls}" style="display:block;margin-bottom:2px">${primaryVal}</div>
           <div style="font-size:11px;font-family:'DM Mono',monospace;line-height:1.6">
-            ${isCut && cutScoreDisplay ? `<span style="color:#b03030;font-weight:500">${cutScoreDisplay}</span><br><span style="color:var(--cut);font-size:10px">36-hole score</span>` : ""}
+            ${isCut ? `<span style="color:var(--cut);font-size:10px">penalty</span>` : ""}
             ${!isCut && holeDisplay ? `<span style="color:var(--ink-mid)">${holeDisplay}</span><br>` : ""}
             ${!isCut && overallVal ? `<span class="${overallCls2}">${overallVal}</span>` : ""}
           </div>
@@ -1298,8 +1302,17 @@ function renderTeamScores() {
       const r1 = info.r1 || "--";
       const r2 = info.r2 || "--";
       // CUT players: show actual R1+R2 scores, then CUT badge for R3/R4
-      const r3disp = isCut ? "<span style='color:#b03030;font-size:11px;font-weight:500'>✂ CUT</span>" : (info.r3 || "--");
-      const r4disp = isCut ? "<span style='color:#b03030;font-size:11px;font-weight:500'>✂ CUT</span>" : (info.r4 || "--");
+      // CUT players: show penalty score only for rounds that have started
+      const r3hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
+      const r4hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
+      const r3pen = (isCut && r3hasStarted) ? penaltyScore("r3", players) : null;
+      const r4pen = (isCut && r4hasStarted) ? penaltyScore("r4", players) : null;
+      const r3disp = isCut
+        ? (r3pen !== null ? `<span style='color:#c0392b;font-weight:500'>${fmtRel(r3pen)}</span><span style='color:var(--cut);font-size:10px;margin-left:3px'>pen</span>` : "<span style='color:var(--cut)'>--</span>")
+        : (info.r3 || "--");
+      const r4disp = isCut
+        ? (r4pen !== null ? `<span style='color:#c0392b;font-weight:500'>${fmtRel(r4pen)}</span><span style='color:var(--cut);font-size:10px;margin-left:3px'>pen</span>` : "<span style='color:var(--cut)'>--</span>")
+        : (info.r4 || "--");
 
       // Player total: for CUT players use R1+R2 only
       const r1v = parseRelScore(info.r1);
