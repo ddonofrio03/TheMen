@@ -1305,8 +1305,8 @@ function renderTeamScores() {
       // CUT players: show penalty score only for rounds that have started
       const r3hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
       const r4hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
-      const r3pen = (isCut && r3hasStarted) ? penaltyScore("r3", players) : null;
-      const r4pen = (isCut && r4hasStarted) ? penaltyScore("r4", players) : null;
+      const r3pen = (isCut && r3hasStarted) ? penaltyScore("r3", picks) : null;
+      const r4pen = (isCut && r4hasStarted) ? penaltyScore("r4", picks) : null;
       const r3disp = isCut
         ? (r3pen !== null ? `<span style='color:#c0392b;font-weight:500'>${fmtRel(r3pen)}</span><span style='color:var(--cut);font-size:10px;margin-left:3px'>pen</span>` : "<span style='color:var(--cut)'>--</span>")
         : (info.r3 || "--");
