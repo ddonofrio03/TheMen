@@ -1,62 +1,699 @@
-# 🏌️ The Men ⛳
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Men — Golf Bets</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green-deep: #0a2e1a;
+    --green-rich: #0d4a2a;
+    --green-mid: #1a6b3a;
+    --green-bright: #2d9a52;
+    --green-pale: #e8f5ee;
+    --gold: #c8a44e;
+    --gold-light: #e8d48a;
+    --gold-dim: #8a7030;
+    --cream: #f5f0e6;
+    --cream-dark: #e8dfd0;
+    --ink: #1a1a14;
+    --ink-mid: #4a4a40;
+    --white: #fefefe;
+    --red-accent: #c44040;
+  }
 
-**Welcome to the 19th Hole of the Internet.**
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
-This is the official, highly unofficial, repository for our golf bets. No mulligans. No foot wedges. All receipts.
+  html { scroll-behavior: smooth; }
 
----
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--green-deep);
+    color: var(--cream);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
 
-## The Roster
+  /* ══════════════════════════════════
+     BACKGROUND TEXTURE & ATMOSPHERE
+     ══════════════════════════════════ */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 20% 10%, rgba(45,154,82,0.12) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 80%, rgba(200,164,78,0.06) 0%, transparent 50%),
+      radial-gradient(ellipse 100% 100% at 50% 50%, rgba(10,46,26,1) 0%, rgba(6,20,12,1) 100%);
+    z-index: -2;
+  }
 
-| Player | Status |
-|--------|--------|
-| 🏌️ **Nick** | Dues paid in shanks |
-| 🏌️ **Alex** | Probably already pressed |
-| 🏌️ **Ryan** | Claims he "had it going on the range" |
-| 🏌️ **TJ** | Dangerous with a putter and a grudge |
-| 🏌️ **Billy** | Will bet on anything, including this sentence |
-| 🏌️ **Dave** | Keeping it in the short grass (14 hdcp, allegedly) |
+  /* Subtle noise grain */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+    z-index: -1;
+    pointer-events: none;
+  }
 
----
+  /* ══════════════════════════════════
+     HERO SECTION
+     ══════════════════════════════════ */
+  .hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px;
+    text-align: center;
+  }
 
-## 🏆 Active Tournaments
+  /* Decorative top border */
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
 
-| Tournament | Link |
-|------------|------|
-| 🤠 **The Houston Open** | [Place Your Bets](https://ddonofrio03.github.io/TheMen/houston.html) |
-| 🌺 **The Masters** | [Place Your Bets](https://ddonofrio03.github.io/TheMen/masters.html) |
+  /* Golf course horizon line */
+  .course-horizon {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 200px;
+    overflow: hidden;
+    pointer-events: none;
+  }
 
----
+  .course-horizon svg {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 200px;
+  }
 
-## House Rules
+  /* ── Animated flag ── */
+  .hero-flag {
+    margin-bottom: 40px;
+    animation: flagIn 1s ease-out 0.2s both;
+  }
 
-1. **All bets are final.** This isn't the first tee where you renegotiate after seeing someone's warm-up swing.
-2. **Pay up promptly.** Venmo, cash, or public shame. Your choice.
-3. **Sandbaggers will be prosecuted.** You know who you are.
-4. **The group chat is sacred.** What happens in The Men stays in The Men.
-5. **If you throw a club, you owe everyone a round.**
+  @keyframes flagIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
----
+  .flag-svg { filter: drop-shadow(0 4px 20px rgba(200,164,78,0.3)); }
 
-## Repo Structure (Coming Soon)
+  /* Flag wave animation */
+  .flag-wave {
+    animation: wave 3s ease-in-out infinite;
+    transform-origin: 0% 50%;
+  }
 
-```
-the-men/
-├── bets/           # Active wagers
-├── results/        # Scorecard receipts
-├── standings/      # Season leaderboard
-├── hall-of-shame/  # Worst rounds on record
-└── README.md       # You are here
-```
+  @keyframes wave {
+    0%, 100% { transform: skewY(0deg) scaleX(1); }
+    25%      { transform: skewY(-1.5deg) scaleX(1.02); }
+    75%      { transform: skewY(1deg) scaleX(0.99); }
+  }
 
----
+  /* ── Title ── */
+  .hero-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(56px, 10vw, 120px);
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 0.9;
+    color: var(--cream);
+    margin-bottom: 16px;
+    animation: titleIn 0.8s ease-out 0.4s both;
+    text-shadow: 0 2px 40px rgba(0,0,0,0.4);
+  }
 
-## The Oath
+  @keyframes titleIn {
+    from { opacity: 0; transform: translateY(30px) scale(0.95); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
 
-> I solemnly swear to play it as it lies, post my real score, honor all bets, and never *ever* claim I "wasn't really trying" after losing a nassau.
+  .hero-subtitle {
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 48px;
+    animation: subIn 0.8s ease-out 0.6s both;
+  }
 
----
+  @keyframes subIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-*"Golf is a good walk spoiled by lies about your handicap."*
+  .hero-tagline {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: rgba(245,240,230,0.5);
+    margin-bottom: 60px;
+    animation: subIn 0.8s ease-out 0.7s both;
+  }
 
-⛳ Now push your commits and pay your debts. ⛳
+  /* ══════════════════════════════════
+     TOURNAMENT CARDS
+     ══════════════════════════════════ */
+  .tournaments {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 800px;
+    animation: cardsIn 0.8s ease-out 0.9s both;
+  }
+
+  @keyframes cardsIn {
+    from { opacity: 0; transform: translateY(40px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .tourney-card {
+    position: relative;
+    flex: 1 1 340px;
+    max-width: 380px;
+    background: linear-gradient(145deg, rgba(20,60,35,0.8) 0%, rgba(10,35,18,0.95) 100%);
+    border: 1px solid rgba(200,164,78,0.15);
+    border-radius: 16px;
+    padding: 32px 28px 28px;
+    text-decoration: none;
+    color: var(--cream);
+    transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    cursor: pointer;
+    backdrop-filter: blur(10px);
+  }
+
+  .tourney-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(200,164,78,0.08) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity 0.35s;
+  }
+
+  .tourney-card:hover {
+    transform: translateY(-6px);
+    border-color: rgba(200,164,78,0.4);
+    box-shadow:
+      0 20px 60px rgba(0,0,0,0.4),
+      0 0 40px rgba(200,164,78,0.08),
+      inset 0 1px 0 rgba(200,164,78,0.15);
+  }
+
+  .tourney-card:hover::before { opacity: 1; }
+
+  .card-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .card-icon svg {
+    position: relative;
+    z-index: 1;
+  }
+
+  .card-icon-houston {
+    background: linear-gradient(135deg, #1a3a5c 0%, #0d2440 100%);
+    box-shadow: 0 4px 16px rgba(13,36,64,0.5);
+  }
+
+  .card-icon-masters {
+    background: linear-gradient(135deg, #1a6b3a 0%, #0a4a2a 100%);
+    box-shadow: 0 4px 16px rgba(10,74,42,0.5);
+  }
+
+  .card-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .status-live {
+    background: rgba(45,154,82,0.15);
+    color: var(--green-bright);
+    border: 1px solid rgba(45,154,82,0.3);
+  }
+
+  .status-live::before {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green-bright);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .status-upcoming {
+    background: rgba(200,164,78,0.1);
+    color: var(--gold);
+    border: 1px solid rgba(200,164,78,0.25);
+  }
+
+  .status-complete {
+    background: rgba(245,240,230,0.06);
+    color: rgba(245,240,230,0.4);
+    border: 1px solid rgba(245,240,230,0.1);
+  }
+
+  .card-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.1;
+    margin-bottom: 6px;
+  }
+
+  .card-venue {
+    font-size: 13px;
+    font-weight: 300;
+    color: rgba(245,240,230,0.45);
+    margin-bottom: 16px;
+  }
+
+  .card-dates {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--gold-dim);
+    letter-spacing: 0.5px;
+    margin-bottom: 20px;
+  }
+
+  .card-arrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--gold);
+    opacity: 0.6;
+    transition: all 0.3s;
+  }
+
+  .tourney-card:hover .card-arrow {
+    opacity: 1;
+    gap: 12px;
+  }
+
+  .card-arrow svg {
+    transition: transform 0.3s;
+  }
+
+  .tourney-card:hover .card-arrow svg {
+    transform: translateX(4px);
+  }
+
+  /* ══════════════════════════════════
+     ROSTER SECTION
+     ══════════════════════════════════ */
+  .roster-section {
+    position: relative;
+    padding: 80px 24px 100px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .roster-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.4;
+  }
+
+  .roster-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold-dim);
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  .roster-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 700;
+    text-align: center;
+    color: var(--cream);
+    margin-bottom: 48px;
+  }
+
+  .roster-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .member-card {
+    position: relative;
+    padding: 24px 20px;
+    background: linear-gradient(145deg, rgba(20,55,35,0.6) 0%, rgba(10,30,18,0.8) 100%);
+    border: 1px solid rgba(200,164,78,0.08);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s;
+  }
+
+  .member-card:hover {
+    border-color: rgba(200,164,78,0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  }
+
+  .member-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    margin: 0 auto 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--white);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .member-avatar::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.15);
+  }
+
+  .member-name {
+    font-family: 'Outfit', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cream);
+    margin-bottom: 4px;
+  }
+
+  .member-quip {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(245,240,230,0.35);
+    line-height: 1.4;
+  }
+
+  /* ══════════════════════════════════
+     RULES / FOOTER
+     ══════════════════════════════════ */
+  .rules-section {
+    padding: 60px 24px;
+    max-width: 700px;
+    margin: 0 auto;
+    text-align: center;
+  }
+
+  .rules-section::before {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.3;
+    margin: 0 auto 40px;
+  }
+
+  .rules-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: 20px;
+    line-height: 1.6;
+    color: rgba(245,240,230,0.5);
+    margin-bottom: 40px;
+  }
+
+  .rules-list {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px 24px;
+    margin-bottom: 48px;
+  }
+
+  .rules-list li {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: rgba(245,240,230,0.3);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .rules-list li::before {
+    content: '⛳';
+    font-size: 10px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 40px 24px 30px;
+    border-top: 1px solid rgba(200,164,78,0.08);
+  }
+
+  .footer-text {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: rgba(245,240,230,0.2);
+    letter-spacing: 1px;
+  }
+
+  /* ══════════════════════════════════
+     RESPONSIVE
+     ══════════════════════════════════ */
+  @media (max-width: 700px) {
+    .hero { padding: 40px 20px; min-height: auto; padding-top: 80px; padding-bottom: 100px; }
+    .tournaments { flex-direction: column; align-items: center; }
+    .tourney-card { max-width: 100%; }
+    .roster-grid { grid-template-columns: repeat(2, 1fr); }
+    .hero-title { letter-spacing: -1px; }
+  }
+
+  @media (max-width: 480px) {
+    .roster-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .member-card { padding: 16px 12px; }
+    .card-title { font-size: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+
+  <!-- Animated flag pin -->
+  <div class="hero-flag">
+    <svg class="flag-svg" width="80" height="100" viewBox="0 0 80 100" xmlns="http://www.w3.org/2000/svg">
+      <!-- Pin stick -->
+      <line x1="20" y1="12" x2="20" y2="95" stroke="#d4c8a0" stroke-width="2.5" stroke-linecap="round"/>
+      <!-- Flag with wave -->
+      <g class="flag-wave">
+        <path d="M20,12 Q38,8 56,16 Q42,24 20,30 Z" fill="url(#flagGold)"/>
+        <path d="M20,12 Q38,8 56,16 Q42,24 20,30 Z" fill="url(#flagShine)" opacity="0.4"/>
+      </g>
+      <!-- Ball at base -->
+      <circle cx="20" cy="95" r="5" fill="#f0ece0"/>
+      <circle cx="18" cy="93" r="1.5" fill="#fff" opacity="0.6"/>
+      <defs>
+        <linearGradient id="flagGold" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#dabb60"/>
+          <stop offset="100%" stop-color="#a07830"/>
+        </linearGradient>
+        <linearGradient id="flagShine" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#fff"/>
+          <stop offset="50%" stop-color="#fff" stop-opacity="0"/>
+          <stop offset="100%" stop-color="#fff" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+    </svg>
+  </div>
+
+  <h1 class="hero-title">The Men</h1>
+  <p class="hero-subtitle">No mulligans · No mercy</p>
+  <p class="hero-tagline">"A tradition unlike any other... except this one involves Venmo."</p>
+
+  <!-- Tournament Cards -->
+  <div class="tournaments">
+
+    <!-- Houston Open -->
+    <a href="houston.html" class="tourney-card">
+      <div class="card-icon card-icon-houston">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6CABDD" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <span class="card-status status-live"><span></span>Live</span>
+      <div class="card-title">Houston Open</div>
+      <div class="card-venue">Memorial Park Golf Course · Houston, TX</div>
+      <div class="card-dates">Mar 27 – 30, 2026</div>
+      <div class="card-arrow">
+        View Scoreboard
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+
+    <!-- The Masters -->
+    <a href="masters.html" class="tourney-card">
+      <div class="card-icon card-icon-masters">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c8a44e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Trophy -->
+          <path d="M8 21h8"/>
+          <path d="M12 17v4"/>
+          <path d="M7 4h10l-1 8a4 4 0 01-8 0L7 4z"/>
+          <path d="M7 4c-1 0-3 0.5-3 3s2 3 3 3"/>
+          <path d="M17 4c1 0 3 0.5 3 3s-2 3-3 3"/>
+        </svg>
+      </div>
+      <span class="card-status status-upcoming">Apr 9 – 12</span>
+      <div class="card-title">The Masters</div>
+      <div class="card-venue">Augusta National Golf Club · Augusta, GA</div>
+      <div class="card-dates">Apr 9 – 12, 2026</div>
+      <div class="card-arrow">
+        View Scoreboard
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </div>
+    </a>
+  </div>
+
+  <!-- Course horizon decoration -->
+  <div class="course-horizon">
+    <svg viewBox="0 0 1440 200" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- Rolling hills -->
+      <path d="M0,160 C240,120 360,140 500,130 C640,120 720,100 900,110 C1080,120 1200,90 1440,100 L1440,200 L0,200Z"
+            fill="rgba(15,55,30,0.4)"/>
+      <path d="M0,170 C200,150 400,165 600,155 C800,145 1000,160 1200,150 C1320,145 1400,155 1440,160 L1440,200 L0,200Z"
+            fill="rgba(10,45,22,0.6)"/>
+      <!-- Distant trees -->
+      <circle cx="180" cy="130" r="18" fill="rgba(20,60,30,0.5)"/>
+      <circle cx="200" cy="125" r="22" fill="rgba(18,55,28,0.4)"/>
+      <circle cx="165" cy="128" r="15" fill="rgba(22,65,32,0.45)"/>
+      <circle cx="820" cy="100" r="20" fill="rgba(18,55,28,0.35)"/>
+      <circle cx="845" cy="95" r="24" fill="rgba(20,60,30,0.3)"/>
+      <circle cx="800" cy="98" r="16" fill="rgba(22,65,32,0.35)"/>
+      <circle cx="1280" cy="105" r="16" fill="rgba(18,55,28,0.3)"/>
+      <circle cx="1300" cy="100" r="20" fill="rgba(20,60,30,0.25)"/>
+      <!-- Small flagstick silhouette -->
+      <line x1="680" y1="90" x2="680" y2="125" stroke="rgba(200,164,78,0.15)" stroke-width="1.5"/>
+      <polygon points="680,90 698,96 680,102" fill="rgba(200,164,78,0.1)"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════════════ ROSTER ═══════════════════ -->
+<section class="roster-section">
+  <div class="roster-label">Est. 2026</div>
+  <h2 class="roster-title">The Roster</h2>
+
+  <div class="roster-grid">
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#6CABDD,#4a8abb)">N</div>
+      <div class="member-name">Nick</div>
+      <div class="member-quip">Dues paid in shanks</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#1a237e,#3949ab)">A</div>
+      <div class="member-name">Alex</div>
+      <div class="member-quip">Probably already pressed</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#b03a2e,#d4574a)">R</div>
+      <div class="member-name">Ryan</div>
+      <div class="member-quip">"Had it going on the range"</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#006F71,#00998a)">T</div>
+      <div class="member-name">TJ</div>
+      <div class="member-quip">Dangerous with a putter</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#7d3c98,#a055c0)">B</div>
+      <div class="member-name">Billy</div>
+      <div class="member-quip">Will bet on anything</div>
+    </div>
+    <div class="member-card">
+      <div class="member-avatar" style="background:linear-gradient(135deg,#6CABDD,#4a8abb)">D</div>
+      <div class="member-name">Dave</div>
+      <div class="member-quip">14 hdcp (allegedly)</div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════ RULES & FOOTER ═══════════════════ -->
+<section class="rules-section">
+  <p class="rules-quote">"I solemnly swear to play it as it lies, post my real score, honor all bets, and never claim I wasn't really trying after losing a nassau."</p>
+
+  <ul class="rules-list">
+    <li>All bets are final</li>
+    <li>Pay up promptly</li>
+    <li>Sandbaggers will be prosecuted</li>
+    <li>What happens in The Men stays in The Men</li>
+    <li>Throw a club, buy a round</li>
+  </ul>
+</section>
+
+<footer>
+  <div class="footer-text">The Men · 2026 Season · All receipts. No mulligans.</div>
+</footer>
+
+</body>
+</html>
