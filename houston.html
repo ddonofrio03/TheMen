@@ -667,7 +667,16 @@ const CONFIG = {
   },
   // Points per category (winner takes all, ties split)
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
-  refreshInterval: 60 // seconds
+  refreshInterval: 60, // seconds
+  // Bettor colors — header bg for cards and team score tables
+  colors: {
+    Dave:  { bg: "#1a5276", text: "#aed6f1" },
+    TJ:    { bg: "#1e8449", text: "#a9dfbf" },
+    Billy: { bg: "#7d3c98", text: "#d2b4de" },
+    Nick:  { bg: "#b7950b", text: "#f9e79f" },
+    Ry:    { bg: "#b03a2e", text: "#f1948a" },
+    Alex:  { bg: "#117a65", text: "#a2d9ce" }
+  }
 };
 
 // ═══════════════════════════════════════════════
@@ -1049,8 +1058,9 @@ function renderScoreboard() {
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
     const bestR1 = r1s.length ? Math.min(...r1s) : null;
 
+    const bColor = CONFIG.colors[bettor] || { bg: "#1a1a18", text: "#aaa" };
     html += `<div class="bettor-card">
-      <div class="card-header">
+      <div class="card-header" style="background:${bColor.bg}">
         <span class="card-name">${bettor}</span>
         <span class="card-total ${overallCls}">${overallFmt}</span>
       </div>
@@ -1213,7 +1223,8 @@ function renderPoints() {
     const p = pts[b];
     const rankCls = i === 0 ? "rank-1" : i === 1 ? "rank-2" : i === 2 ? "rank-3" : "rank-n";
     const isWin = p.Net > 0;
-    html += `<tr class="${isWin ? "pts-win" : ""}">
+    const pColor = CONFIG.colors[b] || { bg: "#1a1a18", text: "#aaa" };
+    html += `<tr class="${isWin ? "pts-win" : ""}" style="border-left: 4px solid ${pColor.bg}">
       <td><span class="rank-badge ${rankCls}">${i+1}</span>${b}</td>
       <td>${fmtCash(p.R1)}</td>
       <td>${fmtCash(p.R2)}</td>
@@ -1257,10 +1268,11 @@ function renderTeamScores() {
     let overallParts = [r1t, r2t, r3t, r4t].filter(v => v !== null);
     const overall = overallParts.length ? overallParts.reduce((a,b) => a+b, 0) : null;
 
+    const tsColor = CONFIG.colors[bettor] || { bg: "#1a1a18", text: "#aaa" };
     html += `<div class="ts-wrap">
-      <div class="ts-bettor-header">
+      <div class="ts-bettor-header" style="background:${tsColor.bg}">
         <span class="ts-bettor-name">${bettor}</span>
-        <span class="ts-bettor-total">${overall !== null ? fmtRel(overall) + " overall" : "--"}</span>
+        <span class="ts-bettor-total" style="color:${tsColor.text}">${overall !== null ? fmtRel(overall) + " overall" : "--"}</span>
       </div>
       <table class="ts-table">
         <thead><tr>
