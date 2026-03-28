@@ -245,10 +245,12 @@
 
   .pick-row:last-child { border-bottom: none; }
 
-  .pick-row.cut-row { opacity: 0.75; background: #fdecea; }
-  .pick-row.cut-row-subtle { opacity: 0.55; background: #fafaf7; }
+  .pick-row.cut-row { opacity: 0.85; background: #fdecea; }
   .pick-row.cut-row .pick-name { color: #b03030; }
   .pick-row.cut-row .pick-score { color: #b03030; }
+  .pick-row.cut-row-subtle { opacity: 0.75; background: #fdecea; }
+  .pick-row.cut-row-subtle .pick-name { color: #b03030; }
+  .pick-row.cut-row-subtle .pick-score { color: #b03030; }
 
   .pick-num {
     font-family: 'DM Mono', monospace;
@@ -462,7 +464,7 @@
 
   .lb-table tr.tracked { background: #f7fdf9; }
   .lb-table tr.tracked td:nth-child(2) { font-weight: 500; }
-  .lb-table tr.cut-row { opacity: 0.5; }
+  .lb-table tr.cut-row { opacity: 0.7; background: #fdecea; }
 
   .owner-pill {
     display: inline-block;
@@ -832,9 +834,19 @@ async function fetchScores() {
     const name = p.athlete?.displayName;
     if (!name) return;
 
-    // ESPN golf API has no status object — detect CUT by score field
-    const isCut = p.score === "CUT" || p.score === "cut";
+    // ESPN golf API has no status object — detect CUT by:
+    // 1. Explicit "CUT" in score field
+    // 2. Player has fewer linescore rounds than the max in the field
+    //    (leaders are always in the highest round; CUT players stay at 2 rounds)
     const isWD  = p.score === "WD"  || p.score === "wd";
+    const explicitCut = p.score === "CUT" || p.score === "cut";
+    const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
+    const playerRounds = p.linescores?.length ?? 0;
+    // A player missed the cut if the field has moved to R3+ and they only have 2 rounds
+    // AND their 2nd round linescore has 18 holes (they finished R2)
+    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
+    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
+    const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
@@ -996,9 +1008,7 @@ function renderScoreboard() {
       const overallVal  = isCut ? "" : (isWD ? "" : (info.score && info.score !== "--" ? info.score + " overall" : ""));
       const overallCls2 = relClass(parseRelScore(info.score));
 
-      // Only highlight CUT players red once R3 has started
-      const r3started = Object.values(scoreMap).some(p => p.r3 && p.r3 !== "--" && p.r3 !== "-");
-      html += `<div class="pick-row${isCut && r3started ? " cut-row" : isCut ? " cut-row-subtle" : ""}">
+      html += `<div class="pick-row${isCut ? " cut-row" : ""}">
         <span class="pick-num">${i+1}</span>
         <div class="pick-info">
           <div class="pick-name">${player}${penNote}</div>
