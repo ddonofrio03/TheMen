@@ -643,21 +643,29 @@ function effectiveRoundScore(player, roundKey) {
   return val;
 }
 
-// Team round total: sum of 4 picks, CUT players replaced by penalty
+// Team round total: sum of 4 picks
+// CUT players: use their actual score for R1+R2 (they played those)
+// Penalty (+2 worst non-team) only applies in R3 and R4
 function teamRoundTotal(bettor, roundKey) {
   const players = CONFIG.picks[bettor];
+  const penaltyRounds = new Set(["r3", "r4"]);
   let total = 0;
   let hasAny = false;
 
   players.forEach(player => {
     const info = scoreMap[player];
     if (!info) return;
-    if (info.isCut || info.isWD) {
+
+    const actual = parseRelScore(info[roundKey]);
+
+    if (actual !== null) {
+      // Always use real score if available (covers R1+R2 for CUT players)
+      total += actual;
+      hasAny = true;
+    } else if ((info.isCut || info.isWD) && penaltyRounds.has(roundKey)) {
+      // CUT player with no score in R3/R4 — apply penalty
       const pen = penaltyScore(roundKey, players);
       if (pen !== null) { total += pen; hasAny = true; }
-    } else {
-      const val = parseRelScore(info[roundKey]);
-      if (val !== null) { total += val; hasAny = true; }
     }
   });
 
@@ -696,7 +704,6 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  // Only players who have actually teed off (r1holes > 0)
   const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
   if (!relevant.length) return false;
   const holesKey = roundKey + "holes";
