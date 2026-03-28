@@ -1359,9 +1359,12 @@ function renderLeaderboard() {
     const td = parseRelScore(info.today);
     const isCut = info.isCut || info.isWD;
 
+    const ownerColor = owner ? (CONFIG.colors[owner] || { bg: "#1a1a18", text: "#fff" }) : null;
+    const nameStyle = ownerColor ? `style="color:${ownerColor.bg};font-weight:600"` : "";
+    const pillStyle = ownerColor ? `style="background:${ownerColor.bg};color:#fff"` : "";
     html += `<tr class="${tracked ? "tracked" : ""}${isCut ? " cut-row" : ""}">
       <td class="muted">${info.pos || "—"}</td>
-      <td>${name}${owner ? `<span class="owner-pill">${owner}</span>` : ""}</td>
+      <td><span ${nameStyle}>${name}</span>${owner ? `<span class="owner-pill" ${pillStyle}>${owner}</span>` : ""}</td>
       <td class="mono right ${relClass(sc)}">${info.score || "--"}</td>
       <td class="mono right ${relClass(td)}">${info.today || "--"}</td>
       <td class="muted">${info.thru || "--"}</td>
