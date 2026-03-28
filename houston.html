@@ -245,7 +245,7 @@
 
   .pick-row:last-child { border-bottom: none; }
 
-  .pick-row.cut-row { opacity: 0.85; background: #fdecea; }
+  .pick-row.cut-row { opacity: 0.75; background: #fdecea; }
   .pick-row.cut-row .pick-name { color: #b03030; }
   .pick-row.cut-row .pick-score { color: #b03030; }
   .pick-row.cut-row-subtle { opacity: 0.75; background: #fdecea; }
@@ -696,11 +696,10 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  // Only check players who have started the tournament (have R1 data)
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && p.r1 && p.r1 !== "--" && p.r1 !== "-");
+  // Only players who have actually teed off (r1holes > 0)
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
   if (!relevant.length) return false;
-  // A round is complete only when every active player has all 18 holes recorded
-  const holesKey = roundKey + "holes"; // e.g. "r2holes"
+  const holesKey = roundKey + "holes";
   return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
 
