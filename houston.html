@@ -618,17 +618,18 @@ function relClass(n) {
 }
 
 // Compute penalty score for a CUT player:
-// +2 of the worst score (to-par) of any non-team player still active in the round
+// +2 beyond the worst score of any PICKED player (in any bettor's team) who is NOT on this team
 function penaltyScore(roundKey, teamPlayers) {
   const teamSet = new Set(teamPlayers);
+  // All players picked by anyone in the group
+  const allPicked = new Set(Object.values(CONFIG.picks).flat());
   let worst = null;
-  Object.entries(scoreMap).forEach(([name, info]) => {
-    if (teamSet.has(name)) return;
-    if (info.isCut || info.isWD) return;
+  allPicked.forEach(name => {
+    if (teamSet.has(name)) return; // skip own team
+    const info = scoreMap[name];
+    if (!info || info.isCut || info.isWD) return;
     const val = parseRelScore(info[roundKey]);
-    if (val !== null) {
-      if (worst === null || val > worst) worst = val;
-    }
+    if (val !== null && (worst === null || val > worst)) worst = val;
   });
   if (worst === null) return null;
   return worst + 2;
