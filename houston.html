@@ -1104,6 +1104,15 @@ function renderScoreboard() {
 
       // Today's round score is the primary display number
       // Overall (cumulative) is the secondary line
+      // For CUT players: show their R1+R2 total clearly labeled
+      let cutScoreDisplay = "";
+      if (isCut) {
+        const r1v = parseRelScore(info.r1);
+        const r2v = parseRelScore(info.r2);
+        const cutTotal = (r1v !== null && r2v !== null) ? r1v + r2v
+                       : (r1v !== null ? r1v : (r2v !== null ? r2v : null));
+        cutScoreDisplay = cutTotal !== null ? fmtRel(cutTotal) : "--";
+      }
       const primaryVal  = isCut ? "CUT" : (isWD ? "WD" : (todayVal && todayVal !== "--" ? todayVal : "--"));
       const primaryCls  = isCut ? "cut" : (isWD ? "cut" : todayCls);
       const overallVal  = isCut ? "" : (isWD ? "" : (info.score && info.score !== "--" ? info.score + " overall" : ""));
@@ -1118,8 +1127,9 @@ function renderScoreboard() {
         <div style="text-align:right;min-width:70px">
           <div class="pick-score ${primaryCls}" style="display:block;margin-bottom:2px">${primaryVal}</div>
           <div style="font-size:11px;font-family:'DM Mono',monospace;line-height:1.6">
-            ${holeDisplay ? `<span style="color:var(--ink-mid)">${holeDisplay}</span><br>` : ""}
-            ${overallVal ? `<span class="${overallCls2}">${overallVal}</span>` : ""}
+            ${isCut && cutScoreDisplay ? `<span style="color:#b03030;font-weight:500">${cutScoreDisplay}</span><br><span style="color:var(--cut);font-size:10px">36-hole score</span>` : ""}
+            ${!isCut && holeDisplay ? `<span style="color:var(--ink-mid)">${holeDisplay}</span><br>` : ""}
+            ${!isCut && overallVal ? `<span class="${overallCls2}">${overallVal}</span>` : ""}
           </div>
         </div>
       </div>`;
@@ -1287,28 +1297,31 @@ function renderTeamScores() {
       const isCut = info.isCut || info.isWD;
       const r1 = info.r1 || "--";
       const r2 = info.r2 || "--";
-      const r3 = isCut ? (info.r3 && info.r3 !== "--" ? info.r3 : "<span style='color:var(--cut);font-size:11px'>CUT</span>") : (info.r3 || "--");
-      const r4 = isCut ? "<span style='color:var(--cut);font-size:11px'>CUT</span>" : (info.r4 || "--");
+      // CUT players: show actual R1+R2 scores, then CUT badge for R3/R4
+      const r3disp = isCut ? "<span style='color:#b03030;font-size:11px;font-weight:500'>✂ CUT</span>" : (info.r3 || "--");
+      const r4disp = isCut ? "<span style='color:#b03030;font-size:11px;font-weight:500'>✂ CUT</span>" : (info.r4 || "--");
 
-      // Player total: sum of available round scores
-      const scores = [info.r1, info.r2, info.r3, info.r4]
-        .map(v => parseRelScore(v))
-        .filter(v => v !== null);
+      // Player total: for CUT players use R1+R2 only
+      const r1v = parseRelScore(info.r1);
+      const r2v = parseRelScore(info.r2);
+      const r3v = isCut ? null : parseRelScore(info.r3);
+      const r4v = isCut ? null : parseRelScore(info.r4);
+      const scores = [r1v, r2v, r3v, r4v].filter(v => v !== null);
       const playerTotal = scores.length ? scores.reduce((a,b) => a+b, 0) : null;
-      const totalFmt = playerTotal !== null ? fmtRel(playerTotal) : "--";
+      const totalFmt = playerTotal !== null ? fmtRel(playerTotal) + (isCut ? `<br><span style="font-size:10px;color:#b03030">cut</span>` : "") : "--";
       const totalCls = relClass(playerTotal);
 
-      const r1c = relClass(parseRelScore(info.r1));
-      const r2c = relClass(parseRelScore(info.r2));
+      const r1c = relClass(r1v);
+      const r2c = relClass(r2v);
       const r3c = isCut ? "" : relClass(parseRelScore(info.r3));
       const r4c = isCut ? "" : relClass(parseRelScore(info.r4));
 
       html += `<tr class="${isCut ? "cut-row" : ""}">
-        <td>${player}${isCut ? ' <span style="font-size:10px;color:#b03030">CUT</span>' : ""}</td>
+        <td>${player}${isCut ? ' <span style="font-size:10px;background:#fdecea;color:#b03030;padding:1px 4px;border-radius:3px;font-weight:500">CUT</span>' : ""}</td>
         <td class="${r1c}">${r1}</td>
         <td class="${r2c}">${r2}</td>
-        <td>${r3}</td>
-        <td>${r4}</td>
+        <td>${r3disp}</td>
+        <td>${r4disp}</td>
         <td class="ts-total-col ${totalCls}">${totalFmt}</td>
       </tr>`;
     });
