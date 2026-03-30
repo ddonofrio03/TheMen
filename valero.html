@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Valero Texas Open — Golf Tracker</title>
+<title>The Men — Golf Tracker</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -59,15 +59,6 @@
     display: flex;
     align-items: baseline;
     gap: 10px;
-  }
-
-  .wordmark a {
-    text-decoration: none;
-    transition: opacity 0.2s ease;
-  }
-
-  .wordmark a:hover {
-    opacity: 0.8;
   }
 
   .wordmark-title {
@@ -617,9 +608,7 @@
 <header>
   <div class="header-inner">
     <div class="wordmark">
-      <a href="https://ddonofrio03.github.io/TheMen/">
-        <span class="wordmark-title">The Men</span>
-      </a>
+      <span class="wordmark-title">The Men</span>
       <span class="wordmark-event" id="event-name">Valero Texas Open · TPC San Antonio</span>
     </div>
     <div class="header-right">
@@ -669,12 +658,12 @@ const CONFIG = {
     Alex:  ["", "", "", ""]
   },
   alts: {
-    Dave:  "",
-    TJ:    "",
-    Billy: "",
-    Nick:  "",
-    Ry:    "",
-    Alex:  ""
+    Dave:  "Min Woo Lee",
+    TJ:    "Karl Vilips",
+    Billy: "Zecheng Dou",
+    Nick:  "Matt Wallace",
+    Ry:    "Rico Hoey",
+    Alex:  "Max McGreevy"
   },
   // Points per category (winner takes all, ties split)
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
@@ -840,7 +829,7 @@ function calcPoints() {
   const pts = {};
   CONFIG.bettors.forEach(b => {
     pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0,
-                Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
+               Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
   });
 
   // Each round: lowest team total FOR THAT ROUND ONLY wins $12
