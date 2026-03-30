@@ -38,6 +38,11 @@
   .snake-row{display:flex;gap:4px;align-items:center;margin-bottom:3px;}
   .snake-rlabel{font-size:10px;color:var(--light);min-width:28px;font-family:'DM Mono',monospace;}
   .snake-chip{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:2px 8px;border-radius:4px;color:white;letter-spacing:0.5px;}
+  .rand-btn{flex:1;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);border-radius:6px;cursor:pointer;transition:all 0.15s;}
+  .rand-btn:hover{background:var(--gold);color:white;}
+  .rand-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .rand-btn.spinning{animation:shake 0.08s infinite;}
+  @keyframes shake{0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);}}
   .start-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
   .start-btn:hover{background:var(--dark);}
 
@@ -112,6 +117,9 @@
       <div class="preview-snake">
         <div class="preview-label">Full draft order preview</div>
         <div id="snake-preview"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="rand-btn" id="rand-btn" onclick="randomizeOrder()">🎲 Randomize Order</button>
       </div>
       <button class="start-btn" onclick="startDraft()">▶ Start Draft</button>
     </div>
@@ -223,6 +231,52 @@ function renderPreview(){
       <span class="snake-rlabel">${picks[0].isAlt?"Alt":"R"+r}</span>
       ${picks.map(p=>`<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
     </div>`).join("");
+}
+
+// ─ RANDOMIZE ─
+function randomizeOrder(){
+  const btn = document.getElementById("rand-btn");
+  btn.disabled = true;
+  btn.classList.add("spinning");
+  btn.textContent = "🎲 Shuffling...";
+
+  let shuffleCount = 0;
+  const totalShuffles = 25;
+  const intervalMs = 80; // fast shuffles
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const timer = setInterval(() => {
+    shuffleCount++;
+    draftOrder = shuffle(draftOrder);
+    renderSetup();
+
+    if (shuffleCount >= totalShuffles) {
+      clearInterval(timer);
+      btn.classList.remove("spinning");
+      btn.disabled = false;
+      btn.textContent = "🎲 Randomize Again";
+
+      // Flash the final order items to celebrate
+      document.querySelectorAll(".order-item").forEach((el, i) => {
+        setTimeout(() => {
+          el.style.transform = "scale(1.04)";
+          el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+          setTimeout(() => {
+            el.style.transform = "";
+            el.style.boxShadow = "";
+          }, 200);
+        }, i * 60);
+      });
+    }
+  }, intervalMs);
 }
 
 // ─ START ─
