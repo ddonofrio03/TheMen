@@ -54,3 +54,434 @@
   .order-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--light);min-width:18px;}
   .order-name{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.5px;flex:1;}
   .drag-handle{color:var(--light);font-size:18px;}
+  .preview-snake{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:20px;}
+  .preview-label{font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-family:'DM Mono',monospace;}
+  .snake-row{display:flex;gap:4px;align-items:center;margin-bottom:3px;}
+  .snake-rlabel{font-size:10px;color:var(--light);min-width:28px;font-family:'DM Mono',monospace;}
+  .snake-chip{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:2px 8px;border-radius:4px;color:white;letter-spacing:0.5px;}
+  .rand-btn{flex:1;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);border-radius:6px;cursor:pointer;transition:all 0.15s;}
+  .rand-btn:hover{background:var(--gold);color:white;}
+  .rand-btn:disabled{opacity:0.5;cursor:not-allowed;}
+  .rand-btn.spinning{animation:shake 0.08s infinite;}
+  @keyframes shake{0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);}}
+  .start-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
+  .start-btn:hover{background:var(--dark);}
+
+  /* DRAFT */
+  .draft-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;}
+  @media(max-width:700px){.draft-layout{grid-template-columns:1fr;}}
+  .clock-banner{padding:14px 20px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;color:white;}
+  .clock-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
+  .clock-sub{font-size:13px;opacity:0.8;margin-top:2px;}
+  .clock-info{font-family:'DM Mono',monospace;font-size:12px;opacity:0.85;text-align:right;}
+  .search-wrap{position:relative;margin-bottom:10px;}
+  .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--light);}
+  .search-input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--white);outline:none;}
+  .search-input:focus{border-color:var(--green);}
+  .player-list{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:500px;overflow-y:auto;}
+  .letter-head{padding:4px 14px;background:#f5f5f2;font-size:10px;font-weight:500;color:var(--light);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;position:sticky;top:0;z-index:1;}
+  .p-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #f0f0ec;transition:background 0.1s;}
+  .p-row:last-child{border-bottom:none;}
+  .p-row.taken{opacity:0.4;}
+  .p-row.avail:hover{background:#f0f8f2;cursor:pointer;}
+  .p-row.avail.altround:hover{background:var(--gold-lt);}
+  .p-name{font-size:13px;font-weight:500;}
+  .p-name .last{font-weight:700;}
+  .p-owner{font-size:11px;font-family:'DM Mono',monospace;}
+  .pick-btn{font-size:11px;padding:4px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-weight:500;}
+  .pick-btn.main{background:var(--green);color:white;}
+  .pick-btn.alt{background:var(--gold-lt);color:#7a5c00;border:1px solid var(--gold);}
+  .pick-btn.main:hover{background:var(--dark);}
+  .pick-btn.alt:hover{background:var(--gold);color:white;}
+
+  /* BOARD */
+  .board-panel{display:flex;flex-direction:column;gap:10px;}
+  .round-section{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+  .round-hdr{padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.5px;color:white;display:flex;align-items:center;justify-content:space-between;background:var(--dark);}
+  .round-hdr.alt{background:#7a5c00;}
+  .b-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f5f5f2;}
+  .b-row:last-child{border-bottom:none;}
+  .b-row.active{background:#f0f8f2;}
+  .b-pos{font-family:'DM Mono',monospace;font-size:11px;color:var(--light);min-width:16px;}
+  .b-bettor{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.5px;min-width:40px;}
+  .b-pick{font-size:12px;color:var(--mid);flex:1;}
+  .b-pick.empty{color:var(--light);font-style:italic;}
+  .b-pick.onclock{color:var(--green);font-weight:500;animation:blink 1.2s infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+
+  /* COMPLETE */
+  .complete-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:600px;margin:0 auto;}
+  .complete-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--green);margin-bottom:6px;}
+  .complete-sub{font-size:13px;color:var(--mid);margin-bottom:20px;}
+  .cfg-note{font-size:12px;color:var(--mid);margin-bottom:10px;line-height:1.5;}
+  .code-block{background:var(--ink);color:#e8f5ee;padding:18px;border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;}
+  .copy-btn{margin-top:12px;padding:10px 24px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
+  .copy-btn:hover{background:var(--dark);}
+  .reset-btn{margin-top:10px;margin-left:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:6px;cursor:pointer;}
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr">
+    <div><span class="title">The Men</span><span class="sub">Masters 2026 — Snake Draft</span></div>
+    <div class="header-actions">
+      <button class="restart-btn-ui" onclick="resetDraft()">Restart Draft</button>
+      <span class="status-pill" id="status-pill">Setup</span>
+    </div>
+  </div>
+</header>
+<main>
+
+  <div class="screen active" id="screen-setup">
+    <div class="setup-card">
+      <div class="setup-title">Set Draft Order</div>
+      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — R1 top→bottom, R2 bottom→top, alternating. Round 5 is the alt pick.</div>
+      <ul class="order-list" id="order-list"></ul>
+      <div class="preview-snake">
+        <div class="preview-label">Full draft order preview</div>
+        <div id="snake-preview"></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <button class="rand-btn" id="rand-btn" onclick="randomizeOrder()">🎲 Randomize Order</button>
+      </div>
+      <button class="start-btn" onclick="startDraft()">▶ Start Draft</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-draft">
+    <div class="clock-banner" id="clock-banner">
+      <div>
+        <div class="clock-name" id="clock-name">—</div>
+        <div class="clock-sub" id="clock-sub">—</div>
+      </div>
+      <div class="clock-info" id="clock-info">—</div>
+    </div>
+    <div class="draft-layout">
+      <div>
+        <div class="search-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-input" id="search-input" placeholder="Search players by name..." oninput="renderPlayerList()">
+        </div>
+        <div class="player-list" id="player-list"></div>
+      </div>
+      <div class="board-panel" id="board-panel"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-complete">
+    <div class="complete-card">
+      <div class="complete-title">Draft Complete!</div>
+      <div class="complete-sub">All picks are in. Copy the block below and paste it into masters.html.</div>
+      <div class="cfg-note">Open masters.html → find the CONFIG block near the top → replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
+      <div class="code-block" id="config-output"></div>
+      <button class="copy-btn" onclick="copyConfig()">Copy CONFIG</button>
+      <button class="reset-btn" onclick="resetDraft()">Reset Draft</button>
+    </div>
+  </div>
+
+</main>
+<script>
+const BETTORS  = ["Dave","TJ","Billy","Nick","Ry","Alex"];
+const COLORS   = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
+const ROUNDS   = 5; // 4 picks + 1 alt
+const MASTERS  = "401811941";
+const STORE    = "masters2026_draft_v2";
+
+let field     = [];
+let draftOrder = [...BETTORS];
+let sequence  = []; // [{bettor, round, isAlt, seqIdx}]
+let picks     = {}; // {Dave:{picks:[],alt:null}}
+let turn      = 0;
+let dragSrc   = null;
+
+BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
+
+// ─ SEQUENCE ─
+function buildSeq(order) {
+  const seq = [];
+  for (let r = 0; r < ROUNDS; r++) {
+    const isAlt = r === ROUNDS - 1;
+    const row   = r % 2 === 0 ? [...order] : [...order].reverse();
+    row.forEach(b => seq.push({bettor:b, round:r+1, isAlt}));
+  }
+  return seq;
+}
+
+// ─ FETCH FIELD ─
+async function fetchField() {
+  try {
+    const r    = await fetch("https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard");
+    const data = await r.json();
+    const ev   = data.events?.find(e => e.id === MASTERS) || data.events?.[0];
+    const pl   = (ev?.competitions?.[0]?.competitors || []).map(p => p.athlete?.displayName).filter(Boolean);
+    pl.sort((a,b) => a.split(' ').pop().toLowerCase().localeCompare(b.split(' ').pop().toLowerCase()));
+    field = pl;
+  } catch(e) { field = []; }
+}
+
+// ─ SETUP ─
+function renderSetup() {
+  const list = document.getElementById("order-list");
+  list.innerHTML = draftOrder.map((b,i) => `
+    <li class="order-item" draggable="true" data-i="${i}"
+        ondragstart="ds(event,${i})" ondragover="dov(event,${i})"
+        ondragleave="dlv(event)" ondrop="drp(event,${i})">
+      <span class="order-num">${i+1}</span>
+      <span class="order-name" style="color:${COLORS[b]}">${b}</span>
+      <span class="drag-handle">⠿</span>
+    </li>`).join("");
+  renderPreview();
+}
+
+function ds(e,i){dragSrc=i;e.currentTarget.style.opacity="0.5";}
+function dov(e,i){e.preventDefault();if(i!==dragSrc)e.currentTarget.classList.add("drag-over");}
+function dlv(e){e.currentTarget.classList.remove("drag-over");}
+function drp(e,i){
+  e.preventDefault();e.currentTarget.classList.remove("drag-over");
+  if(dragSrc===null||dragSrc===i)return;
+  const a=[...draftOrder];const[m]=a.splice(dragSrc,1);a.splice(i,0,m);
+  draftOrder=a;dragSrc=null;renderSetup();
+}
+
+function renderPreview(){
+  const seq = buildSeq(draftOrder);
+  const rows = {};
+  seq.forEach(s=>{if(!rows[s.round])rows[s.round]=[];rows[s.round].push(s);});
+  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r,picks])=>`
+    <div class="snake-row">
+      <span class="snake-rlabel">${picks[0].isAlt?"Alt":"R"+r}</span>
+      ${picks.map(p=>`<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
+    </div>`).join("");
+}
+
+// ─ RANDOMIZE ─
+function randomizeOrder(){
+  const btn = document.getElementById("rand-btn");
+  btn.disabled = true;
+  btn.classList.add("spinning");
+  btn.textContent = "🎲 Shuffling...";
+
+  let shuffleCount = 0;
+  const totalShuffles = 25;
+  const intervalMs = 80; // fast shuffles
+
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+  const timer = setInterval(() => {
+    shuffleCount++;
+    draftOrder = shuffle(draftOrder);
+    renderSetup();
+
+    if (shuffleCount >= totalShuffles) {
+      clearInterval(timer);
+      btn.classList.remove("spinning");
+      btn.disabled = false;
+      btn.textContent = "🎲 Randomize Again";
+
+      document.querySelectorAll(".order-item").forEach((el, i) => {
+        setTimeout(() => {
+          el.style.transform = "scale(1.04)";
+          el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+          setTimeout(() => {
+            el.style.transform = "";
+            el.style.boxShadow = "";
+          }, 200);
+        }, i * 60);
+      });
+    }
+  }, intervalMs);
+}
+
+// ─ START ─
+function startDraft(){
+  sequence = buildSeq(draftOrder);
+  turn = 0;
+  if(!loadState()){
+    showScreen("draft");
+    document.getElementById("status-pill").textContent="Live Draft";
+    renderDraft();
+  }
+}
+
+// ─ DRAFT ─
+function renderDraft(){
+  if(turn>=sequence.length){finishDraft();return;}
+  const t = sequence[turn];
+  const banner = document.getElementById("clock-banner");
+  banner.style.background = COLORS[t.bettor];
+  document.getElementById("clock-name").textContent = t.bettor+"'s pick";
+  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round "+t.round+" · Pick "+(turn+1)+" of "+sequence.length;
+  document.getElementById("clock-info").innerHTML   = (sequence.length-turn)+" picks left";
+  document.getElementById("search-input").value="";
+  renderPlayerList();
+  renderBoard();
+  saveState();
+}
+
+// ─ PLAYER LIST ─
+function renderPlayerList(){
+  const el    = document.getElementById("player-list");
+  if(turn>=sequence.length){el.innerHTML="";return;}
+  const t     = sequence[turn];
+  const query = document.getElementById("search-input").value.toLowerCase().trim();
+
+  const taken = {};
+  BETTORS.forEach(b=>{
+    picks[b].picks.forEach(n=>taken[n]=b);
+    if(picks[b].alt)taken[picks[b].alt]=b+" (alt)";
+  });
+
+  const list = query ? field.filter(n=>n.toLowerCase().includes(query)) : field;
+  if(!list.length){el.innerHTML=`<div style="padding:20px;text-align:center;color:var(--light);font-size:13px">No players found</div>`;return;}
+
+  let html="",lastL="";
+  list.forEach(name=>{
+    const last   = name.split(' ').pop();
+    const letter = last[0].toUpperCase();
+    if(letter!==lastL&&!query){html+=`<div class="letter-head">${letter}</div>`;lastL=letter;}
+
+    const parts = name.split(' ');const ln=parts.pop();const fn=parts.join(' ');
+    const own   = taken[name];
+
+    if(own){
+      const ob = own.replace(' (alt)','');
+      html+=`<div class="p-row taken">
+        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
+        <span class="p-owner" style="color:${COLORS[ob]||'#888'}">${own}</span>
+      </div>`;
+    } else {
+      const bc = t.isAlt?"alt":"main";
+      const bl = t.isAlt?"Alt pick":"Pick";
+      html+=`<div class="p-row avail${t.isAlt?" altround":""}" onclick="makePick('${name.replace(/'/g,"\\'")}')">
+        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
+        <button class="pick-btn ${bc}" onclick="event.stopPropagation();makePick('${name.replace(/'/g,"\\'")}')">+ ${bl}</button>
+      </div>`;
+    }
+  });
+  el.innerHTML=html;
+}
+
+// ─ BOARD ─
+function renderBoard(){
+  const el = document.getElementById("board-panel");
+  const rounds = {};
+  sequence.forEach((s,idx)=>{if(!rounds[s.round])rounds[s.round]=[];rounds[s.round].push({...s,idx});});
+
+  const pickIdx = {};
+  BETTORS.forEach(b=>pickIdx[b]=0);
+
+  const slotPick = {};
+  sequence.forEach((s,idx)=>{
+    if(idx<turn){
+      if(s.isAlt){
+        slotPick[idx]=picks[s.bettor].alt;
+      } else {
+        const pi = sequence.slice(0,idx).filter(x=>x.bettor===s.bettor&&!x.isAlt).length;
+        slotPick[idx]=picks[s.bettor].picks[pi];
+      }
+    }
+  });
+
+  el.innerHTML = Object.entries(rounds).map(([r,slots])=>`
+    <div class="round-section">
+      <div class="round-hdr${slots[0].isAlt?" alt":""}">
+        <span>${slots[0].isAlt?"Alt Round":"Round "+r}</span>
+        <span style="font-size:11px;opacity:0.7;font-family:'DM Mono',monospace">${slots.filter(s=>s.idx<turn).length}/${slots.length}</span>
+      </div>
+      ${slots.map(s=>{
+        const isDone   = s.idx < turn;
+        const isActive = s.idx === turn;
+        const picked   = slotPick[s.idx];
+        const dispName = picked ? picked.split(' ').pop() : "";
+        return `<div class="b-row${isActive?" active":""}">
+          <span class="b-pos">${slots.indexOf(s)+1}</span>
+          <span class="b-bettor" style="color:${COLORS[s.bettor]}">${s.bettor}</span>
+          <span class="b-pick${isDone?"":(isActive?" onclock":" empty")}">
+            ${isDone&&picked ? dispName : isActive ? "on the clock..." : "—"}
+          </span>
+        </div>`;
+      }).join("")}
+    </div>`).join("");
+}
+
+// ─ MAKE PICK ─
+function makePick(name){
+  if(turn>=sequence.length)return;
+  const t=sequence[turn];
+  if(t.isAlt){
+    picks[t.bettor].alt=name;
+  } else {
+    picks[t.bettor].picks.push(name);
+  }
+  turn++;
+  renderDraft();
+}
+
+// ─ FINISH ─
+function finishDraft(){
+  showScreen("complete");
+  document.getElementById("status-pill").textContent="Complete";
+  const pb = BETTORS.map(b=>`    ${b.padEnd(6)}: [${picks[b].picks.map(n=>`"${n}"`).join(', ')}]`).join(',\n');
+  const ab = BETTORS.filter(b=>picks[b].alt).map(b=>`    ${b.padEnd(6)}: "${picks[b].alt}"`).join(',\n');
+  document.getElementById("config-output").textContent=
+    `  picks: {\n${pb}\n  },\n  alts: {\n${ab||'    // no alts set'}\n  },`;
+  saveState();
+}
+
+function copyConfig(){
+  navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(()=>{
+    const btn=document.querySelector(".copy-btn");
+    btn.textContent="Copied!";setTimeout(()=>btn.textContent="Copy CONFIG",2000);
+  });
+}
+
+// ─ PERSIST ─
+function saveState(){
+  localStorage.setItem(STORE,JSON.stringify({draftOrder,picks,turn,started:true,done:turn>=sequence.length}));
+}
+
+function loadState(){
+  try{
+    const s=JSON.parse(localStorage.getItem(STORE)||"{}");
+    if(!s.started)return false;
+    draftOrder=s.draftOrder||draftOrder;
+    picks=s.picks||picks;
+    turn=s.turn??0;
+    sequence=buildSeq(draftOrder);
+    showScreen("draft");
+    document.getElementById("status-pill").textContent=s.done?"Complete":"Live Draft";
+    if(s.done||turn>=sequence.length)finishDraft();
+    else renderDraft();
+    return true;
+  }catch(e){return false;}
+}
+
+function resetDraft(){
+  if(!confirm("Reset the entire draft? All picks will be cleared and you will return to the setup screen."))return;
+  localStorage.removeItem(STORE);
+  BETTORS.forEach(b=>picks[b]={picks:[],alt:null});
+  draftOrder=[...BETTORS];turn=0;
+  showScreen("setup");
+  document.getElementById("status-pill").textContent="Setup";
+  renderSetup();
+}
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  document.getElementById("screen-"+id).classList.add("active");
+}
+
+// ─ BOOT ─
+fetchField().then(()=>{
+  if(!loadState())renderSetup();
+});
+</script>
+</body>
+</html>
