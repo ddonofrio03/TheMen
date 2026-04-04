@@ -6,6 +6,7 @@
 <title>The Men — Masters 2026 Draft</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
   :root {
     --green:#1a5c2a;--dark:#0d3318;--gold:#c8a951;--gold-lt:#f5e9c4;
@@ -18,31 +19,53 @@
   .hdr{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
   .title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;}
   .sub{font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;font-weight:300;margin-left:10px;}
-  
-  /* RESTART BUTTON STYLES */
   .header-actions { display: flex; align-items: center; gap: 12px; }
   .restart-btn-ui {
-    font-family: 'DM Mono', monospace;
-    font-size: 10px;
-    padding: 4px 10px;
-    border-radius: 10px;
-    background: transparent;
-    color: #ff8a8a;
-    border: 1px solid #ff8a8a;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: all 0.2s;
+    font-family: 'DM Mono', monospace;font-size: 10px;padding: 4px 10px;border-radius: 10px;
+    background: transparent;color: #ff8a8a;border: 1px solid #ff8a8a;cursor: pointer;
+    text-transform: uppercase;transition: all 0.2s;
   }
-  .restart-btn-ui:hover {
-    background: var(--red);
-    color: white;
-    border-color: var(--red);
-  }
-
+  .restart-btn-ui:hover{background:var(--red);color:white;border-color:var(--red);}
   .status-pill{font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border-radius:10px;background:#1a3320;color:#6be08a;}
   main{max-width:960px;margin:0 auto;padding:24px 24px 80px;}
-
   .screen{display:none;}.screen.active{display:block;}
+
+  /* LOBBY */
+  .lobby-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:480px;margin:0 auto;}
+  .lobby-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:4px;}
+  .lobby-desc{font-size:13px;color:var(--mid);margin-bottom:20px;line-height:1.6;}
+  .lobby-section{margin-bottom:20px;}
+  .lobby-label{font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-family:'DM Mono',monospace;}
+  .name-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
+  .name-btn{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.5px;padding:8px 18px;border-radius:6px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.15s;color:var(--ink);}
+  .name-btn:hover{border-color:var(--green);background:#f0f8f2;}
+  .name-btn.selected{color:white;border-color:transparent;}
+  .name-btn.taken{opacity:0.3;cursor:not-allowed;}
+  .lobby-actions{display:flex;gap:8px;margin-bottom:16px;}
+  .host-btn,.join-btn{flex:1;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+  .host-btn{background:var(--green);color:var(--gold);border:none;}
+  .host-btn:hover{background:var(--dark);}
+  .join-btn{background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);}
+  .join-btn:hover{background:var(--gold);color:white;}
+  .host-btn:disabled,.join-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .join-row{display:flex;gap:8px;margin-bottom:16px;}
+  .code-input{flex:1;padding:10px 14px;font-family:'DM Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;text-transform:uppercase;border:2px solid var(--border);border-radius:6px;background:var(--white);outline:none;}
+  .code-input:focus{border-color:var(--green);}
+  .room-display{background:var(--dark);border-radius:8px;padding:16px;text-align:center;margin-bottom:16px;}
+  .room-code{font-family:'DM Mono',monospace;font-size:36px;letter-spacing:6px;color:var(--gold);font-weight:700;}
+  .room-hint{font-size:11px;color:#8aaa8a;margin-top:4px;}
+  .members-list{margin-bottom:16px;}
+  .member-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);}
+  .member-dot{width:8px;height:8px;border-radius:50%;}
+  .member-dot.online{background:#2ecc71;}
+  .member-dot.offline{background:var(--border);}
+  .member-name{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.5px;flex:1;}
+  .member-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--light);}
+  .start-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
+  .start-btn:hover{background:var(--dark);}
+  .start-btn:disabled{opacity:0.4;cursor:not-allowed;}
+  .lobby-error{color:var(--red);font-size:12px;margin-top:8px;font-family:'DM Mono',monospace;}
+  .lobby-status{font-size:12px;color:var(--light);margin-top:8px;font-family:'DM Mono',monospace;text-align:center;}
 
   /* SETUP */
   .setup-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:520px;margin:0 auto;}
@@ -51,6 +74,7 @@
   .order-list{list-style:none;margin-bottom:20px;}
   .order-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:grab;user-select:none;transition:box-shadow 0.15s;}
   .order-item.drag-over{border-color:var(--green);background:#f0f8f2;}
+  .order-item.readonly{cursor:default;}
   .order-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--light);min-width:18px;}
   .order-name{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.5px;flex:1;}
   .drag-handle{color:var(--light);font-size:18px;}
@@ -64,8 +88,7 @@
   .rand-btn:disabled{opacity:0.5;cursor:not-allowed;}
   .rand-btn.spinning{animation:shake 0.08s infinite;}
   @keyframes shake{0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);}}
-  .start-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
-  .start-btn:hover{background:var(--dark);}
+  .wait-msg{text-align:center;padding:20px;font-size:13px;color:var(--mid);font-family:'DM Mono',monospace;}
 
   /* DRAFT */
   .draft-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;}
@@ -78,7 +101,8 @@
   .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--light);}
   .search-input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--white);outline:none;}
   .search-input:focus{border-color:var(--green);}
-  .player-list{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:calc(100vh - 220px);overflow-y:auto;}  .letter-head{padding:4px 14px;background:#f5f5f2;font-size:10px;font-weight:500;color:var(--light);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;position:sticky;top:0;z-index:1;}
+  .player-list{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:calc(100vh - 220px);overflow-y:auto;}
+  .letter-head{padding:4px 14px;background:#f5f5f2;font-size:10px;font-weight:500;color:var(--light);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;position:sticky;top:0;z-index:1;}
   .p-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #f0f0ec;transition:background 0.1s;}
   .p-row:last-child{border-bottom:none;}
   .p-row.taken{opacity:0.4;}
@@ -107,6 +131,7 @@
   .b-pick.empty{color:var(--light);font-style:italic;}
   .b-pick.onclock{color:var(--green);font-weight:500;animation:blink 1.2s infinite;}
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .your-turn-banner{background:var(--green);color:white;text-align:center;padding:8px;border-radius:6px;margin-bottom:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;animation:blink 1.2s infinite;}
 
   /* COMPLETE */
   .complete-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:600px;margin:0 auto;}
@@ -124,41 +149,85 @@
   <div class="hdr">
     <div><span class="title">The Men</span><span class="sub">Masters 2026 — Snake Draft</span></div>
     <div class="header-actions">
-      <button class="restart-btn-ui" onclick="resetDraft()">Restart Draft</button>
-      <span class="status-pill" id="status-pill">Setup</span>
+      <button class="restart-btn-ui" onclick="resetDraft()" id="restart-btn" style="display:none">Restart Draft</button>
+      <span class="status-pill" id="status-pill">Lobby</span>
     </div>
   </div>
 </header>
 <main>
 
-  <div class="screen active" id="screen-setup">
+  <!-- LOBBY -->
+  <div class="screen active" id="screen-lobby">
+    <div class="lobby-card">
+      <div class="lobby-title">Masters 2026 Draft</div>
+      <div class="lobby-desc">Draft together in real-time. One person hosts the room, everyone else joins with the code.</div>
+
+      <div class="lobby-section">
+        <div class="lobby-label">Who are you?</div>
+        <div class="name-grid" id="name-grid"></div>
+      </div>
+
+      <div id="pre-connect">
+        <div class="lobby-actions">
+          <button class="host-btn" id="host-btn" onclick="createRoom()" disabled>Host Draft</button>
+        </div>
+        <div style="text-align:center;font-size:12px;color:var(--light);margin-bottom:12px">-- or join an existing room --</div>
+        <div class="join-row">
+          <input class="code-input" id="join-code" placeholder="CODE" maxlength="4" oninput="this.value=this.value.toUpperCase()">
+          <button class="join-btn" id="join-btn" onclick="joinRoom()" disabled>Join</button>
+        </div>
+      </div>
+
+      <div id="room-area" style="display:none">
+        <div class="room-display">
+          <div class="room-code" id="room-code-display">----</div>
+          <div class="room-hint">Share this code with everyone</div>
+        </div>
+        <div class="lobby-label">Players</div>
+        <div class="members-list" id="members-list"></div>
+        <button class="start-btn" id="lobby-start-btn" onclick="hostStartDraft()" style="display:none">Start Draft</button>
+        <div class="wait-msg" id="wait-msg" style="display:none">Waiting for host to start...</div>
+      </div>
+
+      <div class="lobby-error" id="lobby-error"></div>
+      <div class="lobby-status" id="lobby-status"></div>
+    </div>
+  </div>
+
+  <!-- SETUP -->
+  <div class="screen" id="screen-setup">
     <div class="setup-card">
       <div class="setup-title">Set Draft Order</div>
-      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — R1 top→bottom, R2 bottom→top, alternating. Round 5 is the alt pick.</div>
+      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — R1 top-bottom, R2 bottom-top, alternating. Round 5 is the alt pick.</div>
       <ul class="order-list" id="order-list"></ul>
       <div class="preview-snake">
         <div class="preview-label">Full draft order preview</div>
         <div id="snake-preview"></div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:8px">
-        <button class="rand-btn" id="rand-btn" onclick="randomizeOrder()">🎲 Randomize Order</button>
+      <div id="setup-host-controls">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="rand-btn" id="rand-btn" onclick="randomizeOrder()">Randomize Order</button>
+        </div>
+        <button class="start-btn" onclick="beginDraft()">Start Draft</button>
       </div>
-      <button class="start-btn" onclick="startDraft()">▶ Start Draft</button>
+      <div class="wait-msg" id="setup-wait" style="display:none">Host is setting up the draft order...</div>
     </div>
   </div>
 
+  <!-- DRAFT -->
   <div class="screen" id="screen-draft">
     <div class="clock-banner" id="clock-banner">
       <div>
-        <div class="clock-name" id="clock-name">—</div>
-        <div class="clock-sub" id="clock-sub">—</div>
+        <div class="clock-name" id="clock-name">--</div>
+        <div class="clock-sub" id="clock-sub">--</div>
       </div>
-      <div class="clock-info" id="clock-info">—</div>
+      <div class="clock-info" id="clock-info">--</div>
     </div>
+    <div id="your-turn-msg"></div>
     <div class="draft-layout">
       <div>
         <div class="search-wrap">
-          <span class="search-icon">⌕</span>
+          <span class="search-icon">&#x2315;</span>
           <input class="search-input" id="search-input" placeholder="Search players by name..." oninput="renderPlayerList()">
         </div>
         <div class="player-list" id="player-list"></div>
@@ -167,11 +236,12 @@
     </div>
   </div>
 
+  <!-- COMPLETE -->
   <div class="screen" id="screen-complete">
     <div class="complete-card">
       <div class="complete-title">Draft Complete!</div>
       <div class="complete-sub">All picks are in. Copy the block below and paste it into masters.html.</div>
-      <div class="cfg-note">Open masters.html → find the CONFIG block near the top → replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
+      <div class="cfg-note">Open masters.html - find the CONFIG block near the top - replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
       <div class="code-block" id="config-output"></div>
       <button class="copy-btn" onclick="copyConfig()">Copy CONFIG</button>
       <button class="reset-btn" onclick="resetDraft()">Reset Draft</button>
@@ -180,33 +250,54 @@
 
 </main>
 <script>
-const BETTORS  = ["Dave","TJ","Billy","Nick","Ry","Alex"];
-const COLORS   = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
-const ROUNDS   = 5; // 4 picks + 1 alt
-const MASTERS  = "401811941";
-const STORE    = "masters2026_draft_v2";
+// ═══════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════
+const BETTORS = ["Dave","TJ","Billy","Nick","Ry","Alex"];
+const COLORS  = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
+const ROUNDS  = 5;
+const MASTERS = "401811941";
 
-let field     = [];
+// ═══════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════
+let field      = [];
 let draftOrder = [...BETTORS];
-let sequence  = []; // [{bettor, round, isAlt, seqIdx}]
-let picks     = {}; // {Dave:{picks:[],alt:null}}
-let turn      = 0;
-let dragSrc   = null;
+let sequence   = [];
+let picks      = {};
+let turn       = 0;
+let dragSrc    = null;
 
-BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
+BETTORS.forEach(b => picks[b] = {picks:[], alt:null});
 
-// ─ SEQUENCE ─
+// ═══════════════════════════════════════════════
+// NETWORK STATE
+// ═══════════════════════════════════════════════
+let peer       = null;
+let isHost     = false;
+let myName     = null;
+let roomCode   = null;
+let hostConn   = null;      // guest -> host
+let guestConns = {};        // host: name -> conn
+let claimed    = new Set(); // names taken in lobby
+let phase      = "lobby";   // lobby | setup | draft | complete
+
+// ═══════════════════════════════════════════════
+// SEQUENCE
+// ═══════════════════════════════════════════════
 function buildSeq(order) {
   const seq = [];
   for (let r = 0; r < ROUNDS; r++) {
     const isAlt = r === ROUNDS - 1;
-    const row   = r % 2 === 0 ? [...order] : [...order].reverse();
+    const row = r % 2 === 0 ? [...order] : [...order].reverse();
     row.forEach(b => seq.push({bettor:b, round:r+1, isAlt}));
   }
   return seq;
 }
 
-// ─ FETCH FIELD ─
+// ═══════════════════════════════════════════════
+// FETCH FIELD FROM ESPN
+// ═══════════════════════════════════════════════
 async function fetchField() {
   try {
     const r    = await fetch("https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard");
@@ -218,16 +309,256 @@ async function fetchField() {
   } catch(e) { field = []; }
 }
 
-// ─ SETUP ─
+// ═══════════════════════════════════════════════
+// LOBBY
+// ═══════════════════════════════════════════════
+function renderNameGrid() {
+  const el = document.getElementById("name-grid");
+  el.innerHTML = BETTORS.map(b => {
+    const sel = myName === b ? "selected" : "";
+    const taken = claimed.has(b) && myName !== b ? "taken" : "";
+    const style = myName === b ? `background:${COLORS[b]};border-color:${COLORS[b]};color:white` : "";
+    return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken?"disabled":""}>${b}</button>`;
+  }).join("");
+
+  const hasName = !!myName;
+  document.getElementById("host-btn").disabled = !hasName;
+  document.getElementById("join-btn").disabled = !hasName;
+}
+
+function claimName(name) {
+  if (claimed.has(name) && myName !== name) return;
+  myName = name;
+  renderNameGrid();
+}
+
+function genCode() {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+  let c = "";
+  for (let i = 0; i < 4; i++) c += chars[Math.floor(Math.random()*chars.length)];
+  return c;
+}
+
+// ═══════════════════════════════════════════════
+// HOST: CREATE ROOM
+// ═══════════════════════════════════════════════
+function createRoom() {
+  if (!myName) return;
+  const err = document.getElementById("lobby-error");
+  const status = document.getElementById("lobby-status");
+  err.textContent = "";
+  status.textContent = "Connecting...";
+
+  roomCode = genCode();
+  peer = new Peer("themen-" + roomCode, {debug: 0});
+  isHost = true;
+
+  peer.on("open", () => {
+    status.textContent = "";
+    claimed.add(myName);
+    document.getElementById("pre-connect").style.display = "none";
+    document.getElementById("room-area").style.display = "block";
+    document.getElementById("room-code-display").textContent = roomCode;
+    document.getElementById("lobby-start-btn").style.display = "block";
+    renderLobby();
+  });
+
+  peer.on("connection", conn => {
+    conn.on("open", () => {
+      conn.on("data", msg => handleGuestMsg(conn, msg));
+      conn.on("close", () => {
+        const name = Object.keys(guestConns).find(n => guestConns[n] === conn);
+        if (name) { delete guestConns[name]; claimed.delete(name); renderLobby(); broadcastLobby(); }
+      });
+    });
+  });
+
+  peer.on("error", e => {
+    if (e.type === "unavailable-id") {
+      err.textContent = "Room code taken — try again";
+      roomCode = genCode();
+      peer.destroy();
+      createRoom();
+    } else {
+      err.textContent = "Connection error: " + e.type;
+      status.textContent = "";
+    }
+  });
+}
+
+function handleGuestMsg(conn, msg) {
+  if (msg.type === "join") {
+    if (claimed.has(msg.name) && !guestConns[msg.name]) {
+      conn.send({type:"error", text: msg.name + " is already taken"});
+      return;
+    }
+    guestConns[msg.name] = conn;
+    claimed.add(msg.name);
+    renderLobby();
+    broadcastLobby();
+    // If draft already in progress, send full state to late joiner
+    if (phase !== "lobby") {
+      conn.send({type:"state", payload: getFullState()});
+    }
+  } else if (msg.type === "pick") {
+    if (turn < sequence.length && sequence[turn].bettor === msg.from) {
+      applyPick(msg.player);
+    }
+  }
+}
+
+function broadcastLobby() {
+  const msg = {type:"lobby", members: Array.from(claimed), host: myName};
+  Object.values(guestConns).forEach(c => { try{c.send(msg)}catch(e){} });
+}
+
+function broadcast(msg) {
+  Object.values(guestConns).forEach(c => { try{c.send(msg)}catch(e){} });
+}
+
+function getFullState() {
+  return {phase, draftOrder, picks, turn, field, claimed: Array.from(claimed), host: myName};
+}
+
+function broadcastState() {
+  broadcast({type:"state", payload: getFullState()});
+}
+
+// ═══════════════════════════════════════════════
+// GUEST: JOIN ROOM
+// ═══════════════════════════════════════════════
+function joinRoom() {
+  if (!myName) return;
+  const code = document.getElementById("join-code").value.trim().toUpperCase();
+  if (code.length !== 4) return;
+  const err = document.getElementById("lobby-error");
+  const status = document.getElementById("lobby-status");
+  err.textContent = "";
+  status.textContent = "Connecting...";
+
+  roomCode = code;
+  peer = new Peer(undefined, {debug: 0});
+
+  peer.on("open", () => {
+    hostConn = peer.connect("themen-" + code, {reliable: true});
+
+    hostConn.on("open", () => {
+      status.textContent = "";
+      hostConn.send({type:"join", name: myName});
+      claimed.add(myName);
+      document.getElementById("pre-connect").style.display = "none";
+      document.getElementById("room-area").style.display = "block";
+      document.getElementById("room-code-display").textContent = roomCode;
+      document.getElementById("wait-msg").style.display = "block";
+      renderLobby();
+    });
+
+    hostConn.on("data", msg => handleHostMsg(msg));
+
+    hostConn.on("close", () => {
+      err.textContent = "Host disconnected";
+    });
+
+    hostConn.on("error", e => {
+      err.textContent = "Connection failed: " + e.type;
+    });
+  });
+
+  peer.on("error", e => {
+    if (e.type === "peer-unavailable") {
+      err.textContent = "Room not found — check the code";
+    } else {
+      err.textContent = "Connection error: " + e.type;
+    }
+    status.textContent = "";
+  });
+}
+
+function handleHostMsg(msg) {
+  if (msg.type === "lobby") {
+    claimed = new Set(msg.members);
+    renderLobby();
+  } else if (msg.type === "state") {
+    const s = msg.payload;
+    phase = s.phase;
+    draftOrder = s.draftOrder;
+    picks = s.picks;
+    turn = s.turn;
+    if (s.field && s.field.length) field = s.field;
+    claimed = new Set(s.claimed || []);
+
+    if (phase === "setup") {
+      showScreen("setup");
+      document.getElementById("setup-host-controls").style.display = "none";
+      document.getElementById("setup-wait").style.display = "block";
+      sequence = buildSeq(draftOrder);
+      renderSetup();
+    } else if (phase === "draft") {
+      showScreen("draft");
+      document.getElementById("status-pill").textContent = "Live Draft";
+      document.getElementById("restart-btn").style.display = "inline-block";
+      sequence = buildSeq(draftOrder);
+      renderDraft();
+    } else if (phase === "complete") {
+      sequence = buildSeq(draftOrder);
+      finishDraft();
+    }
+  } else if (msg.type === "error") {
+    document.getElementById("lobby-error").textContent = msg.text;
+  }
+}
+
+function sendToHost(msg) {
+  if (isHost) return;
+  if (hostConn && hostConn.open) hostConn.send(msg);
+}
+
+// ═══════════════════════════════════════════════
+// LOBBY RENDER
+// ═══════════════════════════════════════════════
+function renderLobby() {
+  const el = document.getElementById("members-list");
+  el.innerHTML = BETTORS.map(b => {
+    const online = claimed.has(b);
+    const isMe = b === myName;
+    const tag = isHost && isMe ? "host" : isMe ? "you" : "";
+    return `<div class="member-row">
+      <span class="member-dot ${online?"online":"offline"}"></span>
+      <span class="member-name" style="color:${COLORS[b]}">${b}</span>
+      ${tag ? `<span class="member-tag">${tag}</span>` : ""}
+    </div>`;
+  }).join("");
+  renderNameGrid();
+}
+
+// ═══════════════════════════════════════════════
+// HOST: START DRAFT (go to setup)
+// ═══════════════════════════════════════════════
+function hostStartDraft() {
+  phase = "setup";
+  showScreen("setup");
+  document.getElementById("status-pill").textContent = "Setup";
+  if (!isHost) {
+    document.getElementById("setup-host-controls").style.display = "none";
+    document.getElementById("setup-wait").style.display = "block";
+  }
+  sequence = buildSeq(draftOrder);
+  renderSetup();
+  broadcastState();
+}
+
+// ═══════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════
 function renderSetup() {
   const list = document.getElementById("order-list");
+  const canDrag = isHost;
   list.innerHTML = draftOrder.map((b,i) => `
-    <li class="order-item" draggable="true" data-i="${i}"
-        ondragstart="ds(event,${i})" ondragover="dov(event,${i})"
-        ondragleave="dlv(event)" ondrop="drp(event,${i})">
+    <li class="order-item${canDrag?"":" readonly"}" ${canDrag?`draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"`:""}
+        data-i="${i}">
       <span class="order-num">${i+1}</span>
       <span class="order-name" style="color:${COLORS[b]}">${b}</span>
-      <span class="drag-handle">⠿</span>
+      ${canDrag?'<span class="drag-handle">\u2807</span>':""}
     </li>`).join("");
   renderPreview();
 }
@@ -240,6 +571,7 @@ function drp(e,i){
   if(dragSrc===null||dragSrc===i)return;
   const a=[...draftOrder];const[m]=a.splice(dragSrc,1);a.splice(i,0,m);
   draftOrder=a;dragSrc=null;renderSetup();
+  if(isHost) broadcastState();
 }
 
 function renderPreview(){
@@ -253,83 +585,76 @@ function renderPreview(){
     </div>`).join("");
 }
 
-// ─ RANDOMIZE ─
 function randomizeOrder(){
+  if(!isHost) return;
   const btn = document.getElementById("rand-btn");
-  btn.disabled = true;
-  btn.classList.add("spinning");
-  btn.textContent = "🎲 Shuffling...";
+  btn.disabled=true;btn.classList.add("spinning");btn.textContent="Shuffling...";
 
-  let shuffleCount = 0;
-  const totalShuffles = 25;
-  const intervalMs = 80; // fast shuffles
+  let count=0;const total=25;
+  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
-  function shuffle(arr) {
-    const a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
-  }
-
-  const timer = setInterval(() => {
-    shuffleCount++;
-    draftOrder = shuffle(draftOrder);
-    renderSetup();
-
-    if (shuffleCount >= totalShuffles) {
+  const timer=setInterval(()=>{
+    count++;draftOrder=shuffle(draftOrder);renderSetup();
+    if(count>=total){
       clearInterval(timer);
-      btn.classList.remove("spinning");
-      btn.disabled = false;
-      btn.textContent = "🎲 Randomize Again";
-
-      document.querySelectorAll(".order-item").forEach((el, i) => {
-        setTimeout(() => {
-          el.style.transform = "scale(1.04)";
-          el.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
-          setTimeout(() => {
-            el.style.transform = "";
-            el.style.boxShadow = "";
-          }, 200);
-        }, i * 60);
-      });
+      btn.classList.remove("spinning");btn.disabled=false;btn.textContent="Randomize Again";
+      broadcastState();
     }
-  }, intervalMs);
+  },80);
 }
 
-// ─ START ─
-function startDraft(){
+// ═══════════════════════════════════════════════
+// BEGIN DRAFT
+// ═══════════════════════════════════════════════
+function beginDraft(){
+  if(!isHost) return;
+  phase = "draft";
   sequence = buildSeq(draftOrder);
   turn = 0;
-  if(!loadState()){
-    showScreen("draft");
-    document.getElementById("status-pill").textContent="Live Draft";
-    renderDraft();
-  }
+  BETTORS.forEach(b => picks[b] = {picks:[], alt:null});
+  showScreen("draft");
+  document.getElementById("status-pill").textContent = "Live Draft";
+  document.getElementById("restart-btn").style.display = "inline-block";
+  renderDraft();
+  broadcastState();
 }
 
-// ─ DRAFT ─
+// ═══════════════════════════════════════════════
+// DRAFT RENDER
+// ═══════════════════════════════════════════════
 function renderDraft(){
   if(turn>=sequence.length){finishDraft();return;}
   const t = sequence[turn];
   const banner = document.getElementById("clock-banner");
   banner.style.background = COLORS[t.bettor];
   document.getElementById("clock-name").textContent = t.bettor+"'s pick";
-  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round "+t.round+" · Pick "+(turn+1)+" of "+sequence.length;
-  document.getElementById("clock-info").innerHTML   = (sequence.length-turn)+" picks left";
+  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round "+t.round+" \u00b7 Pick "+(turn+1)+" of "+sequence.length;
+  document.getElementById("clock-info").innerHTML    = (sequence.length-turn)+" picks left";
   document.getElementById("search-input").value="";
+
+  // "Your turn" banner
+  const ytm = document.getElementById("your-turn-msg");
+  if (t.bettor === myName) {
+    ytm.innerHTML = '<div class="your-turn-banner">Your pick! Choose a player below</div>';
+  } else {
+    ytm.innerHTML = "";
+  }
+
   renderPlayerList();
   renderBoard();
-  saveState();
 }
 
-// ─ PLAYER LIST ─
+// ═══════════════════════════════════════════════
+// PLAYER LIST
+// ═══════════════════════════════════════════════
 function renderPlayerList(){
-  const el    = document.getElementById("player-list");
+  const el = document.getElementById("player-list");
   if(turn>=sequence.length){el.innerHTML="";return;}
   const t     = sequence[turn];
   const query = document.getElementById("search-input").value.toLowerCase().trim();
+
+  // Can this user pick right now?
+  const canPick = (myName === t.bettor) || isHost;
 
   const taken = {};
   BETTORS.forEach(b=>{
@@ -355,26 +680,59 @@ function renderPlayerList(){
         <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
         <span class="p-owner" style="color:${COLORS[ob]||'#888'}">${own}</span>
       </div>`;
-    } else {
+    } else if(canPick){
       const bc = t.isAlt?"alt":"main";
       const bl = t.isAlt?"Alt pick":"Pick";
-      html+=`<div class="p-row avail${t.isAlt?" altround":""}" onclick="makePick('${name.replace(/'/g,"\\'")}')">
+      html+=`<div class="p-row avail${t.isAlt?" altround":""}" onclick="requestPick('${name.replace(/'/g,"\\'")}')">
         <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-        <button class="pick-btn ${bc}" onclick="event.stopPropagation();makePick('${name.replace(/'/g,"\\'")}')">+ ${bl}</button>
+        <button class="pick-btn ${bc}" onclick="event.stopPropagation();requestPick('${name.replace(/'/g,"\\'")}')">+ ${bl}</button>
+      </div>`;
+    } else {
+      html+=`<div class="p-row">
+        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
       </div>`;
     }
   });
   el.innerHTML=html;
 }
 
-// ─ BOARD ─
+// ═══════════════════════════════════════════════
+// PICK LOGIC
+// ═══════════════════════════════════════════════
+function requestPick(playerName) {
+  if (turn >= sequence.length) return;
+  const t = sequence[turn];
+
+  if (isHost) {
+    // Host can pick for anyone (or themselves)
+    applyPick(playerName);
+  } else if (myName === t.bettor) {
+    // Guest: send pick request to host
+    sendToHost({type:"pick", player: playerName, from: myName});
+  }
+}
+
+function applyPick(playerName) {
+  if (turn >= sequence.length) return;
+  const t = sequence[turn];
+  if (t.isAlt) {
+    picks[t.bettor].alt = playerName;
+  } else {
+    picks[t.bettor].picks.push(playerName);
+  }
+  turn++;
+  if (turn >= sequence.length) phase = "complete";
+  renderDraft();
+  if (isHost) broadcastState();
+}
+
+// ═══════════════════════════════════════════════
+// BOARD
+// ═══════════════════════════════════════════════
 function renderBoard(){
   const el = document.getElementById("board-panel");
   const rounds = {};
   sequence.forEach((s,idx)=>{if(!rounds[s.round])rounds[s.round]=[];rounds[s.round].push({...s,idx});});
-
-  const pickIdx = {};
-  BETTORS.forEach(b=>pickIdx[b]=0);
 
   const slotPick = {};
   sequence.forEach((s,idx)=>{
@@ -403,35 +761,24 @@ function renderBoard(){
           <span class="b-pos">${slots.indexOf(s)+1}</span>
           <span class="b-bettor" style="color:${COLORS[s.bettor]}">${s.bettor}</span>
           <span class="b-pick${isDone?"":(isActive?" onclock":" empty")}">
-            ${isDone&&picked ? dispName : isActive ? "on the clock..." : "—"}
+            ${isDone&&picked ? dispName : isActive ? "on the clock..." : "\u2014"}
           </span>
         </div>`;
       }).join("")}
     </div>`).join("");
 }
 
-// ─ MAKE PICK ─
-function makePick(name){
-  if(turn>=sequence.length)return;
-  const t=sequence[turn];
-  if(t.isAlt){
-    picks[t.bettor].alt=name;
-  } else {
-    picks[t.bettor].picks.push(name);
-  }
-  turn++;
-  renderDraft();
-}
-
-// ─ FINISH ─
+// ═══════════════════════════════════════════════
+// FINISH
+// ═══════════════════════════════════════════════
 function finishDraft(){
+  phase = "complete";
   showScreen("complete");
-  document.getElementById("status-pill").textContent="Complete";
+  document.getElementById("status-pill").textContent = "Complete";
   const pb = BETTORS.map(b=>`    ${b.padEnd(6)}: [${picks[b].picks.map(n=>`"${n}"`).join(', ')}]`).join(',\n');
   const ab = BETTORS.filter(b=>picks[b].alt).map(b=>`    ${b.padEnd(6)}: "${picks[b].alt}"`).join(',\n');
   document.getElementById("config-output").textContent=
     `  picks: {\n${pb}\n  },\n  alts: {\n${ab||'    // no alts set'}\n  },`;
-  saveState();
 }
 
 function copyConfig(){
@@ -441,46 +788,33 @@ function copyConfig(){
   });
 }
 
-// ─ PERSIST ─
-function saveState(){
-  localStorage.setItem(STORE,JSON.stringify({draftOrder,picks,turn,started:true,done:turn>=sequence.length}));
-}
-
-function loadState(){
-  try{
-    const s=JSON.parse(localStorage.getItem(STORE)||"{}");
-    if(!s.started)return false;
-    draftOrder=s.draftOrder||draftOrder;
-    picks=s.picks||picks;
-    turn=s.turn??0;
-    sequence=buildSeq(draftOrder);
-    showScreen("draft");
-    document.getElementById("status-pill").textContent=s.done?"Complete":"Live Draft";
-    if(s.done||turn>=sequence.length)finishDraft();
-    else renderDraft();
-    return true;
-  }catch(e){return false;}
-}
-
+// ═══════════════════════════════════════════════
+// RESET
+// ═══════════════════════════════════════════════
 function resetDraft(){
-  if(!confirm("Reset the entire draft? All picks will be cleared and you will return to the setup screen."))return;
-  localStorage.removeItem(STORE);
+  if(!isHost){alert("Only the host can restart the draft.");return;}
+  if(!confirm("Reset the entire draft? All picks will be cleared."))return;
   BETTORS.forEach(b=>picks[b]={picks:[],alt:null});
-  draftOrder=[...BETTORS];turn=0;
+  draftOrder=[...BETTORS];turn=0;phase="setup";
+  sequence=buildSeq(draftOrder);
   showScreen("setup");
   document.getElementById("status-pill").textContent="Setup";
   renderSetup();
+  broadcastState();
 }
 
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
   document.getElementById("screen-"+id).classList.add("active");
 }
 
-// ─ BOOT ─
-fetchField().then(()=>{
-  if(!loadState())renderSetup();
-});
+// ═══════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════
+fetchField().then(() => renderNameGrid());
 </script>
 </body>
 </html>
