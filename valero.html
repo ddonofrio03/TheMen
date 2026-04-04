@@ -788,15 +788,21 @@ function teamOverallTotal(bettor) {
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
 
-// A round is complete only when EVERY active (non-CUT/WD) player
-// has finished all 18 holes for that round (shows "F").
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
   const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
   if (!relevant.length) return false;
   const holesKey = roundKey + "holes";
-  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+  // Primary: all active players have 18 holes for this round
+  if (relevant.every(p => (p[holesKey] ?? 0) === 18)) return true;
+  // Fallback for R1-R3: round is done if the next round has begun
+  const rn = parseInt(roundKey[1]);
+  if (rn < 4) {
+    const nextKey = "r" + (rn + 1) + "holes";
+    return relevant.some(p => (p[nextKey] ?? 0) > 0);
+  }
+  return false;
 }
 
 function isTournamentFinal() {
