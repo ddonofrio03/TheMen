@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -24,584 +25,585 @@
     --cut: #9a9a94;
   }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--surface);
-    color: var(--ink);
-    min-height: 100vh;
-  }
-
-  /* ── HEADER ── */
-  header {
-    background: var(--ink);
-    color: var(--white);
-    padding: 0;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    border-bottom: 3px solid var(--green-mid);
-  }
-
-  .header-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .wordmark {
-    display: flex;
-    align-items: baseline;
-    gap: 10px;
-  }
-
-  .wordmark-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: var(--white);
-    line-height: 1;
-  }
-
-  .wordmark-event {
-    font-size: 12px;
-    font-weight: 300;
-    color: #aaa;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
-
-  .header-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .live-dot {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
-    font-weight: 500;
-    color: #6be08a;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .live-dot::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #6be08a;
-    animation: pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(0.8); }
-  }
-
-  .refresh-btn {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 6px 14px;
-    border: 1px solid #444;
-    border-radius: 4px;
-    background: transparent;
-    color: #ccc;
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.3px;
-  }
-
-  .refresh-btn:hover { border-color: #888; color: #fff; }
-  .refresh-btn:disabled { opacity: 0.4; cursor: default; }
-
-  .last-update {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: #666;
-  }
-
-  /* ── COUNTDOWN BAR ── */
-  .countdown-bar {
-    background: var(--ink);
-    border-bottom: 1px solid #2a2a28;
-    padding: 4px 24px;
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: #555;
-  }
-
-  #countdown { color: #888; }
-
-  /* ── TABS ── */
-  .tabs-wrap {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 20px 24px 0;
-  }
-
-  .tabs {
-    display: flex;
-    gap: 0;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .tab {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 10px 20px;
-    border: none;
-    background: none;
-    color: var(--ink-light);
-    cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: all 0.15s;
-    letter-spacing: 0.2px;
-  }
-
-  .tab:hover { color: var(--ink-mid); }
-  .tab.active { color: var(--ink); border-bottom-color: var(--green-mid); }
-
-  /* ── MAIN ── */
-  main {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 24px 24px 60px;
-  }
-
-  .section { display: none; }
-  .section.active { display: block; }
-
-  /* ── STATUS BAR ── */
-  .status-msg {
-    font-size: 13px;
-    color: var(--ink-light);
-    padding: 12px 0 20px;
-    font-family: 'DM Mono', monospace;
-  }
-
-  .status-msg.error { color: var(--red); }
-
-  /* ── SCOREBOARD GRID ── */
-  .board-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
-    gap: 14px;
-  }
-
-  .bettor-card {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .card-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--ink);
-    color: var(--white);
-  }
-
-  .card-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
-  .card-total {
-    font-family: 'DM Mono', monospace;
-    font-size: 18px;
-    font-weight: 500;
-  }
-
-  .card-total.under { color: #6be08a; }
-  .card-total.over  { color: #ff8080; }
-  .card-total.even  { color: #aaa; }
-
-  .card-body { padding: 0; }
-
-  .pick-row {
-    display: flex;
-    align-items: center;
-    padding: 9px 16px;
-    border-bottom: 1px solid var(--border);
-    gap: 10px;
-  }
-
-  .pick-row:last-child { border-bottom: none; }
-
-  .pick-row.cut-row { opacity: 0.75; background: #fdecea; }
-  .pick-row.cut-row .pick-name { color: #b03030; }
-  .pick-row.cut-row .pick-score { color: #b03030; }
-  .pick-row.cut-row-subtle { opacity: 0.75; background: #fdecea; }
-  .pick-row.cut-row-subtle .pick-name { color: #b03030; }
-  .pick-row.cut-row-subtle .pick-score { color: #b03030; }
-
-  .pick-num {
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-light);
-    min-width: 14px;
-  }
-
-  .pick-info { flex: 1; min-width: 0; }
-
-  .pick-name {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .pick-detail {
-    font-size: 11px;
-    color: var(--ink-light);
-    font-family: 'DM Mono', monospace;
-    margin-top: 1px;
-  }
-
-  .pick-score {
-    font-family: 'DM Mono', monospace;
-    font-size: 15px;
-    font-weight: 500;
-    min-width: 38px;
-    text-align: right;
-  }
-
-  .pick-score.under { color: var(--green); }
-  .pick-score.over  { color: var(--red); }
-  .pick-score.even  { color: var(--ink-mid); }
-  .pick-score.cut   { color: var(--cut); font-size: 12px; }
-  .pick-score.ns    { color: var(--ink-light); }
-
-  .penalty-tag {
-    font-size: 10px;
-    padding: 1px 5px;
-    border-radius: 3px;
-    background: #fff3cd;
-    color: #856404;
-    font-family: 'DM Mono', monospace;
-    margin-left: 4px;
-  }
-
-  /* ── ROUND ROW ── */
-  .card-rounds {
-    display: flex;
-    border-top: 2px solid var(--border);
-    background: #f5f5f2;
-  }
-
-  .round-cell {
-    flex: 1;
-    text-align: center;
-    padding: 6px 4px;
-    border-right: 1px solid var(--border);
-    font-family: 'DM Mono', monospace;
-  }
-
-  .round-cell:last-child { border-right: none; }
-
-  .round-label {
-    font-size: 9px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--ink-light);
-    display: block;
-  }
-
-  .round-val {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--ink-mid);
-    display: block;
-    margin-top: 1px;
-  }
-
-  .round-val.under { color: var(--green); }
-  .round-val.over  { color: var(--red); }
-  .round-val.best  { color: var(--gold); font-weight: 600; }
-
-  /* ── POINTS TABLE ── */
-  .pts-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .pts-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  .pts-table th {
-    padding: 10px 14px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    background: #f5f5f2;
-    border-bottom: 1px solid var(--border);
-    text-align: center;
-  }
-
-  .pts-table th:first-child { text-align: left; }
-
-  .pts-table td {
-    padding: 11px 14px;
-    border-bottom: 1px solid var(--border);
-    text-align: center;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    color: var(--ink-mid);
-  }
-
-  .pts-table tr:last-child td { border-bottom: none; }
-
-  .pts-table td:first-child {
-    text-align: left;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 14px;
-    color: var(--ink);
-  }
-
-  .pts-table td.winner-col {
-    color: var(--gold);
-    font-weight: 500;
-  }
-
-  .pts-total-col {
-    font-weight: 600 !important;
-    color: var(--ink) !important;
-    font-size: 15px !important;
-  }
-
-  .pts-win {
-    background: #f5fbf7 !important;
-  }
-
-  .pts-table td.pts-earned {
-    color: var(--green);
-    font-weight: 500;
-  }
-
-  .rank-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    border-radius: 50%;
-    font-size: 12px;
-    font-weight: 500;
-    font-family: 'DM Mono', monospace;
-    margin-right: 8px;
-  }
-
-  .rank-1 { background: var(--gold-light); color: var(--gold); }
-  .rank-2 { background: #f0f0ee; color: var(--ink-mid); }
-  .rank-3 { background: #fdf0ee; color: #b0634a; }
-  .rank-n { background: var(--surface); color: var(--ink-light); }
-
-  /* ── TEAM SCORES ── */
-  .ts-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-    margin-bottom: 20px;
-  }
-
-  .ts-bettor-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 16px;
-    background: var(--ink);
-    color: var(--white);
-  }
-
-  .ts-bettor-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 18px;
-    letter-spacing: 1px;
-  }
-
-  .ts-bettor-total {
-    font-family: 'DM Mono', monospace;
-    font-size: 14px;
-    font-weight: 500;
-    color: #aaa;
-  }
-
-  .ts-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-    table-layout: fixed;
-  }
-
-  .ts-table th {
-    padding: 8px 12px;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    background: #f5f5f2;
-    border-bottom: 1px solid var(--border);
-    text-align: right;
-  }
-
-  .ts-table th:first-child { text-align: left; width: 35%; }
-  .ts-table th:last-child { background: #eeeee8; }
-
-  .ts-table td {
-    padding: 9px 12px;
-    border-bottom: 1px solid #f0f0ec;
-    font-family: 'DM Mono', monospace;
-    font-size: 13px;
-    text-align: right;
-    color: var(--ink-mid);
-  }
-
-  .ts-table td:first-child {
-    text-align: left;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    color: var(--ink);
-    font-size: 13px;
-  }
-
-  .ts-table tr:last-child td { border-bottom: none; }
-  .ts-table tr.ts-totals td {
-    background: #f5f5f2;
-    font-weight: 600;
-    border-top: 2px solid var(--border);
-    border-bottom: none;
-  }
-  .ts-table tr.ts-totals td:first-child { color: var(--ink-mid); }
-  .ts-table td.ts-total-col { background: #eeeee8; font-weight: 600; }
-  .ts-table th.ts-total-col { background: #eeeee8; }
-  .ts-table tr.cut-row td:first-child { color: #b03030; }
-
-  /* ── LEADERBOARD ── */
-  .lb-wrap {
-    background: var(--white);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .lb-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-  }
-
-  .lb-table th {
-    padding: 10px 14px;
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--ink-light);
-    background: #f5f5f2;
-    border-bottom: 1px solid var(--border);
-    text-align: left;
-  }
-
-  .lb-table th.right { text-align: right; }
-
-  .lb-table td {
-    padding: 9px 14px;
-    border-bottom: 1px solid #f0f0ec;
-    color: var(--ink);
-    font-size: 13px;
-  }
-
-  .lb-table td.mono { font-family: 'DM Mono', monospace; }
-  .lb-table td.right { text-align: right; }
-  .lb-table td.muted { color: var(--ink-light); font-family: 'DM Mono', monospace; }
-
-  .lb-table tr.tracked { background: #f7fdf9; }
-  .lb-table tr.tracked td:nth-child(2) { font-weight: 500; }
-  .lb-table tr.cut-row { opacity: 0.7; background: #fdecea; }
-
-  .owner-pill {
-    display: inline-block;
-    font-size: 10px;
-    padding: 1px 6px;
-    border-radius: 10px;
-    background: var(--green-light);
-    color: var(--green);
-    font-family: 'DM Mono', monospace;
-    margin-left: 6px;
-    font-weight: 500;
-  }
-
-  /* ── PENALTY NOTE ── */
-  .penalty-note {
-    margin-top: 10px;
-    padding: 10px 14px;
-    background: #fffbf0;
-    border: 1px solid #f0e0a0;
-    border-radius: 6px;
-    font-size: 12px;
-    color: #7a6020;
-    font-family: 'DM Mono', monospace;
-  }
-
-  /* ── LOADING STATE ── */
-  .loading-overlay {
-    text-align: center;
-    padding: 60px 0;
-    color: var(--ink-light);
-    font-size: 14px;
-  }
-
-  .loader {
-    display: inline-block;
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--border);
-    border-top-color: var(--green-mid);
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    margin-right: 10px;
-    vertical-align: middle;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 600px) {
-    .header-inner { padding: 12px 16px; }
-    main, .tabs-wrap { padding-left: 16px; padding-right: 16px; }
-    .board-grid { grid-template-columns: 1fr; }
-    .wordmark-event { display: none; }
-  }
+- { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+font-family: ‘DM Sans’, sans-serif;
+background: var(–surface);
+color: var(–ink);
+min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+background: var(–ink);
+color: var(–white);
+padding: 0;
+position: sticky;
+top: 0;
+z-index: 100;
+border-bottom: 3px solid var(–green-mid);
+}
+
+.header-inner {
+max-width: 1100px;
+margin: 0 auto;
+padding: 14px 24px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+gap: 16px;
+flex-wrap: wrap;
+}
+
+.wordmark {
+display: flex;
+align-items: baseline;
+gap: 10px;
+}
+
+.wordmark-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 28px;
+letter-spacing: 2px;
+color: var(–white);
+line-height: 1;
+}
+
+.wordmark-event {
+font-size: 12px;
+font-weight: 300;
+color: #aaa;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+.header-right {
+display: flex;
+align-items: center;
+gap: 16px;
+}
+
+.live-dot {
+display: flex;
+align-items: center;
+gap: 6px;
+font-size: 12px;
+font-weight: 500;
+color: #6be08a;
+font-family: ‘DM Mono’, monospace;
+}
+
+.live-dot::before {
+content: ‘’;
+width: 7px;
+height: 7px;
+border-radius: 50%;
+background: #6be08a;
+animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+0%, 100% { opacity: 1; transform: scale(1); }
+50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.refresh-btn {
+font-family: ‘DM Sans’, sans-serif;
+font-size: 12px;
+font-weight: 500;
+padding: 6px 14px;
+border: 1px solid #444;
+border-radius: 4px;
+background: transparent;
+color: #ccc;
+cursor: pointer;
+transition: all 0.15s;
+letter-spacing: 0.3px;
+}
+
+.refresh-btn:hover { border-color: #888; color: #fff; }
+.refresh-btn:disabled { opacity: 0.4; cursor: default; }
+
+.last-update {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: #666;
+}
+
+/* ── COUNTDOWN BAR ── */
+.countdown-bar {
+background: var(–ink);
+border-bottom: 1px solid #2a2a28;
+padding: 4px 24px;
+text-align: center;
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: #555;
+}
+
+#countdown { color: #888; }
+
+/* ── TABS ── */
+.tabs-wrap {
+max-width: 1100px;
+margin: 0 auto;
+padding: 20px 24px 0;
+}
+
+.tabs {
+display: flex;
+gap: 0;
+border-bottom: 1px solid var(–border);
+}
+
+.tab {
+font-family: ‘DM Sans’, sans-serif;
+font-size: 13px;
+font-weight: 500;
+padding: 10px 20px;
+border: none;
+background: none;
+color: var(–ink-light);
+cursor: pointer;
+border-bottom: 2px solid transparent;
+margin-bottom: -1px;
+transition: all 0.15s;
+letter-spacing: 0.2px;
+}
+
+.tab:hover { color: var(–ink-mid); }
+.tab.active { color: var(–ink); border-bottom-color: var(–green-mid); }
+
+/* ── MAIN ── */
+main {
+max-width: 1100px;
+margin: 0 auto;
+padding: 24px 24px 60px;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* ── STATUS BAR ── */
+.status-msg {
+font-size: 13px;
+color: var(–ink-light);
+padding: 12px 0 20px;
+font-family: ‘DM Mono’, monospace;
+}
+
+.status-msg.error { color: var(–red); }
+
+/* ── SCOREBOARD GRID ── */
+.board-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+gap: 14px;
+}
+
+.bettor-card {
+background: var(–white);
+border: 1px solid var(–border);
+border-radius: 8px;
+overflow: hidden;
+}
+
+.card-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 12px 16px;
+background: var(–ink);
+color: var(–white);
+}
+
+.card-name {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 20px;
+letter-spacing: 1px;
+}
+
+.card-total {
+font-family: ‘DM Mono’, monospace;
+font-size: 18px;
+font-weight: 500;
+}
+
+.card-total.under { color: #6be08a; }
+.card-total.over  { color: #ff8080; }
+.card-total.even  { color: #aaa; }
+
+.card-body { padding: 0; }
+
+.pick-row {
+display: flex;
+align-items: center;
+padding: 9px 16px;
+border-bottom: 1px solid var(–border);
+gap: 10px;
+}
+
+.pick-row:last-child { border-bottom: none; }
+
+.pick-row.cut-row { opacity: 0.75; background: #fdecea; }
+.pick-row.cut-row .pick-name { color: #b03030; }
+.pick-row.cut-row .pick-score { color: #b03030; }
+.pick-row.cut-row-subtle { opacity: 0.75; background: #fdecea; }
+.pick-row.cut-row-subtle .pick-name { color: #b03030; }
+.pick-row.cut-row-subtle .pick-score { color: #b03030; }
+
+.pick-num {
+font-family: ‘DM Mono’, monospace;
+font-size: 11px;
+color: var(–ink-light);
+min-width: 14px;
+}
+
+.pick-info { flex: 1; min-width: 0; }
+
+.pick-name {
+font-size: 13px;
+font-weight: 500;
+color: var(–ink);
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.pick-detail {
+font-size: 11px;
+color: var(–ink-light);
+font-family: ‘DM Mono’, monospace;
+margin-top: 1px;
+}
+
+.pick-score {
+font-family: ‘DM Mono’, monospace;
+font-size: 15px;
+font-weight: 500;
+min-width: 38px;
+text-align: right;
+}
+
+.pick-score.under { color: var(–green); }
+.pick-score.over  { color: var(–red); }
+.pick-score.even  { color: var(–ink-mid); }
+.pick-score.cut   { color: var(–cut); font-size: 12px; }
+.pick-score.ns    { color: var(–ink-light); }
+
+.penalty-tag {
+font-size: 10px;
+padding: 1px 5px;
+border-radius: 3px;
+background: #fff3cd;
+color: #856404;
+font-family: ‘DM Mono’, monospace;
+margin-left: 4px;
+}
+
+/* ── ROUND ROW ── */
+.card-rounds {
+display: flex;
+border-top: 2px solid var(–border);
+background: #f5f5f2;
+}
+
+.round-cell {
+flex: 1;
+text-align: center;
+padding: 6px 4px;
+border-right: 1px solid var(–border);
+font-family: ‘DM Mono’, monospace;
+}
+
+.round-cell:last-child { border-right: none; }
+
+.round-label {
+font-size: 9px;
+text-transform: uppercase;
+letter-spacing: 0.5px;
+color: var(–ink-light);
+display: block;
+}
+
+.round-val {
+font-size: 13px;
+font-weight: 500;
+color: var(–ink-mid);
+display: block;
+margin-top: 1px;
+}
+
+.round-val.under { color: var(–green); }
+.round-val.over  { color: var(–red); }
+.round-val.best  { color: var(–gold); font-weight: 600; }
+
+/* ── POINTS TABLE ── */
+.pts-wrap {
+background: var(–white);
+border: 1px solid var(–border);
+border-radius: 8px;
+overflow: hidden;
+}
+
+.pts-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 13px;
+}
+
+.pts-table th {
+padding: 10px 14px;
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: var(–ink-light);
+background: #f5f5f2;
+border-bottom: 1px solid var(–border);
+text-align: center;
+}
+
+.pts-table th:first-child { text-align: left; }
+
+.pts-table td {
+padding: 11px 14px;
+border-bottom: 1px solid var(–border);
+text-align: center;
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+color: var(–ink-mid);
+}
+
+.pts-table tr:last-child td { border-bottom: none; }
+
+.pts-table td:first-child {
+text-align: left;
+font-family: ‘DM Sans’, sans-serif;
+font-weight: 500;
+font-size: 14px;
+color: var(–ink);
+}
+
+.pts-table td.winner-col {
+color: var(–gold);
+font-weight: 500;
+}
+
+.pts-total-col {
+font-weight: 600 !important;
+color: var(–ink) !important;
+font-size: 15px !important;
+}
+
+.pts-win {
+background: #f5fbf7 !important;
+}
+
+.pts-table td.pts-earned {
+color: var(–green);
+font-weight: 500;
+}
+
+.rank-badge {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+width: 22px;
+height: 22px;
+border-radius: 50%;
+font-size: 12px;
+font-weight: 500;
+font-family: ‘DM Mono’, monospace;
+margin-right: 8px;
+}
+
+.rank-1 { background: var(–gold-light); color: var(–gold); }
+.rank-2 { background: #f0f0ee; color: var(–ink-mid); }
+.rank-3 { background: #fdf0ee; color: #b0634a; }
+.rank-n { background: var(–surface); color: var(–ink-light); }
+
+/* ── TEAM SCORES ── */
+.ts-wrap {
+background: var(–white);
+border: 1px solid var(–border);
+border-radius: 8px;
+overflow: hidden;
+margin-bottom: 20px;
+}
+
+.ts-bettor-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+padding: 10px 16px;
+background: var(–ink);
+color: var(–white);
+}
+
+.ts-bettor-name {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 18px;
+letter-spacing: 1px;
+}
+
+.ts-bettor-total {
+font-family: ‘DM Mono’, monospace;
+font-size: 14px;
+font-weight: 500;
+color: #aaa;
+}
+
+.ts-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 13px;
+table-layout: fixed;
+}
+
+.ts-table th {
+padding: 8px 12px;
+font-size: 10px;
+font-weight: 500;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: var(–ink-light);
+background: #f5f5f2;
+border-bottom: 1px solid var(–border);
+text-align: right;
+}
+
+.ts-table th:first-child { text-align: left; width: 35%; }
+.ts-table th:last-child { background: #eeeee8; }
+
+.ts-table td {
+padding: 9px 12px;
+border-bottom: 1px solid #f0f0ec;
+font-family: ‘DM Mono’, monospace;
+font-size: 13px;
+text-align: right;
+color: var(–ink-mid);
+}
+
+.ts-table td:first-child {
+text-align: left;
+font-family: ‘DM Sans’, sans-serif;
+font-weight: 500;
+color: var(–ink);
+font-size: 13px;
+}
+
+.ts-table tr:last-child td { border-bottom: none; }
+.ts-table tr.ts-totals td {
+background: #f5f5f2;
+font-weight: 600;
+border-top: 2px solid var(–border);
+border-bottom: none;
+}
+.ts-table tr.ts-totals td:first-child { color: var(–ink-mid); }
+.ts-table td.ts-total-col { background: #eeeee8; font-weight: 600; }
+.ts-table th.ts-total-col { background: #eeeee8; }
+.ts-table tr.cut-row td:first-child { color: #b03030; }
+
+/* ── LEADERBOARD ── */
+.lb-wrap {
+background: var(–white);
+border: 1px solid var(–border);
+border-radius: 8px;
+overflow: hidden;
+}
+
+.lb-table {
+width: 100%;
+border-collapse: collapse;
+font-size: 13px;
+}
+
+.lb-table th {
+padding: 10px 14px;
+font-size: 11px;
+font-weight: 500;
+letter-spacing: 0.5px;
+text-transform: uppercase;
+color: var(–ink-light);
+background: #f5f5f2;
+border-bottom: 1px solid var(–border);
+text-align: left;
+}
+
+.lb-table th.right { text-align: right; }
+
+.lb-table td {
+padding: 9px 14px;
+border-bottom: 1px solid #f0f0ec;
+color: var(–ink);
+font-size: 13px;
+}
+
+.lb-table td.mono { font-family: ‘DM Mono’, monospace; }
+.lb-table td.right { text-align: right; }
+.lb-table td.muted { color: var(–ink-light); font-family: ‘DM Mono’, monospace; }
+
+.lb-table tr.tracked { background: #f7fdf9; }
+.lb-table tr.tracked td:nth-child(2) { font-weight: 500; }
+.lb-table tr.cut-row { opacity: 0.7; background: #fdecea; }
+
+.owner-pill {
+display: inline-block;
+font-size: 10px;
+padding: 1px 6px;
+border-radius: 10px;
+background: var(–green-light);
+color: var(–green);
+font-family: ‘DM Mono’, monospace;
+margin-left: 6px;
+font-weight: 500;
+}
+
+/* ── PENALTY NOTE ── */
+.penalty-note {
+margin-top: 10px;
+padding: 10px 14px;
+background: #fffbf0;
+border: 1px solid #f0e0a0;
+border-radius: 6px;
+font-size: 12px;
+color: #7a6020;
+font-family: ‘DM Mono’, monospace;
+}
+
+/* ── LOADING STATE ── */
+.loading-overlay {
+text-align: center;
+padding: 60px 0;
+color: var(–ink-light);
+font-size: 14px;
+}
+
+.loader {
+display: inline-block;
+width: 20px;
+height: 20px;
+border: 2px solid var(–border);
+border-top-color: var(–green-mid);
+border-radius: 50%;
+animation: spin 0.7s linear infinite;
+margin-right: 10px;
+vertical-align: middle;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 600px) {
+.header-inner { padding: 12px 16px; }
+main, .tabs-wrap { padding-left: 16px; padding-right: 16px; }
+.board-grid { grid-template-columns: 1fr; }
+.wordmark-event { display: none; }
+}
 </style>
+
 </head>
 <body>
 
@@ -646,11 +648,11 @@
 // CONFIG — update picks here each tournament
 // ═══════════════════════════════════════════════
 const CONFIG = {
-  tournamentId: "401811940", // Houston Open (test) — swap for Masters: 401811941
+  tournamentId: "401811940",
   eventName: "Valero Texas Open",
   bettors: ["Dave","TJ","Billy","Nick","Ry","Alex"],
   picks: {
-Dave:  ["Kevin Streelman", "Si Woo Kim", "Davis Thompson", "Ludvig Åberg"],
+    Dave:  ["Kevin Streelman", "Si Woo Kim", "Davis Thompson", "Ludvig Åberg"],
     TJ:    ["Tommy Fleetwood", "Max Homa", "J.J. Spaun", "Max McGreevy"],
     Billy: ["Bud Cauley", "Hideki Matsuyama", "Sepp Straka", "Séamus Power"],
     Nick:  ["Tony Finau", "Thorbjørn Olesen", "Jhonattan Vegas", "Nick Hardy"],
@@ -664,12 +666,9 @@ Dave:  ["Kevin Streelman", "Si Woo Kim", "Davis Thompson", "Ludvig Åberg"],
     Nick:  "Paul Waring",
     Ry:    "Keith Mitchell",
     Alex:  "Matthieu Pavon"
-
   },
-  // Points per category (winner takes all, ties split)
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
-  refreshInterval: 60, // seconds
-  // Bettor colors — header bg for cards and team score tables
+  refreshInterval: 60,
   colors: {
     Dave:  { bg: "#6CABDD", text: "#ffffff" },
     TJ:    { bg: "#006F71", text: "#ffffff" },
@@ -711,15 +710,12 @@ function relClass(n) {
   return "even";
 }
 
-// Compute penalty score for a CUT player:
-// +2 beyond the worst score of any PICKED player (in any bettor's team) who is NOT on this team
 function penaltyScore(roundKey, teamPlayers) {
   const teamSet = new Set(teamPlayers);
-  // All players picked by anyone in the group
   const allPicked = new Set(Object.values(CONFIG.picks).flat());
   let worst = null;
   allPicked.forEach(name => {
-    if (teamSet.has(name)) return; // skip own team
+    if (teamSet.has(name)) return;
     const info = scoreMap[name];
     if (!info || info.isCut || info.isWD) return;
     const val = parseRelScore(info[roundKey]);
@@ -729,18 +725,14 @@ function penaltyScore(roundKey, teamPlayers) {
   return worst + 2;
 }
 
-// Get a player's effective score for a round (penalty if CUT)
 function effectiveRoundScore(player, roundKey) {
   const info = scoreMap[player];
   if (!info) return null;
-  if (info.isCut || info.isWD) return null; // handled at team level
+  if (info.isCut || info.isWD) return null;
   const val = parseRelScore(info[roundKey]);
   return val;
 }
 
-// Team round total: sum of 4 picks
-// CUT players: use their actual score for R1+R2 (they played those)
-// Penalty (+2 worst non-team) only applies in R3 and R4
 function teamRoundTotal(bettor, roundKey) {
   const players = CONFIG.picks[bettor];
   const penaltyRounds = new Set(["r3", "r4"]);
@@ -754,11 +746,9 @@ function teamRoundTotal(bettor, roundKey) {
     const actual = parseRelScore(info[roundKey]);
 
     if (actual !== null) {
-      // Always use real score if available (covers R1+R2 for CUT players)
       total += actual;
       hasAny = true;
     } else if ((info.isCut || info.isWD) && penaltyRounds.has(roundKey)) {
-      // CUT player with no score in R3/R4 — apply penalty
       const pen = penaltyScore(roundKey, players);
       if (pen !== null) { total += pen; hasAny = true; }
     }
@@ -767,7 +757,6 @@ function teamRoundTotal(bettor, roundKey) {
   return hasAny ? total : null;
 }
 
-// Team overall total: sum of all rounds including penalties for CUT players
 function teamOverallTotal(bettor) {
   const players = CONFIG.picks[bettor];
   let total = 0;
@@ -778,12 +767,10 @@ function teamOverallTotal(bettor) {
     if (!info) return;
 
     if (info.isCut || info.isWD) {
-      // R1+R2: use actual scores
       const r1 = parseRelScore(info.r1);
       const r2 = parseRelScore(info.r2);
       if (r1 !== null) { total += r1; hasAny = true; }
       if (r2 !== null) { total += r2; hasAny = true; }
-      // R3+R4: add penalty if those rounds have started
       const r3started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
       const r4started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
       if (r3started) { const p = penaltyScore("r3", players); if (p !== null) { total += p; hasAny = true; } }
@@ -800,30 +787,34 @@ function teamOverallTotal(bettor) {
 // ═══════════════════════════════════════════════
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
-// Returns true if every player in the field has a completed score for this round key
-// i.e. round is finished when all active (non-CUT/WD) players have a numeric score
+
+// A round is complete if:
+// 1. A later round has any scores (proves this round is done), OR
+// 2. At least 90% of active players have a score for this round
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!relevant.length) return false;
-  const holesKey = roundKey + "holes";
-  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+
+  const roundOrder = ["r1", "r2", "r3", "r4"];
+  const idx = roundOrder.indexOf(roundKey);
+
+  // If a later round has any scores, this round is definitively done
+  for (let i = idx + 1; i < roundOrder.length; i++) {
+    const hasLaterData = entries.some(p =>
+      !p.isCut && !p.isWD && parseRelScore(p[roundOrder[i]]) !== null
+    );
+    if (hasLaterData) return true;
+  }
+
+  // Otherwise: 90%+ of active players have a score for this round
+  const active = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+  if (!active.length) return false;
+  const withScore = active.filter(p => parseRelScore(p[roundKey]) !== null);
+  return withScore.length / active.length >= 0.9;
 }
 
-// Returns true if tournament is officially over:
-// all 4 rounds complete and ESPN status shows "post" or "closed"
 function isTournamentFinal() {
   return isRoundComplete("r4");
-}
-
-// Award $12 to winner(s) of a category; split evenly on ties, round to cents
-function awardPot(winners, pot) {
-  if (!winners.length) return {};
-  const share = Math.round((pot / winners.length) * 100) / 100;
-  const result = {};
-  winners.forEach(b => result[b] = share);
-  return result;
 }
 
 function calcPoints() {
@@ -832,10 +823,6 @@ function calcPoints() {
     pts[b] = { R1: 0, R2: 0, R3: 0, R4: 0, Overall: 0, Winner: 0,
                Earned: 0, BuyIn: 0, Net: 0, Total: 0 };
   });
-
-  // Each round: lowest team total FOR THAT ROUND ONLY wins $12
-  // Overall: lowest cumulative team total across all completed rounds
-  // Penalty: CUT players in R3/R4 get +2 beyond worst active non-team score that round
 
   const roundDefs = [
     { label: "R1", key: "r1" },
@@ -858,7 +845,6 @@ function calcPoints() {
     winners.forEach(b => pts[b][label] = share);
   });
 
-  // Overall: sum of all completed rounds, lowest team total wins
   if (isTournamentFinal()) {
     const overalls = {};
     CONFIG.bettors.forEach(b => {
@@ -877,9 +863,6 @@ function calcPoints() {
       winnersO.forEach(b => pts[b].Overall = shareO);
     }
 
-    // Top Finisher Bonus: $12 to whoever has the highest-finishing PICKED player
-    // Looks only at main 4 picks (not alts) across all bettors
-    // "Highest finishing" = lowest to-par score among all picked players
     const allMainPicks = new Set(Object.values(CONFIG.picks).flat().filter(n => n));
     let topPickedPlayer = null, topScore = null;
     allMainPicks.forEach(name => {
@@ -901,8 +884,7 @@ function calcPoints() {
     }
   }
 
-  // Net cash: earned minus flat $12 buy-in for the whole tournament
-  const buyIn = CONFIG.points.R1; // $12 flat, paid once
+  const buyIn = CONFIG.points.R1;
 
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
@@ -931,50 +913,38 @@ async function fetchScores() {
   if (!event) event = data.events?.[0];
   if (!event) throw new Error("No event found");
 
-  // Update event name in header
   document.getElementById("event-name").textContent = event.name || CONFIG.eventName;
 
   const newMap = {};
   const comp = event.competitions?.[0];
   if (!comp) throw new Error("No competition data");
 
-  // Sort by order (leaderboard position)
   const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
 
   sorted.forEach((p, idx) => {
     const name = p.athlete?.displayName;
     if (!name) return;
 
-    // ESPN golf API has no status object — detect CUT by:
-    // 1. Explicit "CUT" in score field
-    // 2. Player has fewer linescore rounds than the max in the field
-    //    (leaders are always in the highest round; CUT players stay at 2 rounds)
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    // A player missed the cut if the field has moved to R3+ and they only have 2 rounds
-    // AND their 2nd round linescore has 18 holes (they finished R2)
     const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
     const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
-    // Rounds: top-level linescores array, one entry per round
     const ls = p.linescores || [];
     const r1 = ls[0]?.displayValue || "--";
     const r2 = ls[1]?.displayValue || "--";
     const r3 = ls[2]?.displayValue || "--";
     const r4 = ls[3]?.displayValue || "--";
-    // Store hole counts so isRoundComplete can check properly
     const r1holes = ls[0]?.linescores?.length ?? 0;
     const r2holes = ls[1]?.linescores?.length ?? 0;
     const r3holes = ls[2]?.linescores?.length ?? 0;
     const r4holes = ls[3]?.linescores?.length ?? 0;
 
-    // Find the actual current round — last linescore that has a displayValue or hole data
-    // ESPN pre-creates empty future round slots, so we skip those
     let currentRoundData = null;
     for (let i = ls.length - 1; i >= 0; i--) {
       const entry = ls[i];
@@ -985,32 +955,20 @@ async function fetchScores() {
     }
     const today = (isCut || isWD || !currentRoundData) ? "--" : (currentRoundData.displayValue || "--");
 
-    // Thru: derived from hole-by-hole data inside the current round
-    // holes.length = number of holes completed by this player today
-    // If 0 holes: haven't started yet
-    // If 1-17 holes: currently playing, show hole number  
-    // If 18 holes: finished their round today
     let thru = "--";
     if (isCut || isWD) {
       thru = "CUT";
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
       if (holes.length === 0) {
-        // No hole data — check if this is a completed prior round or not started
-        if (ls.length > 1) {
-          // Has multiple rounds — current round not started yet or no hole data
-          thru = "--";
-        } else {
-          thru = "--";
-        }
+        thru = "--";
       } else if (holes.length < 18) {
-        thru = String(holes.length); // on this hole right now
+        thru = String(holes.length);
       } else {
-        thru = "F"; // completed all 18 holes
+        thru = "F";
       }
     }
 
-    // Position from sort order (1-based)
     const pos = (isCut || isWD) ? "CUT" : String(idx + 1);
 
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4,
@@ -1027,9 +985,7 @@ function renderScoreboard() {
   const el  = document.getElementById("scoreboard");
   const pts = calcPoints();
 
-  // Sort by overall total ascending
   const sorted = [...CONFIG.bettors].sort((a, b) => {
-    // Sort by today's active round score (lowest first = leader on top)
     const getRoundScore = (bettor) => {
       const r4 = teamRoundTotal(bettor, "r4");
       const r3 = teamRoundTotal(bettor, "r3");
@@ -1048,8 +1004,6 @@ function renderScoreboard() {
 
   sorted.forEach(bettor => {
     const picks   = CONFIG.picks[bettor];
-    // Card header shows today's active round score
-    // Find the most recent round with data
     const r1t_h = teamRoundTotal(bettor, "r1");
     const r2t_h = teamRoundTotal(bettor, "r2");
     const r3t_h = teamRoundTotal(bettor, "r3");
@@ -1065,7 +1019,6 @@ function renderScoreboard() {
     const r3t = teamRoundTotal(bettor, "r3");
     const r4t = teamRoundTotal(bettor, "r4");
 
-    // Find best round across all bettors (for gold highlight)
     const r1s = CONFIG.bettors.map(b => teamRoundTotal(b, "r1")).filter(n => n !== null);
     const bestR1 = r1s.length ? Math.min(...r1s) : null;
 
@@ -1090,7 +1043,6 @@ function renderScoreboard() {
       const todayParsed = parseRelScore(todayVal);
       const todayCls = relClass(todayParsed);
 
-      // Format thru for display
       let holeDisplay = "";
       if (isWD) {
         holeDisplay = "WD";
@@ -1102,7 +1054,6 @@ function renderScoreboard() {
         holeDisplay = "Hole " + thru;
       }
 
-      // Today's score formatted
       const todayDisplay = todayVal && todayVal !== "--"
         ? (todayParsed === 0 ? "E today" : (todayParsed > 0 ? "+" + todayParsed + " today" : todayParsed + " today"))
         : "";
@@ -1113,13 +1064,9 @@ function renderScoreboard() {
         if (pen !== null) penNote = `<span class="penalty-tag">+2 pen</span>`;
       }
 
-      // For CUT players: show their penalty score for the current/most recent round
-      // This is the score being used in the team total calculation
       let cutPenaltyDisplay = "";
       let cutPenaltyCls = "over";
       if (isCut) {
-        // Only show penalty for rounds that have actually started
-        // A round has started if any active player has a score for it
         const r4started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
         const r3started = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
         const pen = r4started ? penaltyScore("r4", picks)
@@ -1150,7 +1097,6 @@ function renderScoreboard() {
       </div>`;
     });
 
-    // Alt pick if exists
     const alt = CONFIG.alts[bettor];
     if (alt) {
       const ai = scoreMap[alt] || {};
@@ -1264,8 +1210,6 @@ function renderPoints() {
   });
 
   html += '</tbody></table></div>';
-
-  // Status note
   html += `<p style="font-size:12px;color:var(--ink-light);margin-top:10px;font-family:'DM Mono',monospace">
     $12 buy-in &nbsp;·&nbsp; $12 to lowest team total each round · Overall paid on final result · ties split evenly
   </p>`;
@@ -1289,7 +1233,6 @@ function renderTeamScores() {
     const r3t = teamRoundTotal(bettor, "r3");
     const r4t = teamRoundTotal(bettor, "r4");
 
-    // Overall = sum of completed rounds
     let overallParts = [r1t, r2t, r3t, r4t].filter(v => v !== null);
     const overall = overallParts.length ? overallParts.reduce((a,b) => a+b, 0) : null;
 
@@ -1312,8 +1255,6 @@ function renderTeamScores() {
       const isCut = info.isCut || info.isWD;
       const r1 = info.r1 || "--";
       const r2 = info.r2 || "--";
-      // CUT players: show actual R1+R2 scores, then CUT badge for R3/R4
-      // CUT players: show penalty score only for rounds that have started
       const r3hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r3) !== null);
       const r4hasStarted = Object.values(scoreMap).some(p => !p.isCut && !p.isWD && parseRelScore(p.r4) !== null);
       const r3pen = (isCut && r3hasStarted) ? penaltyScore("r3", picks) : null;
@@ -1325,7 +1266,6 @@ function renderTeamScores() {
         ? (r4pen !== null ? `<span style='color:#c0392b;font-weight:500'>${fmtRel(r4pen)}</span><span style='color:var(--cut);font-size:10px;margin-left:3px'>pen</span>` : "<span style='color:var(--cut)'>--</span>")
         : (info.r4 || "--");
 
-      // Player total: actual scores for R1+R2, penalty scores for R3/R4 if CUT
       const r1v = parseRelScore(info.r1);
       const r2v = parseRelScore(info.r2);
       const r3v = isCut ? r3pen : parseRelScore(info.r3);
@@ -1350,7 +1290,6 @@ function renderTeamScores() {
       </tr>`;
     });
 
-    // Totals row
     html += `<tr class="ts-totals">
       <td>Team Total</td>
       <td class="${relClass(r1t)}">${r1t !== null ? fmtRel(r1t) : "--"}</td>
@@ -1475,5 +1414,6 @@ function showTab(id) {
 // ── BOOT ──
 refresh();
 </script>
+
 </body>
 </html>
