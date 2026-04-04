@@ -788,29 +788,15 @@ function teamOverallTotal(bettor) {
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
 
-// A round is complete if:
-// 1. A later round has any scores (proves this round is done), OR
-// 2. At least 90% of active players have a score for this round
+// A round is complete only when EVERY active (non-CUT/WD) player
+// has finished all 18 holes for that round (shows "F").
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-
-  const roundOrder = ["r1", "r2", "r3", "r4"];
-  const idx = roundOrder.indexOf(roundKey);
-
-  // If a later round has any scores, this round is definitively done
-  for (let i = idx + 1; i < roundOrder.length; i++) {
-    const hasLaterData = entries.some(p =>
-      !p.isCut && !p.isWD && parseRelScore(p[roundOrder[i]]) !== null
-    );
-    if (hasLaterData) return true;
-  }
-
-  // Otherwise: 90%+ of active players have a score for this round
-  const active = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!active.length) return false;
-  const withScore = active.filter(p => parseRelScore(p[roundKey]) !== null);
-  return withScore.length / active.length >= 0.9;
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+  if (!relevant.length) return false;
+  const holesKey = roundKey + "holes";
+  return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
 
 function isTournamentFinal() {

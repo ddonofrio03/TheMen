@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head><title>Round Logic Tests</title></head>
+<body>
+<h2>Round Logic Unit Tests</h2>
+<pre id="output"></pre>
+<script>
+// ═══════════════════════════════════════════════
+// Minimal reproduction of scoring functions from valero.html
+// ═══════════════════════════════════════════════
+let scoreMap = {};
+
+function parseRelScore(s) {
+  if (!s || s === "--" || s === "-" || s === "CUT" || s === "WD") return null;
+  if (s === "E") return 0;
+  const n = parseInt(s.replace("+", ""));
+  return isNaN(n) ? null : n;
+}
+
+// THE FIXED VERSION — round is complete only when all active players have 18 holes
+function isRoundComplete(roundKey) {
+  const entries = Object.values(scoreMap);
+  if (!entries.length) return false;
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+  if (!relevant.length) return false;
+  const holesKey = roundKey + "holes";
+  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+}
+
+function isTournamentFinal() {
+  return isRoundComplete("r4");
+}
+
+// ═══════════════════════════════════════════════
+// Test runner
+// ═══════════════════════════════════════════════
+const results = [];
+let passed = 0, failed = 0;
+
+function assert(condition, name) {
+  if (condition) {
+    results.push("PASS: " + name);
+    passed++;
+  } else {
+    results.push("FAIL: " + name);
+    failed++;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// Test 1: Empty scoreMap — nothing is complete
+// ═══════════════════════════════════════════════
+scoreMap = {};
+assert(!isRoundComplete("r1"), "Empty scoreMap → R1 not complete");
+assert(!isRoundComplete("r2"), "Empty scoreMap → R2 not complete");
+assert(!isRoundComplete("r3"), "Empty scoreMap → R3 not complete");
+assert(!isTournamentFinal(), "Empty scoreMap → tournament not final");
+
+// ═══════════════════════════════════════════════
+// Test 2: R1 fully complete (all 18 holes), R2 in progress
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r2: "-1", r1holes: 18, r2holes: 9, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+  "Player B": { r1: "+1", r2: "E",  r1holes: 18, r2holes: 12, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+  "Player C": { r1: "E",  r2: "+2", r1holes: 18, r2holes: 18, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+};
+assert(isRoundComplete("r1"), "All 18 holes R1 → R1 complete");
+assert(!isRoundComplete("r2"), "Mixed holes R2 (9,12,18) → R2 NOT complete");
+assert(!isRoundComplete("r3"), "No R3 data → R3 NOT complete");
+
+// ═══════════════════════════════════════════════
+// Test 3: R1 + R2 complete, R3 ongoing — THE KEY SCENARIO
+// This is the user's current situation: round 2 done, round 3 in progress
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r2: "-1", r3: "-2", r1holes: 18, r2holes: 18, r3holes: 14, r4holes: 0, isCut: false, isWD: false },
+  "Player B": { r1: "+1", r2: "E",  r3: "+1", r1holes: 18, r2holes: 18, r3holes: 10, r4holes: 0, isCut: false, isWD: false },
+  "Player C": { r1: "E",  r2: "+2", r3: "E",  r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 0, isCut: false, isWD: false },
+  // CUT player — should be ignored for round completion checks
+  "Player D": { r1: "+5", r2: "+6", r3: "--", r1holes: 18, r2holes: 18, r3holes: 0, r4holes: 0, isCut: true, isWD: false },
+};
+assert(isRoundComplete("r1"), "R1 complete (all 18)");
+assert(isRoundComplete("r2"), "R2 complete (all active have 18)");
+assert(!isRoundComplete("r3"), "R3 NOT complete (A=14, B=10 holes) — this is the critical fix");
+assert(!isRoundComplete("r4"), "R4 not started");
+assert(!isTournamentFinal(), "Tournament not final");
+
+// ═══════════════════════════════════════════════
+// Test 4: R3 fully complete (all active players at 18 holes)
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r2: "-1", r3: "-2", r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 0, isCut: false, isWD: false },
+  "Player B": { r1: "+1", r2: "E",  r3: "+1", r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 0, isCut: false, isWD: false },
+  "Player C": { r1: "E",  r2: "+2", r3: "E",  r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 0, isCut: false, isWD: false },
+  "Player D": { r1: "+5", r2: "+6", r3: "--", r1holes: 18, r2holes: 18, r3holes: 0, r4holes: 0, isCut: true, isWD: false },
+};
+assert(isRoundComplete("r3"), "R3 complete when all active players have 18 holes");
+assert(!isRoundComplete("r4"), "R4 still not started");
+assert(!isTournamentFinal(), "Tournament not final (R4 not done)");
+
+// ═══════════════════════════════════════════════
+// Test 5: Full tournament complete
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r2: "-1", r3: "-2", r4: "-4", r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 18, isCut: false, isWD: false },
+  "Player B": { r1: "+1", r2: "E",  r3: "+1", r4: "-1", r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 18, isCut: false, isWD: false },
+  "Player D": { r1: "+5", r2: "+6", r3: "--", r4: "--", r1holes: 18, r2holes: 18, r3holes: 0, r4holes: 0, isCut: true, isWD: false },
+};
+assert(isRoundComplete("r1"), "R1 complete");
+assert(isRoundComplete("r2"), "R2 complete");
+assert(isRoundComplete("r3"), "R3 complete");
+assert(isRoundComplete("r4"), "R4 complete");
+assert(isTournamentFinal(), "Tournament IS final");
+
+// ═══════════════════════════════════════════════
+// Test 6: WD player should be ignored (not block round completion)
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r2: "-1", r1holes: 18, r2holes: 18, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+  "Player B": { r1: "+1", r2: "WD", r1holes: 18, r2holes: 5, r3holes: 0, r4holes: 0, isCut: false, isWD: true },
+};
+assert(isRoundComplete("r1"), "R1 complete (WD player ignored)");
+assert(isRoundComplete("r2"), "R2 complete (only active Player A has 18, WD ignored)");
+
+// ═══════════════════════════════════════════════
+// Test 7: Player hasn't teed off yet (0 holes R1) — not relevant
+// ═══════════════════════════════════════════════
+scoreMap = {
+  "Player A": { r1: "-3", r1holes: 18, r2holes: 0, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+  "Player B": { r1: "--", r1holes: 0, r2holes: 0, r3holes: 0, r4holes: 0, isCut: false, isWD: false },
+};
+assert(isRoundComplete("r1"), "R1 complete — player with 0 R1 holes filtered out (hasn't teed off)");
+
+// ═══════════════════════════════════════════════
+// Test 8: 90% of players done but one still on course — should NOT be complete
+// This is the exact scenario the old buggy 90% threshold would have gotten wrong
+// ═══════════════════════════════════════════════
+scoreMap = {};
+for (let i = 0; i < 60; i++) {
+  scoreMap["Player " + i] = {
+    r1: "-" + (i % 5), r2: "+" + (i % 3), r3: "E",
+    r1holes: 18, r2holes: 18, r3holes: 18, r4holes: 0,
+    isCut: false, isWD: false
+  };
+}
+// One player still on hole 16
+scoreMap["LastGuy"] = {
+  r1: "+2", r2: "+1", r3: "-1",
+  r1holes: 18, r2holes: 18, r3holes: 16, r4holes: 0,
+  isCut: false, isWD: false
+};
+assert(!isRoundComplete("r3"), "R3 NOT complete — 1 of 61 players still on hole 16 (old 90% rule would wrongly say complete)");
+
+// ═══════════════════════════════════════════════
+// Output
+// ═══════════════════════════════════════════════
+const summary = `\n${"=".repeat(50)}\n${passed} passed, ${failed} failed out of ${passed + failed} tests\n${"=".repeat(50)}`;
+results.push(summary);
+document.getElementById("output").textContent = results.join("\n");
+
+if (failed > 0) {
+  document.getElementById("output").style.color = "red";
+} else {
+  document.getElementById("output").style.color = "green";
+}
+</script>
+</body>
+</html>
