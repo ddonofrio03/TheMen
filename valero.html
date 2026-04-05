@@ -951,7 +951,10 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
+    const anyHoleData = sorted.some(q =>
+      (q.linescores || []).some(r => (r.linescores || []).length > 0)
+    );
+    const hasR2complete = !anyHoleData || (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
     const isCut = explicitCut || impliedCut;
 
@@ -1394,6 +1397,20 @@ async function refresh() {
 
   try {
     scoreMap = await fetchScores();
+
+    // DEBUG
+    const _active = Object.entries(scoreMap).filter(([,p]) => !p.isCut && !p.isWD);
+    const _cut = Object.entries(scoreMap).filter(([,p]) => p.isCut);
+    console.log("=== DEBUG ===");
+    console.log("Total:", Object.keys(scoreMap).length, "Active:", _active.length, "CUT:", _cut.length);
+    console.log("Sample active:", _active[0]?.[0], JSON.stringify(_active[0]?.[1]));
+    console.log("R1:", isRoundComplete("r1"), "R2:", isRoundComplete("r2"), "R3:", isRoundComplete("r3"), "R4:", isRoundComplete("r4"));
+    console.log("isTournamentFinal:", isTournamentFinal());
+    const _noR4 = _active.filter(([,p]) => parseRelScore(p.r4) === null);
+    console.log("Active missing R4:", _noR4.length, _noR4.slice(0,5).map(([n])=>n));
+    console.log("Thru values:", [...new Set(_active.map(([,p]) => p.thru))]);
+    console.log("=== END ===");
+
     renderScoreboard();
     renderPoints();
     renderTeamScores();
