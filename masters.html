@@ -828,10 +828,34 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!relevant.length) return false;
+
+  const active = entries.filter(p => !p.isCut && !p.isWD);
+  if (!active.length) return false;
+
   const holesKey = roundKey + "holes";
-  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+  const roundOrder = ["r1", "r2", "r3", "r4"];
+  const idx = roundOrder.indexOf(roundKey);
+
+  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
+
+  const allHaveScore = active.every(p => parseRelScore(p[roundKey]) !== null);
+  if (!allHaveScore) return false;
+
+  for (let i = idx + 1; i < roundOrder.length; i++) {
+    const laterKey = roundOrder[i];
+    const laterHolesKey = laterKey + "holes";
+    const laterHasData = active.some(p =>
+      parseRelScore(p[laterKey]) !== null || (p[laterHolesKey] ?? 0) > 0
+    );
+    if (laterHasData) return true;
+  }
+
+  const isLatestRound = !roundOrder.slice(idx + 1).some(laterKey =>
+    active.some(p => parseRelScore(p[laterKey]) !== null)
+  );
+  if (isLatestRound && active.every(p => p.thru === "F")) return true;
+
+  return false;
 }
 
 function isTournamentFinal() {
@@ -892,21 +916,23 @@ function calcPoints() {
       winnersO.forEach(b => pts[b].Overall = shareO);
     }
 
-    let tournWinner = null, lowestScore = null;
-    Object.entries(scoreMap).forEach(([name, info]) => {
-      if (info.isCut || info.isWD) return;
+    const allMainPicks = new Set(Object.values(CONFIG.picks).flat().filter(n => n));
+    let topPickedPlayer = null, topScore = null;
+    allMainPicks.forEach(name => {
+      const info = scoreMap[name];
+      if (!info || info.isCut || info.isWD) return;
       const s = parseRelScore(info.score);
-      if (s !== null && (lowestScore === null || s < lowestScore)) {
-        lowestScore = s; tournWinner = name;
+      if (s !== null && (topScore === null || s < topScore)) {
+        topScore = s; topPickedPlayer = name;
       }
     });
-    if (tournWinner) {
-      const bettorsWithWinner = CONFIG.bettors.filter(b =>
-        CONFIG.picks[b].includes(tournWinner)
+    if (topPickedPlayer) {
+      const bettorsWithTop = CONFIG.bettors.filter(b =>
+        CONFIG.picks[b].includes(topPickedPlayer)
       );
-      if (bettorsWithWinner.length) {
-        const shareW = Math.round((CONFIG.points.Winner / bettorsWithWinner.length) * 100) / 100;
-        bettorsWithWinner.forEach(b => pts[b].Winner = shareW);
+      if (bettorsWithTop.length) {
+        const shareW = Math.round((CONFIG.points.Winner / bettorsWithTop.length) * 100) / 100;
+        bettorsWithTop.forEach(b => pts[b].Winner = shareW);
       }
     }
   }
@@ -956,7 +982,10 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
+    const anyHoleData = sorted.some(q =>
+      (q.linescores || []).some(r => (r.linescores || []).length > 0)
+    );
+    const hasR2complete = !anyHoleData || (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
     const isCut = explicitCut || impliedCut;
 
@@ -988,7 +1017,10 @@ async function fetchScores() {
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
       if (holes.length === 0) {
-        thru = "--";
+        const anyHoleDataInField = sorted.some(q =>
+          (q.linescores || []).some(r => (r.linescores || []).length > 0)
+        );
+        thru = (!anyHoleDataInField && currentRoundData.displayValue) ? "F" : "--";
       } else if (holes.length < 18) {
         thru = String(holes.length);
       } else {
@@ -1172,7 +1204,7 @@ function renderScoreboard() {
   });
 
   html += '</div>';
-  html += `<div class="penalty-note">Penalty rule: CUT players score +2 beyond the worst active non-team score that round.</div>`;
+  html += `<div class="penalty-note">Penalty rule: CUT players score +2 beyond worst active picked non-team player that round. Top Pick bonus: $12 to bettor with highest-finishing main pick.</div>`;
   el.innerHTML = html;
 }
 
@@ -1213,7 +1245,7 @@ function renderPoints() {
   html += roundHeader("R3", r3done);
   html += roundHeader("R4", r4done);
   html += roundHeader("Overall", done);
-  html += `<th>Winner <span style="opacity:.5;font-size:10px">($12)</span></th>`;
+  html += `<th>Top Pick <span style="opacity:.5;font-size:10px">($12)</span></th>`;
   html += `<th>Earned</th><th>Buy-in</th><th>Net</th>`;
   html += '</tr></thead><tbody>';
 
