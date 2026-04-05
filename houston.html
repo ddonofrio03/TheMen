@@ -799,15 +799,48 @@ function teamOverallTotal(bettor) {
 // ═══════════════════════════════════════════════
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
-// Returns true if every player in the field has a completed score for this round key
-// i.e. round is finished when all active (non-CUT/WD) players have a numeric score
+// A round is complete when:
+// 1. Every active player has 18 holes for that round (direct hole data), OR
+// 2. Every active player has a score for that round AND a later round has
+//    any data (scores or holes) — proves this round is done, OR
+// 3. Every active player has a score for that round AND every active player
+//    shows thru="F" AND this is the latest round with scores — the round
+//    JUST ended but the next round hasn't started yet.
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!relevant.length) return false;
+
+  const active = entries.filter(p => !p.isCut && !p.isWD);
+  if (!active.length) return false;
+
   const holesKey = roundKey + "holes";
-  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+  const roundOrder = ["r1", "r2", "r3", "r4"];
+  const idx = roundOrder.indexOf(roundKey);
+
+  // Check 1: all active players have 18 holes for this round
+  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
+
+  // All active players must have a score for this round for checks 2 & 3
+  const allHaveScore = active.every(p => parseRelScore(p[roundKey]) !== null);
+  if (!allHaveScore) return false;
+
+  // Check 2: a later round has any data (scores or holes)
+  for (let i = idx + 1; i < roundOrder.length; i++) {
+    const laterKey = roundOrder[i];
+    const laterHolesKey = laterKey + "holes";
+    const laterHasData = active.some(p =>
+      parseRelScore(p[laterKey]) !== null || (p[laterHolesKey] ?? 0) > 0
+    );
+    if (laterHasData) return true;
+  }
+
+  // Check 3: latest round with scores AND all players show "F"
+  const isLatestRound = !roundOrder.slice(idx + 1).some(laterKey =>
+    active.some(p => parseRelScore(p[laterKey]) !== null)
+  );
+  if (isLatestRound && active.every(p => p.thru === "F")) return true;
+
+  return false;
 }
 
 // Returns true if tournament is officially over:
