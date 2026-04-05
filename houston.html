@@ -948,10 +948,7 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    // A player missed the cut if the field has moved to R3+ and they only have 2 rounds
-    // AND their 2nd round linescore has 18 holes (they finished R2)
-    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
-    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
+    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
     const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
