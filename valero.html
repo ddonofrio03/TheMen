@@ -788,20 +788,45 @@ function teamOverallTotal(bettor) {
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
 
+// A round is complete when:
+// 1. Every active player has 18 holes for that round, OR
+// 2. Every active player has a score AND a later round has any data, OR
+// 3. Every active player has a score AND all show thru="F" AND this is
+//    the latest round (round just ended, next hasn't started yet).
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!relevant.length) return false;
+
+  const active = entries.filter(p => !p.isCut && !p.isWD);
+  if (!active.length) return false;
+
   const holesKey = roundKey + "holes";
-  // Primary: all active players have 18 holes for this round
-  if (relevant.every(p => (p[holesKey] ?? 0) === 18)) return true;
-  // Fallback for R1-R3: round is done if the next round has begun
-  const rn = parseInt(roundKey[1]);
-  if (rn < 4) {
-    const nextKey = "r" + (rn + 1) + "holes";
-    return relevant.some(p => (p[nextKey] ?? 0) > 0);
+  const roundOrder = ["r1", "r2", "r3", "r4"];
+  const idx = roundOrder.indexOf(roundKey);
+
+  // Check 1: all active players have 18 holes for this round
+  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
+
+  // All active players must have a score for this round for checks 2 & 3
+  const allHaveScore = active.every(p => parseRelScore(p[roundKey]) !== null);
+  if (!allHaveScore) return false;
+
+  // Check 2: a later round has any data (scores or holes)
+  for (let i = idx + 1; i < roundOrder.length; i++) {
+    const laterKey = roundOrder[i];
+    const laterHolesKey = laterKey + "holes";
+    const laterHasData = active.some(p =>
+      parseRelScore(p[laterKey]) !== null || (p[laterHolesKey] ?? 0) > 0
+    );
+    if (laterHasData) return true;
   }
+
+  // Check 3: latest round with scores AND all players show "F"
+  const isLatestRound = !roundOrder.slice(idx + 1).some(laterKey =>
+    active.some(p => parseRelScore(p[laterKey]) !== null)
+  );
+  if (isLatestRound && active.every(p => p.thru === "F")) return true;
+
   return false;
 }
 
@@ -921,7 +946,10 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
+    const anyHoleData = sorted.some(q =>
+      (q.linescores || []).some(r => (r.linescores || []).length > 0)
+    );
+    const hasR2complete = !anyHoleData || (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
     const isCut = explicitCut || impliedCut;
 
@@ -953,7 +981,10 @@ async function fetchScores() {
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
       if (holes.length === 0) {
-        thru = "--";
+        const anyHoleDataInField = sorted.some(q =>
+          (q.linescores || []).some(r => (r.linescores || []).length > 0)
+        );
+        thru = (!anyHoleDataInField && currentRoundData.displayValue) ? "F" : "--";
       } else if (holes.length < 18) {
         thru = String(holes.length);
       } else {
