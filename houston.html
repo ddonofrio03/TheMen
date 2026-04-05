@@ -1469,6 +1469,22 @@ async function refresh() {
 
   try {
     scoreMap = await fetchScores();
+
+    // DEBUG: log round completion status to console
+    const active = Object.entries(scoreMap).filter(([,p]) => !p.isCut && !p.isWD);
+    const cut = Object.entries(scoreMap).filter(([,p]) => p.isCut);
+    console.log("=== DEBUG: scoreMap stats ===");
+    console.log("Total players:", Object.keys(scoreMap).length, "Active:", active.length, "CUT:", cut.length);
+    console.log("Sample active player:", active[0]?.[0], active[0]?.[1]);
+    console.log("Sample CUT player:", cut[0]?.[0], cut[0]?.[1]);
+    const noR4 = active.filter(([,p]) => parseRelScore(p.r4) === null);
+    console.log("Active players missing R4 score:", noR4.length, noR4.slice(0, 3).map(([n]) => n));
+    console.log("R1 complete:", isRoundComplete("r1"), "R2:", isRoundComplete("r2"), "R3:", isRoundComplete("r3"), "R4:", isRoundComplete("r4"));
+    console.log("isTournamentFinal:", isTournamentFinal());
+    const thruValues = [...new Set(active.map(([,p]) => p.thru))];
+    console.log("Active thru values:", thruValues);
+    console.log("=== END DEBUG ===");
+
     renderScoreboard();
     renderPoints();
     renderTeamScores();
