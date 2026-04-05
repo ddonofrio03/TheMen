@@ -1019,7 +1019,10 @@ async function fetchScores() {
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
       if (holes.length === 0) {
-        thru = "--";
+        const anyHoleDataInField = sorted.some(q =>
+          (q.linescores || []).some(r => (r.linescores || []).length > 0)
+        );
+        thru = (!anyHoleDataInField && currentRoundData.displayValue) ? "F" : "--";
       } else if (holes.length < 18) {
         thru = String(holes.length);
       } else {

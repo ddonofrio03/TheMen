@@ -1026,10 +1026,15 @@ async function fetchScores() {
     } else if (currentRoundData) {
       const holes = currentRoundData.linescores || [];
       if (holes.length === 0) {
-        // No hole data — check if this is a completed prior round or not started
-        if (ls.length > 1) {
-          // Has multiple rounds — current round not started yet or no hole data
-          thru = "--";
+        // No hole-by-hole data. If player has a displayValue for their
+        // current round, ESPN likely dropped hole data after completion.
+        // Check if ALL round linescores lack hole data — if so, it's a
+        // past tournament and everyone is finished.
+        const anyHoleDataInField = sorted.some(q =>
+          (q.linescores || []).some(r => (r.linescores || []).length > 0)
+        );
+        if (!anyHoleDataInField && currentRoundData.displayValue) {
+          thru = "F";
         } else {
           thru = "--";
         }
