@@ -987,7 +987,10 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    const hasR2complete = (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
+    const anyHoleData = sorted.some(q =>
+      (q.linescores || []).some(r => (r.linescores || []).length > 0)
+    );
+    const hasR2complete = !anyHoleData || (p.linescores?.[1]?.linescores?.length ?? 0) === 18;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && hasR2complete && !isWD;
     const isCut = explicitCut || impliedCut;
 
