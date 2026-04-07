@@ -5,180 +5,554 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Men — Masters 2026 Draft</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <style>
-  :root {
-    --green:#1a5c2a;--dark:#0d3318;--gold:#c8a951;--gold-lt:#f5e9c4;
-    --ink:#1a1a18;--mid:#4a4a46;--light:#8a8a84;--border:#e0dfd8;
-    --surface:#f7f6f2;--white:#ffffff;--red:#c0392b;
+  :root{
+    --bg:#f6f3eb;
+    --panel:#ffffff;
+    --soft:#f1ece0;
+    --ink:#1e1a17;
+    --muted:#6e655d;
+    --line:#ddd3c3;
+    --green:#1f4d3a;
+    --green-dark:#17392b;
+    --gold:#b99245;
+    --gold-soft:#efe2bf;
+    --red:#b33a2f;
   }
-  *{box-sizing:border-box;margin:0;padding:0;}
-  body{font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--ink);min-height:100vh;}
-  header{background:var(--dark);border-bottom:3px solid var(--gold);}
-  .hdr{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-  .title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;}
-  .sub{font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;font-weight:300;margin-left:10px;}
-  .header-actions{display:flex;align-items:center;gap:12px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Outfit',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+  }
+  header{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    border-bottom:3px solid var(--gold);
+  }
+  .hdr{
+    max-width:1080px;
+    margin:0 auto;
+    padding:16px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .title{
+    font-family:'Playfair Display',serif;
+    font-size:30px;
+    color:#fff;
+    letter-spacing:.3px;
+  }
+  .sub{
+    color:#d9c38d;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.4px;
+    font-weight:600;
+  }
+  .header-actions{display:flex;align-items:center;gap:12px}
   .restart-btn-ui{
-    font-family:'DM Mono', monospace;font-size:10px;padding:4px 10px;border-radius:10px;
-    background:transparent;color:#ff8a8a;border:1px solid #ff8a8a;cursor:pointer;
-    text-transform:uppercase;transition:all 0.2s;
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:transparent;
+    color:#ffb0aa;
+    border:1px solid #ffb0aa;
+    cursor:pointer;
   }
-  .restart-btn-ui:hover{background:var(--red);color:white;border-color:var(--red);}
-  .status-pill{font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border-radius:10px;background:#1a3320;color:#6be08a;}
-  main{max-width:960px;margin:0 auto;padding:24px 24px 80px;}
-  .screen{display:none;}.screen.active{display:block;}
-
-  .lobby-card,.setup-card,.complete-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:520px;margin:0 auto;}
-  .lobby-title,.setup-title,.complete-title{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
-  .lobby-title{font-size:24px;margin-bottom:4px;}
-  .setup-title{font-size:22px;margin-bottom:6px;}
-  .complete-title{font-size:26px;color:var(--green);margin-bottom:6px;}
-  .lobby-desc,.setup-desc,.complete-sub,.cfg-note{font-size:13px;color:var(--mid);line-height:1.6;}
-  .lobby-desc{margin-bottom:20px;}
-  .setup-desc{margin-bottom:24px;}
-  .complete-sub{margin-bottom:20px;}
-  .cfg-note{font-size:12px;margin-bottom:10px;}
-
-  .lobby-section{margin-bottom:20px;}
-  .lobby-label,.preview-label{
-    font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;
-    margin-bottom:8px;font-family:'DM Mono',monospace;
+  .restart-btn-ui:hover{background:var(--red);color:#fff;border-color:var(--red)}
+  .status-pill{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:#163126;
+    color:#8ff0a8;
   }
 
-  .name-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+  main{
+    max-width:1080px;
+    margin:0 auto;
+    padding:28px 24px 80px;
+  }
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 10px 24px rgba(25,20,15,.05);
+  }
+
+  .lobby-card,.setup-card,.complete-card{
+    max-width:560px;
+    margin:0 auto;
+    padding:30px;
+  }
+
+  .lobby-title,.setup-title,.complete-title{
+    font-family:'Playfair Display',serif;
+    letter-spacing:.2px;
+  }
+  .lobby-title{font-size:30px;margin-bottom:6px}
+  .setup-title{font-size:28px;margin-bottom:6px}
+  .complete-title{font-size:32px;color:var(--green);margin-bottom:6px}
+  .lobby-desc,.setup-desc,.complete-sub,.cfg-note{
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.6;
+  }
+  .lobby-desc{margin-bottom:22px}
+  .setup-desc{margin-bottom:22px}
+  .complete-sub{margin-bottom:18px}
+  .cfg-note{font-size:13px;margin-bottom:10px}
+
+  .lobby-section{margin-bottom:20px}
+  .label{
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:8px;
+    font-family:'DM Mono',monospace;
+  }
+
+  .name-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:18px;
+  }
   .name-btn{
-    font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.5px;padding:10px 20px;
-    border-radius:6px;border:2px solid var(--border);background:var(--white);cursor:pointer;
-    transition:all 0.15s;color:var(--ink);
+    font-family:'Playfair Display',serif;
+    font-size:20px;
+    padding:10px 18px;
+    border-radius:10px;
+    border:2px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    transition:.15s;
+    color:var(--ink);
   }
-  .name-btn:hover{border-color:var(--green);background:#f0f8f2;}
-  .name-btn.selected{color:white;border-color:transparent;}
-  .name-btn.taken{opacity:0.45;cursor:not-allowed;}
-
+  .name-btn:hover{border-color:var(--green);background:#f4fbf7}
+  .name-btn.taken{opacity:.45;cursor:not-allowed}
   .helper-box{
-    background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;
-    margin-bottom:18px;font-size:13px;color:var(--mid);line-height:1.6;
+    background:var(--soft);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.65;
   }
 
-  .lobby-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .lobby-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
   .host-btn,.join-btn,.start-btn,.rand-btn,.copy-btn{
-    padding:12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;border-radius:6px;cursor:pointer;transition:all 0.15s;
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.15s;
+    font-weight:700;
+    letter-spacing:.4px;
   }
-  .host-btn,.join-btn{flex:1;font-size:17px;}
-  .host-btn{background:var(--green);color:var(--gold);border:none;}
-  .host-btn:hover{background:var(--dark);}
-  .join-btn{background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);}
-  .join-btn:hover{background:var(--gold);color:white;}
-  .host-btn:disabled,.join-btn:disabled,.start-btn:disabled,.rand-btn:disabled{opacity:0.45;cursor:not-allowed;}
+  .host-btn,.join-btn{flex:1;font-size:16px}
+  .host-btn{background:var(--green);color:#fff;border:none}
+  .host-btn:hover{background:var(--green-dark)}
+  .join-btn{background:var(--gold-soft);color:#7a5a1d;border:2px solid var(--gold)}
+  .join-btn:hover{background:var(--gold);color:#fff}
+  .host-btn:disabled,.join-btn:disabled,.start-btn:disabled,.rand-btn:disabled{opacity:.45;cursor:not-allowed}
 
-  .room-display{background:var(--dark);border-radius:8px;padding:16px;text-align:center;margin-bottom:16px;}
-  .room-code{font-family:'DM Mono',monospace;font-size:20px;letter-spacing:1px;color:var(--gold);font-weight:700;}
-  .room-hint{font-size:11px;color:#8aaa8a;margin-top:6px;}
+  .room-display{
+    background:linear-gradient(135deg,#162c22,#1e4130);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+  .room-code{
+    font-family:'DM Mono',monospace;
+    font-size:18px;
+    letter-spacing:1px;
+    color:#eed48d;
+    font-weight:700;
+  }
+  .room-hint{
+    font-size:11px;
+    color:#9bb4a4;
+    margin-top:6px;
+  }
 
-  .members-list{margin-bottom:16px;}
-  .member-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);}
-  .member-dot{width:8px;height:8px;border-radius:50%;}
-  .member-dot.online{background:#2ecc71;}
-  .member-dot.offline{background:var(--border);}
-  .member-name{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.5px;flex:1;}
-  .member-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--light);}
+  .members-list{margin-bottom:16px}
+  .member-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    border-radius:10px;
+    margin-bottom:6px;
+    background:var(--bg);
+    border:1px solid var(--line);
+  }
+  .member-dot{width:8px;height:8px;border-radius:50%}
+  .member-dot.online{background:#2ecc71}
+  .member-dot.offline{background:#cfc6ba}
+  .member-name{
+    font-family:'Playfair Display',serif;
+    font-size:16px;
+    flex:1;
+  }
+  .member-tag{
+    font-size:10px;
+    font-family:'DM Mono',monospace;
+    color:var(--muted);
+  }
 
-  .start-btn{width:100%;font-size:20px;background:var(--green);color:var(--gold);border:none;}
-  .start-btn:hover{background:var(--dark);}
-  .lobby-error{color:var(--red);font-size:12px;margin-top:8px;font-family:'DM Mono',monospace;}
-  .lobby-status{font-size:12px;color:var(--light);margin-top:8px;font-family:'DM Mono',monospace;text-align:center;}
-  .wait-msg{text-align:center;padding:20px;font-size:13px;color:var(--mid);font-family:'DM Mono',monospace;}
+  .start-btn{
+    width:100%;
+    font-size:18px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+  }
+  .start-btn:hover{background:var(--green-dark)}
+  .lobby-error{
+    color:var(--red);
+    font-size:12px;
+    margin-top:8px;
+    font-family:'DM Mono',monospace;
+  }
+  .lobby-status{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+    font-family:'DM Mono',monospace;
+    text-align:center;
+  }
+  .wait-msg{
+    text-align:center;
+    padding:18px;
+    font-size:13px;
+    color:var(--muted);
+    font-family:'DM Mono',monospace;
+  }
 
-  .order-list{list-style:none;margin-bottom:20px;}
-  .order-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:grab;user-select:none;transition:box-shadow 0.15s;}
-  .order-item.drag-over{border-color:var(--green);background:#f0f8f2;}
-  .order-item.readonly{cursor:default;}
-  .order-num{font-family:'DM Mono',monospace;font-size:12px;color:var(--light);min-width:18px;}
-  .order-name{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.5px;flex:1;}
-  .drag-handle{color:var(--light);font-size:18px;}
-  .preview-snake{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:20px;}
-  .snake-row{display:flex;gap:4px;align-items:center;margin-bottom:3px;}
-  .snake-rlabel{font-size:10px;color:var(--light);min-width:28px;font-family:'DM Mono',monospace;}
-  .snake-chip{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:2px 8px;border-radius:4px;color:white;letter-spacing:0.5px;}
-  .rand-btn{flex:1;font-size:17px;background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);}
-  .rand-btn:hover{background:var(--gold);color:white;}
-  .rand-btn.spinning{animation:shake 0.08s infinite;}
-  @keyframes shake{0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);}}
+  .order-list{list-style:none;margin-bottom:20px}
+  .order-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:6px;
+    cursor:grab;
+    user-select:none;
+  }
+  .order-item.drag-over{border-color:var(--green);background:#f4fbf7}
+  .order-item.readonly{cursor:default}
+  .order-num{
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    min-width:18px;
+  }
+  .order-name{
+    font-family:'Playfair Display',serif;
+    font-size:18px;
+    flex:1;
+  }
+  .drag-handle{color:var(--muted);font-size:18px}
 
-  .draft-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;}
-  @media(max-width:700px){.draft-layout{grid-template-columns:1fr;}}
-  .clock-banner{padding:14px 20px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;color:white;}
-  .clock-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;}
-  .clock-sub{font-size:13px;opacity:0.8;margin-top:2px;}
-  .clock-info{font-family:'DM Mono',monospace;font-size:12px;opacity:0.85;text-align:right;}
-  .search-wrap{position:relative;margin-bottom:10px;}
-  .search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--light);}
-  .search-input{width:100%;padding:9px 12px 9px 32px;border:1px solid var(--border);border-radius:6px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--white);outline:none;}
-  .search-input:focus{border-color:var(--green);}
-  .player-list{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;max-height:calc(100vh - 220px);overflow-y:auto;}
-  .letter-head{padding:4px 14px;background:#f5f5f2;font-size:10px;font-weight:500;color:var(--light);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;position:sticky;top:0;z-index:1;}
-  .p-row{display:flex;align-items:center;justify-content:space-between;padding:9px 14px;border-bottom:1px solid #f0f0ec;transition:background 0.1s;}
-  .p-row:last-child{border-bottom:none;}
-  .p-row.taken{opacity:0.4;}
-  .p-row.avail:hover{background:#f0f8f2;cursor:pointer;}
-  .p-row.avail.altround:hover{background:var(--gold-lt);}
-  .p-name{font-size:13px;font-weight:500;}
-  .p-name .last{font-weight:700;}
-  .p-owner{font-size:11px;font-family:'DM Mono',monospace;}
-  .pick-btn{font-size:11px;padding:4px 12px;border-radius:10px;border:none;cursor:pointer;font-family:'DM Mono',monospace;font-weight:500;}
-  .pick-btn.main{background:var(--green);color:white;}
-  .pick-btn.alt{background:var(--gold-lt);color:#7a5c00;border:1px solid var(--gold);}
-  .pick-btn.main:hover{background:var(--dark);}
-  .pick-btn.alt:hover{background:var(--gold);color:white;}
+  .preview-snake{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:20px;
+  }
+  .snake-row{
+    display:flex;
+    gap:4px;
+    align-items:center;
+    margin-bottom:4px;
+    flex-wrap:wrap;
+  }
+  .snake-rlabel{
+    font-size:10px;
+    color:var(--muted);
+    min-width:28px;
+    font-family:'DM Mono',monospace;
+  }
+  .snake-chip{
+    font-family:'Playfair Display',serif;
+    font-size:13px;
+    padding:3px 9px;
+    border-radius:999px;
+    color:#fff;
+  }
 
-  .board-panel{display:flex;flex-direction:column;gap:10px;}
-  .round-section{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
-  .round-hdr{padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.5px;color:white;display:flex;align-items:center;justify-content:space-between;background:var(--dark);}
-  .round-hdr.alt{background:#7a5c00;}
-  .b-row{display:flex;align-items:center;gap:8px;padding:7px 14px;border-bottom:1px solid #f5f5f2;}
-  .b-row:last-child{border-bottom:none;}
-  .b-row.active{background:#f0f8f2;}
-  .b-pos{font-family:'DM Mono',monospace;font-size:11px;color:var(--light);min-width:16px;}
-  .b-bettor{font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:0.5px;min-width:40px;}
-  .b-pick{font-size:12px;color:var(--mid);flex:1;}
-  .b-pick.empty{color:var(--light);font-style:italic;}
-  .b-pick.onclock{color:var(--green);font-weight:500;animation:blink 1.2s infinite;}
-  @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
-  .your-turn-banner{background:var(--green);color:white;text-align:center;padding:8px;border-radius:6px;margin-bottom:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;animation:blink 1.2s infinite;}
+  .rand-btn{
+    flex:1;
+    font-size:16px;
+    background:var(--gold-soft);
+    color:#7a5a1d;
+    border:2px solid var(--gold);
+  }
+  .rand-btn:hover{background:var(--gold);color:#fff}
+  .rand-btn.spinning{animation:shake .08s infinite}
+  @keyframes shake{0%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}100%{transform:rotate(-2deg)}}
 
-  .code-block{background:var(--ink);color:#e8f5ee;padding:18px;border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;}
-  .copy-btn{margin-top:12px;font-size:16px;background:var(--green);color:var(--gold);border:none;}
-  .copy-btn:hover{background:var(--dark);}
-  .reset-btn{margin-top:10px;margin-left:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:6px;cursor:pointer;}
+  .draft-layout{
+    display:grid;
+    grid-template-columns:1fr 340px;
+    gap:18px;
+  }
+  @media(max-width:760px){.draft-layout{grid-template-columns:1fr}}
+
+  .clock-banner{
+    padding:16px 20px;
+    border-radius:14px;
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    box-shadow:0 10px 20px rgba(0,0,0,.07);
+  }
+  .clock-name{
+    font-family:'Playfair Display',serif;
+    font-size:28px;
+  }
+  .clock-sub{
+    font-size:13px;
+    opacity:.88;
+    margin-top:2px;
+  }
+  .clock-info{
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    opacity:.9;
+    text-align:right;
+  }
+
+  .search-wrap{position:relative;margin-bottom:10px}
+  .search-icon{
+    position:absolute;
+    left:11px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
+  }
+  .search-input{
+    width:100%;
+    padding:10px 12px 10px 32px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:14px;
+    font-family:'Outfit',sans-serif;
+    background:#fff;
+    outline:none;
+  }
+  .search-input:focus{border-color:var(--green)}
+
+  .player-list{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    max-height:calc(100vh - 220px);
+    overflow-y:auto;
+  }
+  .letter-head{
+    padding:5px 14px;
+    background:#f5f0e7;
+    font-size:10px;
+    font-weight:600;
+    color:var(--muted);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    border-bottom:1px solid var(--line);
+    font-family:'DM Mono',monospace;
+    position:sticky;
+    top:0;
+    z-index:1;
+  }
+  .p-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:6px;
+    padding:7px 10px;
+    border-bottom:1px solid #f1ece4;
+  }
+  .p-row:last-child{border-bottom:none}
+  .p-row.taken{opacity:.45}
+  .p-row.avail:hover{background:#f4fbf7;cursor:pointer}
+  .p-row.avail.altround:hover{background:var(--gold-soft)}
+  .p-name{
+    font-size:14px;
+    font-weight:500;
+    margin:0;
+  }
+  .p-name .last{font-weight:700}
+  .p-owner{
+    font-size:11px;
+    font-family:'DM Mono',monospace;
+    margin-right:6px;
+    flex:0 0 auto;
+  }
+  .pick-btn{
+    font-size:11px;
+    padding:4px 9px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    font-family:'DM Mono',monospace;
+    font-weight:500;
+    flex:0 0 auto;
+  }
+  .pick-btn.main{background:var(--green);color:#fff}
+  .pick-btn.alt{background:var(--gold-soft);color:#7a5a1d;border:1px solid var(--gold)}
+  .pick-btn.main:hover{background:var(--green-dark)}
+  .pick-btn.alt:hover{background:var(--gold);color:#fff}
+
+  .board-panel{display:flex;flex-direction:column;gap:10px}
+  .round-section{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+  .round-hdr{
+    padding:8px 14px;
+    font-family:'Playfair Display',serif;
+    font-size:15px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--green-dark);
+  }
+  .round-hdr.alt{background:#846222}
+  .b-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 14px;
+    border-bottom:1px solid #f4efe8;
+  }
+  .b-row:last-child{border-bottom:none}
+  .b-row.active{background:#f4fbf7}
+  .b-pos{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    min-width:16px;
+  }
+  .b-bettor{
+    font-family:'Playfair Display',serif;
+    font-size:14px;
+    min-width:48px;
+  }
+  .b-pick{font-size:12px;color:var(--muted);flex:1}
+  .b-pick.empty{color:#aaa096;font-style:italic}
+  .b-pick.onclock{color:var(--green);font-weight:700;animation:blink 1.2s infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+  .your-turn-banner{
+    background:var(--green);
+    color:#fff;
+    text-align:center;
+    padding:9px;
+    border-radius:10px;
+    margin-bottom:10px;
+    font-weight:700;
+    letter-spacing:.5px;
+    animation:blink 1.2s infinite;
+  }
+
+  .code-block{
+    background:#1f1d1a;
+    color:#edf8f0;
+    padding:18px;
+    border-radius:10px;
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    line-height:1.7;
+    overflow-x:auto;
+    white-space:pre;
+  }
+  .copy-btn{
+    margin-top:12px;
+    font-size:16px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+  }
+  .copy-btn:hover{background:var(--green-dark)}
+  .reset-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:10px 20px;
+    font-family:'Outfit',sans-serif;
+    font-size:13px;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+  }
 </style>
 </head>
 <body>
 <header>
   <div class="hdr">
-    <div><span class="title">The Men</span><span class="sub">Masters 2026 — Snake Draft</span></div>
+    <div class="brand">
+      <span class="title">The Men</span>
+      <span class="sub">Masters 2026 Draft</span>
+    </div>
     <div class="header-actions">
       <button class="restart-btn-ui" onclick="resetDraft()" id="restart-btn" style="display:none">Restart Draft</button>
       <span class="status-pill" id="status-pill">Lobby</span>
     </div>
   </div>
 </header>
+
 <main>
 
   <div class="screen active" id="screen-lobby">
-    <div class="lobby-card">
-      <div class="lobby-title">Masters 2026 Draft</div>
-      <div class="lobby-desc">Dave always hosts. Everyone else joins. No room code. No typing.</div>
+    <div class="lobby-card card">
+      <div class="lobby-title">The Men’s Masters Draft</div>
+      <div class="lobby-desc">One link. Dave hosts. Everybody else joins. Nice and simple, which is helpful because apparently golf needed IT support.</div>
 
       <div class="lobby-section">
-        <div class="lobby-label">Pick your name</div>
+        <div class="label">Pick your name</div>
         <div class="name-grid" id="name-grid"></div>
       </div>
 
       <div class="helper-box">
         Step 1: Dave opens this page, selects Dave, and clicks Host Draft.<br>
-        Step 2: Everyone else opens the same page, selects their name, and clicks Join Draft.
+        Step 2: Mike, TJ, and Paul open the same page, select their own name, and click Join Draft.
       </div>
 
       <div id="pre-connect">
@@ -190,10 +564,10 @@
 
       <div id="room-area" style="display:none">
         <div class="room-display">
-          <div class="room-code">Fixed room: themen-masters-2026</div>
+          <div class="room-code">Fixed room: the-men-masters-2026</div>
           <div class="room-hint">Dave should host first. Then everyone else clicks Join Draft.</div>
         </div>
-        <div class="lobby-label">Players</div>
+        <div class="label">Players</div>
         <div class="members-list" id="members-list"></div>
         <button class="start-btn" id="lobby-start-btn" onclick="hostStartDraft()" style="display:none">Start Draft</button>
         <div class="wait-msg" id="wait-msg" style="display:none">Waiting for Dave to start...</div>
@@ -205,12 +579,12 @@
   </div>
 
   <div class="screen" id="screen-setup">
-    <div class="setup-card">
+    <div class="setup-card card">
       <div class="setup-title">Set Draft Order</div>
-      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — 4 picks plus 1 alt round at the end.</div>
+      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds. Four picks and one alt round at the end.</div>
       <ul class="order-list" id="order-list"></ul>
       <div class="preview-snake">
-        <div class="preview-label">Full draft order preview</div>
+        <div class="label">Full draft order preview</div>
         <div id="snake-preview"></div>
       </div>
       <div id="setup-host-controls">
@@ -231,7 +605,9 @@
       </div>
       <div class="clock-info" id="clock-info">--</div>
     </div>
+
     <div id="your-turn-msg"></div>
+
     <div class="draft-layout">
       <div>
         <div class="search-wrap">
@@ -245,10 +621,10 @@
   </div>
 
   <div class="screen" id="screen-complete">
-    <div class="complete-card">
-      <div class="complete-title">Draft Complete!</div>
-      <div class="complete-sub">All picks are in. Copy the block below and paste it into masters.html.</div>
-      <div class="cfg-note">Open masters.html - find the CONFIG block near the top - replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
+    <div class="complete-card card">
+      <div class="complete-title">Draft Complete</div>
+      <div class="complete-sub">All picks are in. Copy the block below and paste it into your masters file.</div>
+      <div class="cfg-note">Find the CONFIG block near the top and replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
       <div class="code-block" id="config-output"></div>
       <button class="copy-btn" onclick="copyConfig()">Copy CONFIG</button>
       <button class="reset-btn" onclick="resetDraft()">Reset Draft</button>
@@ -256,46 +632,49 @@
   </div>
 
 </main>
+
 <script>
-const BETTORS = ["Dave","TJ","Billy","Nick","Ry","Alex"];
-const COLORS  = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
+const BETTORS = ["Dave","Mike","TJ","Paul"];
+const COLORS  = {Dave:"#2f6fdf",Mike:"#b03a2e",TJ:"#0b7a75",Paul:"#7d3c98"};
 const ROUNDS  = 5;
 const HOST_NAME = "Dave";
-const FIXED_ROOM = "themen-masters-2026";
+const FIXED_ROOM = "the-men-masters-2026";
 
 const PEER_OPTIONS = {
   debug: 2,
   config: {
     iceServers: [
-      { urls: "stun:stun.l.google.com:19302" }
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" }
     ]
   }
 };
 
-let field      = [];
+let field = [];
 let draftOrder = [...BETTORS];
-let sequence   = [];
-let picks      = {};
-let turn       = 0;
-let dragSrc    = null;
+let sequence = [];
+let picks = {};
+let turn = 0;
+let dragSrc = null;
 
-BETTORS.forEach(b => picks[b] = {picks:[], alt:null});
+BETTORS.forEach(b => picks[b] = { picks: [], alt: null });
 
-let peer       = null;
-let isHost     = false;
-let myName     = null;
-let roomCode   = FIXED_ROOM;
-let hostConn   = null;
-let guestConns = {};
-let claimed    = new Set();
-let phase      = "lobby";
+let peer = null;
+let isHost = false;
+let myName = null;
+let hostConn = null;
+let phase = "lobby";
+let claimed = new Set();
+
+const guestConnsByName = {};
+const guestMetaByPeerId = {};
 
 function buildSeq(order) {
   const seq = [];
   for (let r = 0; r < ROUNDS; r++) {
     const isAlt = r === ROUNDS - 1;
     const row = r % 2 === 0 ? [...order] : [...order].reverse();
-    row.forEach(b => seq.push({bettor:b, round:r+1, isAlt}));
+    row.forEach(b => seq.push({ bettor: b, round: r + 1, isAlt }));
   }
   return seq;
 }
@@ -315,7 +694,40 @@ async function fetchField() {
     "Scottie Scheffler","Sepp Straka","Sergio Garcia","Shane Lowry","Tom McKibbin","Tommy Fleetwood","Tyrrell Hatton",
     "Vijay Singh","Viktor Hovland","Wyndham Clark","Xander Schauffele","Zach Johnson"
   ];
-  field.sort((a,b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
+  field.sort((a, b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
+}
+
+function deepClone(obj) {
+  return JSON.parse(JSON.stringify(obj));
+}
+
+function getFullState() {
+  return {
+    phase,
+    draftOrder: [...draftOrder],
+    sequence: buildSeq(draftOrder),
+    picks: deepClone(picks),
+    turn,
+    field: [...field],
+    claimed: Array.from(claimed),
+    host: HOST_NAME
+  };
+}
+
+function sendToConn(conn, msg) {
+  try {
+    if (conn && conn.open) conn.send(msg);
+  } catch (e) {}
+}
+
+function broadcastLobby() {
+  const msg = { type: "lobby", members: Array.from(claimed), host: HOST_NAME };
+  Object.values(guestConnsByName).forEach(conn => sendToConn(conn, msg));
+}
+
+function broadcastState() {
+  const msg = { type: "state", payload: getFullState() };
+  Object.values(guestConnsByName).forEach(conn => sendToConn(conn, msg));
 }
 
 function renderNameGrid() {
@@ -324,7 +736,7 @@ function renderNameGrid() {
     const sel = myName === b ? "selected" : "";
     const taken = claimed.has(b) && myName !== b ? "taken" : "";
     const style = myName === b ? `background:${COLORS[b]};border-color:${COLORS[b]};color:white` : "";
-    return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken?"disabled":""}>${b}</button>`;
+    return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken ? "disabled" : ""}>${b}</button>`;
   }).join("");
 
   document.getElementById("host-btn").disabled = myName !== HOST_NAME;
@@ -339,36 +751,39 @@ function claimName(name) {
 
 function createRoom() {
   if (myName !== HOST_NAME) return;
+
   const err = document.getElementById("lobby-error");
   const status = document.getElementById("lobby-status");
   err.textContent = "";
   status.textContent = "Dave is hosting...";
 
+  if (peer) {
+    try { peer.destroy(); } catch (e) {}
+  }
+
   peer = new Peer(FIXED_ROOM, PEER_OPTIONS);
   isHost = true;
 
   peer.on("open", () => {
+    claimed.add(HOST_NAME);
     status.textContent = "";
-    claimed.add(myName);
     document.getElementById("pre-connect").style.display = "none";
     document.getElementById("room-area").style.display = "block";
     document.getElementById("lobby-start-btn").style.display = "block";
+    document.getElementById("wait-msg").style.display = "none";
     renderLobby();
   });
 
   peer.on("connection", conn => {
+    guestMetaByPeerId[conn.peer] = { conn, name: null };
+
     conn.on("open", () => {
-      conn.on("data", msg => handleGuestMsg(conn, msg));
-      conn.on("close", () => {
-        const name = Object.keys(guestConns).find(n => guestConns[n] === conn);
-        if (name) {
-          delete guestConns[name];
-          claimed.delete(name);
-          renderLobby();
-          broadcastLobby();
-        }
-      });
+      sendToConn(conn, { type: "hello", text: "connected" });
     });
+
+    conn.on("data", msg => handleGuestMsg(conn, msg));
+    conn.on("close", () => handleGuestDisconnect(conn));
+    conn.on("error", () => handleGuestDisconnect(conn));
   });
 
   peer.on("error", e => {
@@ -377,76 +792,103 @@ function createRoom() {
   });
 }
 
+function handleGuestDisconnect(conn) {
+  const meta = guestMetaByPeerId[conn.peer];
+  if (!meta) return;
+
+  const name = meta.name;
+  if (name) {
+    delete guestConnsByName[name];
+    claimed.delete(name);
+  }
+
+  delete guestMetaByPeerId[conn.peer];
+  renderLobby();
+  broadcastLobby();
+  broadcastState();
+}
+
 function handleGuestMsg(conn, msg) {
+  if (!msg || !msg.type) return;
+
   if (msg.type === "join") {
-    if (msg.name === HOST_NAME) {
-      conn.send({type:"error", text:"Dave is already the host"});
+    const name = msg.name;
+
+    if (!BETTORS.includes(name) || name === HOST_NAME) {
+      sendToConn(conn, { type: "error", text: "Invalid player" });
       return;
     }
-    if (!BETTORS.includes(msg.name)) {
-      conn.send({type:"error", text:"Invalid player"});
-      return;
+
+    const existing = guestConnsByName[name];
+    if (existing && existing !== conn) {
+      try { existing.close(); } catch (e) {}
     }
-    if (claimed.has(msg.name) && !guestConns[msg.name]) {
-      conn.send({type:"error", text: msg.name + " is already taken"});
-      return;
-    }
-    guestConns[msg.name] = conn;
-    claimed.add(msg.name);
+
+    guestConnsByName[name] = conn;
+    guestMetaByPeerId[conn.peer].name = name;
+    claimed.add(name);
+
     renderLobby();
     broadcastLobby();
-    if (phase !== "lobby") {
-      conn.send({type:"state", payload: getFullState()});
-    }
-  } else if (msg.type === "pick") {
-    if (turn < sequence.length && sequence[turn].bettor === msg.from) {
-      applyPick(msg.player);
-    }
+    sendToConn(conn, { type: "state", payload: getFullState() });
+    broadcastState();
+    return;
   }
-}
 
-function broadcastLobby() {
-  const msg = {type:"lobby", members: Array.from(claimed), host: myName};
-  Object.values(guestConns).forEach(c => { try { c.send(msg); } catch(e) {} });
-}
+  if (msg.type === "request_state") {
+    sendToConn(conn, { type: "state", payload: getFullState() });
+    return;
+  }
 
-function broadcast(msg) {
-  Object.values(guestConns).forEach(c => { try { c.send(msg); } catch(e) {} });
-}
+  if (msg.type === "pick") {
+    if (!msg.from || !msg.player) return;
+    if (turn >= sequence.length) return;
 
-function getFullState() {
-  return {phase, draftOrder, picks, turn, field, claimed: Array.from(claimed), host: myName};
-}
+    const t = sequence[turn];
+    if (t.bettor !== msg.from) return;
 
-function broadcastState() {
-  broadcast({type:"state", payload: getFullState()});
+    applyPick(msg.player);
+  }
 }
 
 function joinRoom() {
   if (!myName || myName === HOST_NAME) return;
+
   const err = document.getElementById("lobby-error");
   const status = document.getElementById("lobby-status");
   err.textContent = "";
   status.textContent = myName + " is joining...";
 
+  if (peer) {
+    try { peer.destroy(); } catch (e) {}
+  }
+
   peer = new Peer(undefined, PEER_OPTIONS);
 
   peer.on("open", () => {
-    hostConn = peer.connect(FIXED_ROOM, {reliable: true});
+    hostConn = peer.connect(FIXED_ROOM, {
+      reliable: true,
+      serialization: "json"
+    });
 
     hostConn.on("open", () => {
-      status.textContent = "";
-      hostConn.send({type:"join", name: myName});
       claimed.add(myName);
+      status.textContent = "";
       document.getElementById("pre-connect").style.display = "none";
       document.getElementById("room-area").style.display = "block";
       document.getElementById("wait-msg").style.display = "block";
       renderLobby();
+      sendToHost({ type: "join", name: myName });
+      setTimeout(() => sendToHost({ type: "request_state" }), 400);
     });
 
     hostConn.on("data", msg => handleHostMsg(msg));
-    hostConn.on("close", () => { err.textContent = "Dave disconnected"; });
-    hostConn.on("error", e => { err.textContent = "Connection failed: " + e.type; });
+    hostConn.on("close", () => {
+      err.textContent = "Dave disconnected";
+    });
+    hostConn.on("error", e => {
+      err.textContent = "Connection failed: " + e.type;
+    });
   });
 
   peer.on("error", e => {
@@ -456,42 +898,75 @@ function joinRoom() {
 }
 
 function handleHostMsg(msg) {
-  if (msg.type === "lobby") {
-    claimed = new Set(msg.members);
-    renderLobby();
-  } else if (msg.type === "state") {
-    const s = msg.payload;
-    phase = s.phase;
-    draftOrder = s.draftOrder;
-    picks = s.picks;
-    turn = s.turn;
-    if (s.field && s.field.length) field = s.field;
-    claimed = new Set(s.claimed || []);
+  if (!msg || !msg.type) return;
 
-    if (phase === "setup") {
-      showScreen("setup");
-      document.getElementById("setup-host-controls").style.display = "none";
-      document.getElementById("setup-wait").style.display = "block";
-      sequence = buildSeq(draftOrder);
-      renderSetup();
-    } else if (phase === "draft") {
-      showScreen("draft");
-      document.getElementById("status-pill").textContent = "Live Draft";
-      document.getElementById("restart-btn").style.display = "inline-block";
-      sequence = buildSeq(draftOrder);
-      renderDraft();
-    } else if (phase === "complete") {
-      sequence = buildSeq(draftOrder);
-      finishDraft();
-    }
-  } else if (msg.type === "error") {
-    document.getElementById("lobby-error").textContent = msg.text;
+  if (msg.type === "hello") return;
+
+  if (msg.type === "lobby") {
+    claimed = new Set(msg.members || []);
+    renderLobby();
+    return;
+  }
+
+  if (msg.type === "state") {
+    applyIncomingState(msg.payload);
+    return;
+  }
+
+  if (msg.type === "error") {
+    document.getElementById("lobby-error").textContent = msg.text || "Unknown error";
+  }
+}
+
+function applyIncomingState(s) {
+  if (!s) return;
+
+  phase = s.phase || "lobby";
+  draftOrder = Array.isArray(s.draftOrder) ? [...s.draftOrder] : [...BETTORS];
+  sequence = Array.isArray(s.sequence) ? s.sequence : buildSeq(draftOrder);
+  picks = s.picks ? deepClone(s.picks) : deepClone(picks);
+  turn = typeof s.turn === "number" ? s.turn : 0;
+  field = Array.isArray(s.field) && s.field.length ? [...s.field] : field;
+  claimed = new Set(Array.isArray(s.claimed) ? s.claimed : []);
+
+  if (phase === "lobby") {
+    showScreen("lobby");
+    document.getElementById("status-pill").textContent = "Lobby";
+    document.getElementById("restart-btn").style.display = "none";
+    document.getElementById("setup-host-controls").style.display = "none";
+    document.getElementById("setup-wait").style.display = "none";
+    renderLobby();
+    return;
+  }
+
+  if (phase === "setup") {
+    showScreen("setup");
+    document.getElementById("status-pill").textContent = "Setup";
+    document.getElementById("restart-btn").style.display = "none";
+    document.getElementById("setup-host-controls").style.display = "none";
+    document.getElementById("setup-wait").style.display = "block";
+    renderSetup();
+    return;
+  }
+
+  if (phase === "draft") {
+    showScreen("draft");
+    document.getElementById("status-pill").textContent = "Live Draft";
+    document.getElementById("restart-btn").style.display = "inline-block";
+    renderDraft();
+    return;
+  }
+
+  if (phase === "complete") {
+    finishDraft();
   }
 }
 
 function sendToHost(msg) {
   if (isHost) return;
-  if (hostConn && hostConn.open) hostConn.send(msg);
+  try {
+    if (hostConn && hostConn.open) hostConn.send(msg);
+  } catch (e) {}
 }
 
 function renderLobby() {
@@ -501,7 +976,7 @@ function renderLobby() {
     const isMe = b === myName;
     const tag = isHost && isMe ? "host" : isMe ? "you" : "";
     return `<div class="member-row">
-      <span class="member-dot ${online?"online":"offline"}"></span>
+      <span class="member-dot ${online ? "online" : "offline"}"></span>
       <span class="member-name" style="color:${COLORS[b]}">${b}</span>
       ${tag ? `<span class="member-tag">${tag}</span>` : ""}
     </div>`;
@@ -510,14 +985,14 @@ function renderLobby() {
 }
 
 function hostStartDraft() {
+  if (!isHost) return;
   phase = "setup";
+  draftOrder = [...BETTORS];
+  sequence = buildSeq(draftOrder);
   showScreen("setup");
   document.getElementById("status-pill").textContent = "Setup";
-  if (!isHost) {
-    document.getElementById("setup-host-controls").style.display = "none";
-    document.getElementById("setup-wait").style.display = "block";
-  }
-  sequence = buildSeq(draftOrder);
+  document.getElementById("setup-host-controls").style.display = "block";
+  document.getElementById("setup-wait").style.display = "none";
   renderSetup();
   broadcastState();
 }
@@ -525,105 +1000,143 @@ function hostStartDraft() {
 function renderSetup() {
   const list = document.getElementById("order-list");
   const canDrag = isHost;
-  list.innerHTML = draftOrder.map((b,i) => `
-    <li class="order-item${canDrag?"":" readonly"}" ${canDrag?`draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"`:""}
-        data-i="${i}">
-      <span class="order-num">${i+1}</span>
+
+  list.innerHTML = draftOrder.map((b, i) => `
+    <li class="order-item${canDrag ? "" : " readonly"}"
+      ${canDrag ? `draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"` : ""}
+      data-i="${i}">
+      <span class="order-num">${i + 1}</span>
       <span class="order-name" style="color:${COLORS[b]}">${b}</span>
-      ${canDrag?'<span class="drag-handle">&#10247;</span>':""}
-    </li>`).join("");
+      ${canDrag ? '<span class="drag-handle">&#10247;</span>' : ""}
+    </li>
+  `).join("");
+
   renderPreview();
 }
 
-function ds(e,i){ dragSrc=i; e.currentTarget.style.opacity="0.5"; }
-function dov(e,i){ e.preventDefault(); if(i!==dragSrc)e.currentTarget.classList.add("drag-over"); }
-function dlv(e){ e.currentTarget.classList.remove("drag-over"); }
-function drp(e,i){
-  e.preventDefault();
-  e.currentTarget.classList.remove("drag-over");
-  if(dragSrc===null||dragSrc===i) return;
-  const a=[...draftOrder];
-  const m=a.splice(dragSrc,1)[0];
-  a.splice(i,0,m);
-  draftOrder=a;
-  dragSrc=null;
-  renderSetup();
-  if(isHost) broadcastState();
+function ds(e, i) {
+  dragSrc = i;
+  e.currentTarget.style.opacity = "0.5";
 }
 
-function renderPreview(){
+function dov(e, i) {
+  e.preventDefault();
+  if (i !== dragSrc) e.currentTarget.classList.add("drag-over");
+}
+
+function dlv(e) {
+  e.currentTarget.classList.remove("drag-over");
+}
+
+function drp(e, i) {
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  if (dragSrc === null || dragSrc === i) return;
+
+  const a = [...draftOrder];
+  const moved = a.splice(dragSrc, 1)[0];
+  a.splice(i, 0, moved);
+  draftOrder = a;
+  dragSrc = null;
+  sequence = buildSeq(draftOrder);
+  renderSetup();
+  if (isHost) broadcastState();
+}
+
+function renderPreview() {
   const seq = buildSeq(draftOrder);
   const rows = {};
   seq.forEach(s => {
-    if(!rows[s.round]) rows[s.round] = [];
+    if (!rows[s.round]) rows[s.round] = [];
     rows[s.round].push(s);
   });
-  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r,picks]) => `
+
+  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r, arr]) => `
     <div class="snake-row">
-      <span class="snake-rlabel">${picks[0].isAlt?"Alt":"R"+r}</span>
-      ${picks.map(p => `<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
-    </div>`).join("");
+      <span class="snake-rlabel">${arr[0].isAlt ? "Alt" : "R" + r}</span>
+      ${arr.map(p => `<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
+    </div>
+  `).join("");
 }
 
-function randomizeOrder(){
-  if(!isHost) return;
+function randomizeOrder() {
+  if (!isHost) return;
+
   const btn = document.getElementById("rand-btn");
-  btn.disabled=true;
+  btn.disabled = true;
   btn.classList.add("spinning");
-  btn.textContent="Shuffling...";
+  btn.textContent = "Shuffling...";
 
-  let count=0;
-  const total=25;
+  let count = 0;
+  const total = 25;
 
-  function shuffle(arr){
-    const a=[...arr];
-    for(let i=a.length-1;i>0;i--){
-      const j=Math.floor(Math.random()*(i+1));
-      [a[i],a[j]]=[a[j],a[i]];
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
     }
     return a;
   }
 
-  const timer=setInterval(()=>{
+  const timer = setInterval(() => {
     count++;
-    draftOrder=shuffle(draftOrder);
+    draftOrder = shuffle(draftOrder);
+    sequence = buildSeq(draftOrder);
     renderSetup();
-    if(count>=total){
+    if (count >= total) {
       clearInterval(timer);
       btn.classList.remove("spinning");
-      btn.disabled=false;
-      btn.textContent="Randomize Again";
+      btn.disabled = false;
+      btn.textContent = "Randomize Again";
       broadcastState();
     }
-  },80);
+  }, 80);
 }
 
-function beginDraft(){
-  if(!isHost) return;
+function beginDraft() {
+  if (!isHost) return;
+
   phase = "draft";
-  sequence = buildSeq(draftOrder);
+  BETTORS.forEach(b => picks[b] = { picks: [], alt: null });
   turn = 0;
-  BETTORS.forEach(b => picks[b] = {picks:[], alt:null});
+  sequence = buildSeq(draftOrder);
+
   showScreen("draft");
   document.getElementById("status-pill").textContent = "Live Draft";
   document.getElementById("restart-btn").style.display = "inline-block";
+
   renderDraft();
   broadcastState();
 }
 
-function renderDraft(){
-  if(turn>=sequence.length){ finishDraft(); return; }
+function getTakenMap() {
+  const taken = {};
+  BETTORS.forEach(b => {
+    picks[b].picks.forEach(n => taken[n] = b);
+    if (picks[b].alt) taken[picks[b].alt] = b + " (alt)";
+  });
+  return taken;
+}
+
+function renderDraft() {
+  if (turn >= sequence.length) {
+    finishDraft();
+    return;
+  }
+
   const t = sequence[turn];
   const banner = document.getElementById("clock-banner");
   banner.style.background = COLORS[t.bettor];
   document.getElementById("clock-name").textContent = t.bettor + "'s pick";
-  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn+1) + " of " + sequence.length;
-  document.getElementById("clock-info").innerHTML   = (sequence.length-turn) + " picks left";
-  document.getElementById("search-input").value = "";
+  document.getElementById("clock-sub").textContent = t.isAlt
+    ? "Choose your alternate"
+    : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
+  document.getElementById("clock-info").innerHTML = (sequence.length - turn) + " picks left";
 
   const ytm = document.getElementById("your-turn-msg");
   if (t.bettor === myName) {
-    ytm.innerHTML = '<div class="your-turn-banner">Your pick! Choose a player below</div>';
+    ytm.innerHTML = '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>';
   } else {
     ytm.innerHTML = "";
   }
@@ -632,27 +1145,21 @@ function renderDraft(){
   renderBoard();
 }
 
-function renderPlayerList(){
+function renderPlayerList() {
   const el = document.getElementById("player-list");
-  if(turn >= sequence.length){
+  if (turn >= sequence.length) {
     el.innerHTML = "";
     return;
   }
 
   const t = sequence[turn];
   const query = document.getElementById("search-input").value.toLowerCase().trim();
-  const canPick = (myName === t.bettor) || isHost;
-
-  const taken = {};
-  BETTORS.forEach(b => {
-    picks[b].picks.forEach(n => taken[n] = b);
-    if (picks[b].alt) taken[picks[b].alt] = b + " (alt)";
-  });
-
+  const canPick = isHost || myName === t.bettor;
+  const taken = getTakenMap();
   const list = query ? field.filter(n => n.toLowerCase().includes(query)) : field;
 
   if (!list.length) {
-    el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--light);font-size:13px">No players found</div>`;
+    el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No players found</div>`;
     return;
   }
 
@@ -674,11 +1181,11 @@ function renderPlayerList(){
     const own = taken[name];
 
     if (own) {
-      const ob = own.replace(" (alt)", "");
+      const ownerBase = own.replace(" (alt)", "");
       html += `
         <div class="p-row taken">
+          <span class="p-owner" style="color:${COLORS[ownerBase] || '#888'}">${own}</span>
           <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-          <span class="p-owner" style="color:${COLORS[ob] || '#888'}">${own}</span>
         </div>
       `;
     } else if (canPick) {
@@ -686,8 +1193,8 @@ function renderPlayerList(){
       const bl = t.isAlt ? "Alt pick" : "Pick";
       html += `
         <div class="p-row avail${t.isAlt ? " altround" : ""}" data-player="${encodeURIComponent(name)}">
-          <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
           <button class="pick-btn ${bc}" data-player="${encodeURIComponent(name)}">+ ${bl}</button>
+          <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
         </div>
       `;
     } else {
@@ -707,86 +1214,113 @@ function setupPlayerListClicks() {
   el.addEventListener("click", function(e) {
     const target = e.target.closest("[data-player]");
     if (!target) return;
-    const encodedName = target.getAttribute("data-player");
-    if (!encodedName) return;
-    const playerName = decodeURIComponent(encodedName);
+    const encoded = target.getAttribute("data-player");
+    if (!encoded) return;
+    const playerName = decodeURIComponent(encoded);
     requestPick(playerName);
   });
 }
 
 function requestPick(playerName) {
   if (turn >= sequence.length) return;
+
   const t = sequence[turn];
+  const taken = getTakenMap();
+  if (taken[playerName]) return;
 
   if (isHost) {
     applyPick(playerName);
-  } else if (myName === t.bettor) {
-    sendToHost({type:"pick", player: playerName, from: myName});
+    return;
+  }
+
+  if (myName === t.bettor) {
+    sendToHost({ type: "pick", player: playerName, from: myName });
   }
 }
 
 function applyPick(playerName) {
+  if (!isHost) return;
   if (turn >= sequence.length) return;
+
+  const taken = getTakenMap();
+  if (taken[playerName]) return;
+
   const t = sequence[turn];
+
   if (t.isAlt) {
     picks[t.bettor].alt = playerName;
   } else {
     picks[t.bettor].picks.push(playerName);
   }
+
   turn++;
-  if (turn >= sequence.length) phase = "complete";
+  if (turn >= sequence.length) {
+    phase = "complete";
+  }
+
+  if (phase === "complete") {
+    finishDraft();
+    broadcastState();
+    return;
+  }
+
   renderDraft();
-  if (isHost) broadcastState();
+  broadcastState();
 }
 
-function renderBoard(){
+function renderBoard() {
   const el = document.getElementById("board-panel");
   const rounds = {};
-  sequence.forEach((s,idx) => {
-    if(!rounds[s.round]) rounds[s.round] = [];
-    rounds[s.round].push({...s,idx});
+
+  sequence.forEach((s, idx) => {
+    if (!rounds[s.round]) rounds[s.round] = [];
+    rounds[s.round].push({ ...s, idx });
   });
 
   const slotPick = {};
-  sequence.forEach((s,idx) => {
-    if(idx < turn){
-      if(s.isAlt){
+  sequence.forEach((s, idx) => {
+    if (idx < turn) {
+      if (s.isAlt) {
         slotPick[idx] = picks[s.bettor].alt;
       } else {
-        const pi = sequence.slice(0,idx).filter(x => x.bettor === s.bettor && !x.isAlt).length;
+        const pi = sequence.slice(0, idx).filter(x => x.bettor === s.bettor && !x.isAlt).length;
         slotPick[idx] = picks[s.bettor].picks[pi];
       }
     }
   });
 
-  el.innerHTML = Object.entries(rounds).map(([r,slots]) => `
+  el.innerHTML = Object.entries(rounds).map(([r, slots]) => `
     <div class="round-section">
-      <div class="round-hdr${slots[0].isAlt?" alt":""}">
-        <span>${slots[0].isAlt?"Alt Round":"Round "+r}</span>
-        <span style="font-size:11px;opacity:0.7;font-family:'DM Mono',monospace">${slots.filter(s => s.idx < turn).length}/${slots.length}</span>
+      <div class="round-hdr${slots[0].isAlt ? " alt" : ""}">
+        <span>${slots[0].isAlt ? "Alt Round" : "Round " + r}</span>
+        <span style="font-size:11px;opacity:.75;font-family:'DM Mono',monospace">${slots.filter(s => s.idx < turn).length}/${slots.length}</span>
       </div>
-      ${slots.map(s => {
-        const isDone   = s.idx < turn;
+      ${slots.map((s, index) => {
+        const isDone = s.idx < turn;
         const isActive = s.idx === turn;
-        const picked   = slotPick[s.idx];
+        const picked = slotPick[s.idx];
         const dispName = picked ? picked.split(" ").pop() : "";
-        return `<div class="b-row${isActive?" active":""}">
-          <span class="b-pos">${slots.indexOf(s)+1}</span>
+        return `<div class="b-row${isActive ? " active" : ""}">
+          <span class="b-pos">${index + 1}</span>
           <span class="b-bettor" style="color:${COLORS[s.bettor]}">${s.bettor}</span>
-          <span class="b-pick${isDone?"":(isActive?" onclock":" empty")}">
+          <span class="b-pick${isDone ? "" : (isActive ? " onclock" : " empty")}">
             ${isDone && picked ? dispName : isActive ? "on the clock..." : "—"}
           </span>
         </div>`;
       }).join("")}
-    </div>`).join("");
+    </div>
+  `).join("");
 }
 
-function finishDraft(){
+function finishDraft() {
   phase = "complete";
   showScreen("complete");
   document.getElementById("status-pill").textContent = "Complete";
+  document.getElementById("restart-btn").style.display = "inline-block";
+
   const pb = BETTORS.map(b => `    ${b.padEnd(6)}: [${picks[b].picks.map(n => `"${n}"`).join(", ")}]`).join(",\n");
   const ab = BETTORS.filter(b => picks[b].alt).map(b => `    ${b.padEnd(6)}: "${picks[b].alt}"`).join(",\n");
+
   document.getElementById("config-output").textContent =
 `  picks: {
 ${pb}
@@ -796,38 +1330,47 @@ ${ab || "    // no alts set"}
   },`;
 }
 
-function copyConfig(){
+function copyConfig() {
   navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(() => {
-    const btn=document.querySelector(".copy-btn");
-    btn.textContent="Copied!";
-    setTimeout(() => btn.textContent="Copy CONFIG",2000);
+    const btn = document.querySelector(".copy-btn");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy CONFIG", 2000);
   });
 }
 
-function resetDraft(){
-  if(!isHost){
+function resetDraft() {
+  if (!isHost) {
     alert("Only Dave can restart the draft.");
     return;
   }
-  if(!confirm("Reset the entire draft? All picks will be cleared.")) return;
-  BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
+
+  if (!confirm("Reset the entire draft? All picks will be cleared.")) return;
+
+  BETTORS.forEach(b => picks[b] = { picks: [], alt: null });
   draftOrder = [...BETTORS];
+  sequence = buildSeq(draftOrder);
   turn = 0;
   phase = "setup";
-  sequence = buildSeq(draftOrder);
+
   showScreen("setup");
   document.getElementById("status-pill").textContent = "Setup";
+  document.getElementById("setup-host-controls").style.display = "block";
+  document.getElementById("setup-wait").style.display = "none";
+
   renderSetup();
   broadcastState();
 }
 
-function showScreen(id){
+function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById("screen-"+id).classList.add("active");
+  document.getElementById("screen-" + id).classList.add("active");
 }
 
 setupPlayerListClicks();
-fetchField().then(() => renderNameGrid());
+fetchField().then(() => {
+  sequence = buildSeq(draftOrder);
+  renderNameGrid();
+});
 </script>
 </body>
 </html>
