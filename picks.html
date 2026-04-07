@@ -156,7 +156,6 @@
 </header>
 <main>
 
-  <!-- LOBBY -->
   <div class="screen active" id="screen-lobby">
     <div class="lobby-card">
       <div class="lobby-title">Masters 2026 Draft</div>
@@ -194,7 +193,6 @@
     </div>
   </div>
 
-  <!-- SETUP -->
   <div class="screen" id="screen-setup">
     <div class="setup-card">
       <div class="setup-title">Set Draft Order</div>
@@ -214,7 +212,6 @@
     </div>
   </div>
 
-  <!-- DRAFT -->
   <div class="screen" id="screen-draft">
     <div class="clock-banner" id="clock-banner">
       <div>
@@ -236,7 +233,6 @@
     </div>
   </div>
 
-  <!-- COMPLETE -->
   <div class="screen" id="screen-complete">
     <div class="complete-card">
       <div class="complete-title">Draft Complete!</div>
@@ -382,7 +378,7 @@ async function fetchField() {
     "Zach Johnson"
   ];
 
-  field.sort((a,b) => a.split(' ').pop().toLowerCase().localeCompare(b.split(' ').pop().toLowerCase()));
+  field.sort((a,b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
 }
 
 // ═══════════════════════════════════════════════
@@ -444,7 +440,12 @@ function createRoom() {
       conn.on("data", msg => handleGuestMsg(conn, msg));
       conn.on("close", () => {
         const name = Object.keys(guestConns).find(n => guestConns[n] === conn);
-        if (name) { delete guestConns[name]; claimed.delete(name); renderLobby(); broadcastLobby(); }
+        if (name) {
+          delete guestConns[name];
+          claimed.delete(name);
+          renderLobby();
+          broadcastLobby();
+        }
       });
     });
   });
@@ -506,6 +507,7 @@ function joinRoom() {
   if (!myName) return;
   const code = document.getElementById("join-code").value.trim().toUpperCase();
   if (code.length !== 4) return;
+
   const err = document.getElementById("lobby-error");
   const status = document.getElementById("lobby-status");
   err.textContent = "";
@@ -633,19 +635,24 @@ function renderSetup() {
         data-i="${i}">
       <span class="order-num">${i+1}</span>
       <span class="order-name" style="color:${COLORS[b]}">${b}</span>
-      ${canDrag?'<span class="drag-handle">\u2807</span>':""}
+      ${canDrag?'<span class="drag-handle">&#10247;</span>':""}
     </li>`).join("");
   renderPreview();
 }
 
-function ds(e,i){dragSrc=i;e.currentTarget.style.opacity="0.5";}
-function dov(e,i){e.preventDefault();if(i!==dragSrc)e.currentTarget.classList.add("drag-over");}
-function dlv(e){e.currentTarget.classList.remove("drag-over");}
+function ds(e,i){ dragSrc=i; e.currentTarget.style.opacity="0.5"; }
+function dov(e,i){ e.preventDefault(); if(i!==dragSrc)e.currentTarget.classList.add("drag-over"); }
+function dlv(e){ e.currentTarget.classList.remove("drag-over"); }
 function drp(e,i){
-  e.preventDefault();e.currentTarget.classList.remove("drag-over");
-  if(dragSrc===null||dragSrc===i)return;
-  const a=[...draftOrder];const[m]=a.splice(dragSrc,1);a.splice(i,0,m);
-  draftOrder=a;dragSrc=null;renderSetup();
+  e.preventDefault();
+  e.currentTarget.classList.remove("drag-over");
+  if(dragSrc===null || dragSrc===i) return;
+  const a=[...draftOrder];
+  const m=a.splice(dragSrc,1)[0];
+  a.splice(i,0,m);
+  draftOrder=a;
+  dragSrc=null;
+  renderSetup();
   if(isHost) broadcastState();
 }
 
@@ -666,33 +673,34 @@ function renderPreview(){
 function randomizeOrder(){
   if(!isHost) return;
   const btn = document.getElementById("rand-btn");
-  btn.disabled = true;
+  btn.disabled=true;
   btn.classList.add("spinning");
-  btn.textContent = "Shuffling...";
+  btn.textContent="Shuffling...";
 
-  let count = 0;
-  const total = 25;
+  let count=0;
+  const total=25;
+
   function shuffle(arr){
-    const a = [...arr];
-    for(let i = a.length - 1; i > 0; i--){
-      const j = Math.floor(Math.random() * (i + 1));
-      [a[i], a[j]] = [a[j], a[i]];
+    const a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [a[i],a[j]]=[a[j],a[i]];
     }
     return a;
   }
 
-  const timer = setInterval(() => {
+  const timer=setInterval(()=>{
     count++;
-    draftOrder = shuffle(draftOrder);
+    draftOrder=shuffle(draftOrder);
     renderSetup();
-    if(count >= total){
+    if(count>=total){
       clearInterval(timer);
       btn.classList.remove("spinning");
-      btn.disabled = false;
-      btn.textContent = "Randomize Again";
+      btn.disabled=false;
+      btn.textContent="Randomize Again";
       broadcastState();
     }
-  }, 80);
+  },80);
 }
 
 // ═══════════════════════════════════════════════
@@ -740,29 +748,36 @@ function renderDraft(){
 // ═══════════════════════════════════════════════
 function renderPlayerList(){
   const el = document.getElementById("player-list");
-  if(turn >= sequence.length){ el.innerHTML = ""; return; }
-  const t     = sequence[turn];
-  const query = document.getElementById("search-input").value.toLowerCase().trim();
+  if(turn >= sequence.length){
+    el.innerHTML = "";
+    return;
+  }
 
+  const t = sequence[turn];
+  const query = document.getElementById("search-input").value.toLowerCase().trim();
   const canPick = (myName === t.bettor) || isHost;
 
   const taken = {};
   BETTORS.forEach(b => {
     picks[b].picks.forEach(n => taken[n] = b);
-    if(picks[b].alt) taken[picks[b].alt] = b + " (alt)";
+    if (picks[b].alt) taken[picks[b].alt] = b + " (alt)";
   });
 
   const list = query ? field.filter(n => n.toLowerCase().includes(query)) : field;
-  if(!list.length){
+
+  if (!list.length) {
     el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--light);font-size:13px">No players found</div>`;
     return;
   }
 
-  let html = "", lastL = "";
+  let html = "";
+  let lastL = "";
+
   list.forEach(name => {
-    const last   = name.split(" ").pop();
+    const last = name.split(" ").pop();
     const letter = last[0].toUpperCase();
-    if(letter !== lastL && !query){
+
+    if (letter !== lastL && !query) {
       html += `<div class="letter-head">${letter}</div>`;
       lastL = letter;
     }
@@ -772,26 +787,48 @@ function renderPlayerList(){
     const fn = parts.join(" ");
     const own = taken[name];
 
-    if(own){
+    if (own) {
       const ob = own.replace(" (alt)", "");
-      html += `<div class="p-row taken">
-        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-        <span class="p-owner" style="color:${COLORS[ob]||'#888'}">${own}</span>
-      </div>`;
-    } else if(canPick){
+      html += `
+        <div class="p-row taken">
+          <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
+          <span class="p-owner" style="color:${COLORS[ob] || '#888'}">${own}</span>
+        </div>
+      `;
+    } else if (canPick) {
       const bc = t.isAlt ? "alt" : "main";
       const bl = t.isAlt ? "Alt pick" : "Pick";
-      html += `<div class="p-row avail${t.isAlt?" altround":""}" onclick="requestPick(${JSON.stringify(name)})">
-        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-        <button class="pick-btn ${bc}" onclick="event.stopPropagation();requestPick(${JSON.stringify(name)})">+ ${bl}</button>
-      </div>`;
+      html += `
+        <div class="p-row avail${t.isAlt ? " altround" : ""}" data-player="${encodeURIComponent(name)}">
+          <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
+          <button class="pick-btn ${bc}" data-player="${encodeURIComponent(name)}">+ ${bl}</button>
+        </div>
+      `;
     } else {
-      html += `<div class="p-row">
-        <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-      </div>`;
+      html += `
+        <div class="p-row">
+          <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
+        </div>
+      `;
     }
   });
+
   el.innerHTML = html;
+}
+
+function setupPlayerListClicks() {
+  const el = document.getElementById("player-list");
+
+  el.addEventListener("click", function(e) {
+    const target = e.target.closest("[data-player]");
+    if (!target) return;
+
+    const encodedName = target.getAttribute("data-player");
+    if (!encodedName) return;
+
+    const playerName = decodeURIComponent(encodedName);
+    requestPick(playerName);
+  });
 }
 
 // ═══════════════════════════════════════════════
@@ -811,11 +848,13 @@ function requestPick(playerName) {
 function applyPick(playerName) {
   if (turn >= sequence.length) return;
   const t = sequence[turn];
+
   if (t.isAlt) {
     picks[t.bettor].alt = playerName;
   } else {
     picks[t.bettor].picks.push(playerName);
   }
+
   turn++;
   if (turn >= sequence.length) phase = "complete";
   renderDraft();
@@ -828,6 +867,7 @@ function applyPick(playerName) {
 function renderBoard(){
   const el = document.getElementById("board-panel");
   const rounds = {};
+
   sequence.forEach((s,idx) => {
     if(!rounds[s.round]) rounds[s.round] = [];
     rounds[s.round].push({...s,idx});
@@ -897,8 +937,12 @@ function copyConfig(){
 // RESET
 // ═══════════════════════════════════════════════
 function resetDraft(){
-  if(!isHost){ alert("Only the host can restart the draft."); return; }
+  if(!isHost){
+    alert("Only the host can restart the draft.");
+    return;
+  }
   if(!confirm("Reset the entire draft? All picks will be cleared.")) return;
+
   BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
   draftOrder = [...BETTORS];
   turn = 0;
@@ -921,6 +965,7 @@ function showScreen(id){
 // ═══════════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════════
+setupPlayerListClicks();
 fetchField().then(() => renderNameGrid());
 </script>
 </body>
