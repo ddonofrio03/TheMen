@@ -256,7 +256,6 @@
 const BETTORS = ["Dave","TJ","Billy","Nick","Ry","Alex"];
 const COLORS  = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
 const ROUNDS  = 5;
-const MASTERS = "401811941";
 
 // ═══════════════════════════════════════════════
 // STATE
@@ -277,10 +276,10 @@ let peer       = null;
 let isHost     = false;
 let myName     = null;
 let roomCode   = null;
-let hostConn   = null;      // guest -> host
-let guestConns = {};        // host: name -> conn
-let claimed    = new Set(); // names taken in lobby
-let phase      = "lobby";   // lobby | setup | draft | complete
+let hostConn   = null;
+let guestConns = {};
+let claimed    = new Set();
+let phase      = "lobby";
 
 // ═══════════════════════════════════════════════
 // SEQUENCE
@@ -296,17 +295,94 @@ function buildSeq(order) {
 }
 
 // ═══════════════════════════════════════════════
-// FETCH FIELD FROM ESPN
+// PLAYER FIELD
 // ═══════════════════════════════════════════════
 async function fetchField() {
-  try {
-    const r    = await fetch("https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard");
-    const data = await r.json();
-    const ev   = data.events?.find(e => e.id === MASTERS) || data.events?.[0];
-    const pl   = (ev?.competitions?.[0]?.competitors || []).map(p => p.athlete?.displayName).filter(Boolean);
-    pl.sort((a,b) => a.split(' ').pop().toLowerCase().localeCompare(b.split(' ').pop().toLowerCase()));
-    field = pl;
-  } catch(e) { field = []; }
+  field = [
+    "Aaron Rai",
+    "Adam Scott",
+    "Akshay Bhatia",
+    "Alex Noren",
+    "Aldrich Potgieter",
+    "Ángel Cabrera",
+    "Ben Griffin",
+    "Brian Campbell",
+    "Brian Harman",
+    "Bubba Watson",
+    "Cameron Smith",
+    "Cameron Young",
+    "Carlos Ortiz",
+    "Casey Jarvis",
+    "Charl Schwartzel",
+    "Chris Gotterup",
+    "Collin Morikawa",
+    "Corey Conners",
+    "Daniel Berger",
+    "Danny Willett",
+    "Davis Riley",
+    "Dustin Johnson",
+    "Ethan Fang",
+    "Fred Couples",
+    "Gary Woodland",
+    "Harris English",
+    "Harry Hall",
+    "Hideki Matsuyama",
+    "Im Sung-jae",
+    "J. J. Spaun",
+    "Jacob Bridgeman",
+    "Jake Knapp",
+    "Jason Day",
+    "Jhonattan Vegas",
+    "Jon Rahm",
+    "Jordan Spieth",
+    "José María Olazábal",
+    "Justin Rose",
+    "Justin Thomas",
+    "Keegan Bradley",
+    "Kim Si-woo",
+    "Kurt Kitayama",
+    "Ludvig Åberg",
+    "Marco Penge",
+    "Mason Howell",
+    "Mateo Pulcini",
+    "Matt Fitzpatrick",
+    "Matt McCarty",
+    "Maverick McNealy",
+    "Max Greyserman",
+    "Max Homa",
+    "Michael Brennan",
+    "Michael Kim",
+    "Min Woo Lee",
+    "Naoyuki Kataoka",
+    "Nico Echavarría",
+    "Nick Taylor",
+    "Nicolai Højgaard",
+    "Patrick Cantlay",
+    "Rasmus Højgaard",
+    "Rasmus Neergaard-Petersen",
+    "Robert MacIntyre",
+    "Rory McIlroy",
+    "Russell Henley",
+    "Ryan Fox",
+    "Ryan Gerard",
+    "Sami Välimäki",
+    "Sam Burns",
+    "Sam Stevens",
+    "Scottie Scheffler",
+    "Sepp Straka",
+    "Sergio Garcia",
+    "Shane Lowry",
+    "Tom McKibbin",
+    "Tommy Fleetwood",
+    "Tyrrell Hatton",
+    "Vijay Singh",
+    "Viktor Hovland",
+    "Wyndham Clark",
+    "Xander Schauffele",
+    "Zach Johnson"
+  ];
+
+  field.sort((a,b) => a.split(' ').pop().toLowerCase().localeCompare(b.split(' ').pop().toLowerCase()));
 }
 
 // ═══════════════════════════════════════════════
@@ -396,7 +472,6 @@ function handleGuestMsg(conn, msg) {
     claimed.add(msg.name);
     renderLobby();
     broadcastLobby();
-    // If draft already in progress, send full state to late joiner
     if (phase !== "lobby") {
       conn.send({type:"state", payload: getFullState()});
     }
@@ -409,11 +484,11 @@ function handleGuestMsg(conn, msg) {
 
 function broadcastLobby() {
   const msg = {type:"lobby", members: Array.from(claimed), host: myName};
-  Object.values(guestConns).forEach(c => { try{c.send(msg)}catch(e){} });
+  Object.values(guestConns).forEach(c => { try { c.send(msg); } catch(e) {} });
 }
 
 function broadcast(msg) {
-  Object.values(guestConns).forEach(c => { try{c.send(msg)}catch(e){} });
+  Object.values(guestConns).forEach(c => { try { c.send(msg); } catch(e) {} });
 }
 
 function getFullState() {
@@ -532,7 +607,7 @@ function renderLobby() {
 }
 
 // ═══════════════════════════════════════════════
-// HOST: START DRAFT (go to setup)
+// HOST: START DRAFT
 // ═══════════════════════════════════════════════
 function hostStartDraft() {
   phase = "setup";
@@ -577,30 +652,47 @@ function drp(e,i){
 function renderPreview(){
   const seq = buildSeq(draftOrder);
   const rows = {};
-  seq.forEach(s=>{if(!rows[s.round])rows[s.round]=[];rows[s.round].push(s);});
-  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r,picks])=>`
+  seq.forEach(s => {
+    if(!rows[s.round]) rows[s.round] = [];
+    rows[s.round].push(s);
+  });
+  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r,picks]) => `
     <div class="snake-row">
       <span class="snake-rlabel">${picks[0].isAlt?"Alt":"R"+r}</span>
-      ${picks.map(p=>`<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
+      ${picks.map(p => `<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
     </div>`).join("");
 }
 
 function randomizeOrder(){
   if(!isHost) return;
   const btn = document.getElementById("rand-btn");
-  btn.disabled=true;btn.classList.add("spinning");btn.textContent="Shuffling...";
+  btn.disabled = true;
+  btn.classList.add("spinning");
+  btn.textContent = "Shuffling...";
 
-  let count=0;const total=25;
-  function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  let count = 0;
+  const total = 25;
+  function shuffle(arr){
+    const a = [...arr];
+    for(let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
 
-  const timer=setInterval(()=>{
-    count++;draftOrder=shuffle(draftOrder);renderSetup();
-    if(count>=total){
+  const timer = setInterval(() => {
+    count++;
+    draftOrder = shuffle(draftOrder);
+    renderSetup();
+    if(count >= total){
       clearInterval(timer);
-      btn.classList.remove("spinning");btn.disabled=false;btn.textContent="Randomize Again";
+      btn.classList.remove("spinning");
+      btn.disabled = false;
+      btn.textContent = "Randomize Again";
       broadcastState();
     }
-  },80);
+  }, 80);
 }
 
 // ═══════════════════════════════════════════════
@@ -623,16 +715,15 @@ function beginDraft(){
 // DRAFT RENDER
 // ═══════════════════════════════════════════════
 function renderDraft(){
-  if(turn>=sequence.length){finishDraft();return;}
+  if(turn >= sequence.length){ finishDraft(); return; }
   const t = sequence[turn];
   const banner = document.getElementById("clock-banner");
   banner.style.background = COLORS[t.bettor];
-  document.getElementById("clock-name").textContent = t.bettor+"'s pick";
-  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round "+t.round+" \u00b7 Pick "+(turn+1)+" of "+sequence.length;
-  document.getElementById("clock-info").innerHTML    = (sequence.length-turn)+" picks left";
-  document.getElementById("search-input").value="";
+  document.getElementById("clock-name").textContent = t.bettor + "'s pick";
+  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
+  document.getElementById("clock-info").innerHTML   = (sequence.length - turn) + " picks left";
+  document.getElementById("search-input").value = "";
 
-  // "Your turn" banner
   const ytm = document.getElementById("your-turn-msg");
   if (t.bettor === myName) {
     ytm.innerHTML = '<div class="your-turn-banner">Your pick! Choose a player below</div>';
@@ -649,51 +740,58 @@ function renderDraft(){
 // ═══════════════════════════════════════════════
 function renderPlayerList(){
   const el = document.getElementById("player-list");
-  if(turn>=sequence.length){el.innerHTML="";return;}
+  if(turn >= sequence.length){ el.innerHTML = ""; return; }
   const t     = sequence[turn];
   const query = document.getElementById("search-input").value.toLowerCase().trim();
 
-  // Can this user pick right now?
   const canPick = (myName === t.bettor) || isHost;
 
   const taken = {};
-  BETTORS.forEach(b=>{
-    picks[b].picks.forEach(n=>taken[n]=b);
-    if(picks[b].alt)taken[picks[b].alt]=b+" (alt)";
+  BETTORS.forEach(b => {
+    picks[b].picks.forEach(n => taken[n] = b);
+    if(picks[b].alt) taken[picks[b].alt] = b + " (alt)";
   });
 
-  const list = query ? field.filter(n=>n.toLowerCase().includes(query)) : field;
-  if(!list.length){el.innerHTML=`<div style="padding:20px;text-align:center;color:var(--light);font-size:13px">No players found</div>`;return;}
+  const list = query ? field.filter(n => n.toLowerCase().includes(query)) : field;
+  if(!list.length){
+    el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--light);font-size:13px">No players found</div>`;
+    return;
+  }
 
-  let html="",lastL="";
-  list.forEach(name=>{
-    const last   = name.split(' ').pop();
+  let html = "", lastL = "";
+  list.forEach(name => {
+    const last   = name.split(" ").pop();
     const letter = last[0].toUpperCase();
-    if(letter!==lastL&&!query){html+=`<div class="letter-head">${letter}</div>`;lastL=letter;}
+    if(letter !== lastL && !query){
+      html += `<div class="letter-head">${letter}</div>`;
+      lastL = letter;
+    }
 
-    const parts = name.split(' ');const ln=parts.pop();const fn=parts.join(' ');
-    const own   = taken[name];
+    const parts = name.split(" ");
+    const ln = parts.pop();
+    const fn = parts.join(" ");
+    const own = taken[name];
 
     if(own){
-      const ob = own.replace(' (alt)','');
-      html+=`<div class="p-row taken">
+      const ob = own.replace(" (alt)", "");
+      html += `<div class="p-row taken">
         <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
         <span class="p-owner" style="color:${COLORS[ob]||'#888'}">${own}</span>
       </div>`;
     } else if(canPick){
-      const bc = t.isAlt?"alt":"main";
-      const bl = t.isAlt?"Alt pick":"Pick";
-      html+=`<div class="p-row avail${t.isAlt?" altround":""}" onclick="requestPick('${name.replace(/'/g,"\\'")}')">
+      const bc = t.isAlt ? "alt" : "main";
+      const bl = t.isAlt ? "Alt pick" : "Pick";
+      html += `<div class="p-row avail${t.isAlt?" altround":""}" onclick="requestPick(${JSON.stringify(name)})">
         <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
-        <button class="pick-btn ${bc}" onclick="event.stopPropagation();requestPick('${name.replace(/'/g,"\\'")}')">+ ${bl}</button>
+        <button class="pick-btn ${bc}" onclick="event.stopPropagation();requestPick(${JSON.stringify(name)})">+ ${bl}</button>
       </div>`;
     } else {
-      html+=`<div class="p-row">
+      html += `<div class="p-row">
         <div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div>
       </div>`;
     }
   });
-  el.innerHTML=html;
+  el.innerHTML = html;
 }
 
 // ═══════════════════════════════════════════════
@@ -704,10 +802,8 @@ function requestPick(playerName) {
   const t = sequence[turn];
 
   if (isHost) {
-    // Host can pick for anyone (or themselves)
     applyPick(playerName);
   } else if (myName === t.bettor) {
-    // Guest: send pick request to host
     sendToHost({type:"pick", player: playerName, from: myName});
   }
 }
@@ -732,36 +828,39 @@ function applyPick(playerName) {
 function renderBoard(){
   const el = document.getElementById("board-panel");
   const rounds = {};
-  sequence.forEach((s,idx)=>{if(!rounds[s.round])rounds[s.round]=[];rounds[s.round].push({...s,idx});});
+  sequence.forEach((s,idx) => {
+    if(!rounds[s.round]) rounds[s.round] = [];
+    rounds[s.round].push({...s,idx});
+  });
 
   const slotPick = {};
-  sequence.forEach((s,idx)=>{
-    if(idx<turn){
+  sequence.forEach((s,idx) => {
+    if(idx < turn){
       if(s.isAlt){
-        slotPick[idx]=picks[s.bettor].alt;
+        slotPick[idx] = picks[s.bettor].alt;
       } else {
-        const pi = sequence.slice(0,idx).filter(x=>x.bettor===s.bettor&&!x.isAlt).length;
-        slotPick[idx]=picks[s.bettor].picks[pi];
+        const pi = sequence.slice(0,idx).filter(x => x.bettor === s.bettor && !x.isAlt).length;
+        slotPick[idx] = picks[s.bettor].picks[pi];
       }
     }
   });
 
-  el.innerHTML = Object.entries(rounds).map(([r,slots])=>`
+  el.innerHTML = Object.entries(rounds).map(([r,slots]) => `
     <div class="round-section">
       <div class="round-hdr${slots[0].isAlt?" alt":""}">
         <span>${slots[0].isAlt?"Alt Round":"Round "+r}</span>
-        <span style="font-size:11px;opacity:0.7;font-family:'DM Mono',monospace">${slots.filter(s=>s.idx<turn).length}/${slots.length}</span>
+        <span style="font-size:11px;opacity:0.7;font-family:'DM Mono',monospace">${slots.filter(s => s.idx < turn).length}/${slots.length}</span>
       </div>
-      ${slots.map(s=>{
+      ${slots.map(s => {
         const isDone   = s.idx < turn;
         const isActive = s.idx === turn;
         const picked   = slotPick[s.idx];
-        const dispName = picked ? picked.split(' ').pop() : "";
+        const dispName = picked ? picked.split(" ").pop() : "";
         return `<div class="b-row${isActive?" active":""}">
           <span class="b-pos">${slots.indexOf(s)+1}</span>
           <span class="b-bettor" style="color:${COLORS[s.bettor]}">${s.bettor}</span>
           <span class="b-pick${isDone?"":(isActive?" onclock":" empty")}">
-            ${isDone&&picked ? dispName : isActive ? "on the clock..." : "\u2014"}
+            ${isDone && picked ? dispName : isActive ? "on the clock..." : "—"}
           </span>
         </div>`;
       }).join("")}
@@ -775,16 +874,22 @@ function finishDraft(){
   phase = "complete";
   showScreen("complete");
   document.getElementById("status-pill").textContent = "Complete";
-  const pb = BETTORS.map(b=>`    ${b.padEnd(6)}: [${picks[b].picks.map(n=>`"${n}"`).join(', ')}]`).join(',\n');
-  const ab = BETTORS.filter(b=>picks[b].alt).map(b=>`    ${b.padEnd(6)}: "${picks[b].alt}"`).join(',\n');
-  document.getElementById("config-output").textContent=
-    `  picks: {\n${pb}\n  },\n  alts: {\n${ab||'    // no alts set'}\n  },`;
+  const pb = BETTORS.map(b => `    ${b.padEnd(6)}: [${picks[b].picks.map(n => `"${n}"`).join(", ")}]`).join(",\n");
+  const ab = BETTORS.filter(b => picks[b].alt).map(b => `    ${b.padEnd(6)}: "${picks[b].alt}"`).join(",\n");
+  document.getElementById("config-output").textContent =
+`  picks: {
+${pb}
+  },
+  alts: {
+${ab || "    // no alts set"}
+  },`;
 }
 
 function copyConfig(){
-  navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(()=>{
-    const btn=document.querySelector(".copy-btn");
-    btn.textContent="Copied!";setTimeout(()=>btn.textContent="Copy CONFIG",2000);
+  navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(() => {
+    const btn = document.querySelector(".copy-btn");
+    btn.textContent = "Copied!";
+    setTimeout(() => btn.textContent = "Copy CONFIG", 2000);
   });
 }
 
@@ -792,13 +897,15 @@ function copyConfig(){
 // RESET
 // ═══════════════════════════════════════════════
 function resetDraft(){
-  if(!isHost){alert("Only the host can restart the draft.");return;}
-  if(!confirm("Reset the entire draft? All picks will be cleared."))return;
-  BETTORS.forEach(b=>picks[b]={picks:[],alt:null});
-  draftOrder=[...BETTORS];turn=0;phase="setup";
-  sequence=buildSeq(draftOrder);
+  if(!isHost){ alert("Only the host can restart the draft."); return; }
+  if(!confirm("Reset the entire draft? All picks will be cleared.")) return;
+  BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
+  draftOrder = [...BETTORS];
+  turn = 0;
+  phase = "setup";
+  sequence = buildSeq(draftOrder);
   showScreen("setup");
-  document.getElementById("status-pill").textContent="Setup";
+  document.getElementById("status-pill").textContent = "Setup";
   renderSetup();
   broadcastState();
 }
@@ -807,8 +914,8 @@ function resetDraft(){
 // UTILS
 // ═══════════════════════════════════════════════
 function showScreen(id){
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  document.getElementById("screen-"+id).classList.add("active");
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + id).classList.add("active");
 }
 
 // ═══════════════════════════════════════════════
