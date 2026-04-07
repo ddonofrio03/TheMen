@@ -19,41 +19,64 @@
   .hdr{max-width:960px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
   .title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:#fff;}
   .sub{font-size:11px;color:var(--gold);letter-spacing:1px;text-transform:uppercase;font-weight:300;margin-left:10px;}
-  .header-actions { display: flex; align-items: center; gap: 12px; }
-  .restart-btn-ui {
-    font-family: 'DM Mono', monospace;font-size: 10px;padding: 4px 10px;border-radius: 10px;
-    background: transparent;color: #ff8a8a;border: 1px solid #ff8a8a;cursor: pointer;
-    text-transform: uppercase;transition: all 0.2s;
+  .header-actions{display:flex;align-items:center;gap:12px;}
+  .restart-btn-ui{
+    font-family:'DM Mono', monospace;font-size:10px;padding:4px 10px;border-radius:10px;
+    background:transparent;color:#ff8a8a;border:1px solid #ff8a8a;cursor:pointer;
+    text-transform:uppercase;transition:all 0.2s;
   }
   .restart-btn-ui:hover{background:var(--red);color:white;border-color:var(--red);}
   .status-pill{font-family:'DM Mono',monospace;font-size:11px;padding:4px 10px;border-radius:10px;background:#1a3320;color:#6be08a;}
   main{max-width:960px;margin:0 auto;padding:24px 24px 80px;}
   .screen{display:none;}.screen.active{display:block;}
 
-  /* LOBBY */
-  .lobby-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:480px;margin:0 auto;}
-  .lobby-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;margin-bottom:4px;}
-  .lobby-desc{font-size:13px;color:var(--mid);margin-bottom:20px;line-height:1.6;}
+  .lobby-card,.setup-card,.complete-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:520px;margin:0 auto;}
+  .lobby-title,.setup-title,.complete-title{font-family:'Bebas Neue',sans-serif;letter-spacing:1px;}
+  .lobby-title{font-size:24px;margin-bottom:4px;}
+  .setup-title{font-size:22px;margin-bottom:6px;}
+  .complete-title{font-size:26px;color:var(--green);margin-bottom:6px;}
+  .lobby-desc,.setup-desc,.complete-sub,.cfg-note{font-size:13px;color:var(--mid);line-height:1.6;}
+  .lobby-desc{margin-bottom:20px;}
+  .setup-desc{margin-bottom:24px;}
+  .complete-sub{margin-bottom:20px;}
+  .cfg-note{font-size:12px;margin-bottom:10px;}
+
   .lobby-section{margin-bottom:20px;}
-  .lobby-label{font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-family:'DM Mono',monospace;}
-  .name-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px;}
-  .name-btn{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:0.5px;padding:8px 18px;border-radius:6px;border:2px solid var(--border);background:var(--white);cursor:pointer;transition:all 0.15s;color:var(--ink);}
+  .lobby-label,.preview-label{
+    font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;
+    margin-bottom:8px;font-family:'DM Mono',monospace;
+  }
+
+  .name-grid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:18px;}
+  .name-btn{
+    font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:0.5px;padding:10px 20px;
+    border-radius:6px;border:2px solid var(--border);background:var(--white);cursor:pointer;
+    transition:all 0.15s;color:var(--ink);
+  }
   .name-btn:hover{border-color:var(--green);background:#f0f8f2;}
   .name-btn.selected{color:white;border-color:transparent;}
-  .name-btn.taken{opacity:0.3;cursor:not-allowed;}
-  .lobby-actions{display:flex;gap:8px;margin-bottom:16px;}
-  .host-btn,.join-btn{flex:1;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;border-radius:6px;cursor:pointer;transition:all 0.15s;}
+  .name-btn.taken{opacity:0.45;cursor:not-allowed;}
+
+  .helper-box{
+    background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;
+    margin-bottom:18px;font-size:13px;color:var(--mid);line-height:1.6;
+  }
+
+  .lobby-actions{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px;}
+  .host-btn,.join-btn,.start-btn,.rand-btn,.copy-btn{
+    padding:12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;border-radius:6px;cursor:pointer;transition:all 0.15s;
+  }
+  .host-btn,.join-btn{flex:1;font-size:17px;}
   .host-btn{background:var(--green);color:var(--gold);border:none;}
   .host-btn:hover{background:var(--dark);}
   .join-btn{background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);}
   .join-btn:hover{background:var(--gold);color:white;}
-  .host-btn:disabled,.join-btn:disabled{opacity:0.4;cursor:not-allowed;}
-  .join-row{display:flex;gap:8px;margin-bottom:16px;}
-  .code-input{flex:1;padding:10px 14px;font-family:'DM Mono',monospace;font-size:18px;letter-spacing:4px;text-align:center;text-transform:uppercase;border:2px solid var(--border);border-radius:6px;background:var(--white);outline:none;}
-  .code-input:focus{border-color:var(--green);}
+  .host-btn:disabled,.join-btn:disabled,.start-btn:disabled,.rand-btn:disabled{opacity:0.45;cursor:not-allowed;}
+
   .room-display{background:var(--dark);border-radius:8px;padding:16px;text-align:center;margin-bottom:16px;}
-  .room-code{font-family:'DM Mono',monospace;font-size:36px;letter-spacing:6px;color:var(--gold);font-weight:700;}
-  .room-hint{font-size:11px;color:#8aaa8a;margin-top:4px;}
+  .room-code{font-family:'DM Mono',monospace;font-size:20px;letter-spacing:1px;color:var(--gold);font-weight:700;}
+  .room-hint{font-size:11px;color:#8aaa8a;margin-top:6px;}
+
   .members-list{margin-bottom:16px;}
   .member-row{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;margin-bottom:4px;background:var(--surface);border:1px solid var(--border);}
   .member-dot{width:8px;height:8px;border-radius:50%;}
@@ -61,16 +84,13 @@
   .member-dot.offline{background:var(--border);}
   .member-name{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:0.5px;flex:1;}
   .member-tag{font-size:10px;font-family:'DM Mono',monospace;color:var(--light);}
-  .start-btn{width:100%;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
+
+  .start-btn{width:100%;font-size:20px;background:var(--green);color:var(--gold);border:none;}
   .start-btn:hover{background:var(--dark);}
-  .start-btn:disabled{opacity:0.4;cursor:not-allowed;}
   .lobby-error{color:var(--red);font-size:12px;margin-top:8px;font-family:'DM Mono',monospace;}
   .lobby-status{font-size:12px;color:var(--light);margin-top:8px;font-family:'DM Mono',monospace;text-align:center;}
+  .wait-msg{text-align:center;padding:20px;font-size:13px;color:var(--mid);font-family:'DM Mono',monospace;}
 
-  /* SETUP */
-  .setup-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:520px;margin:0 auto;}
-  .setup-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:6px;}
-  .setup-desc{font-size:13px;color:var(--mid);margin-bottom:24px;line-height:1.6;}
   .order-list{list-style:none;margin-bottom:20px;}
   .order-item{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:6px;margin-bottom:6px;cursor:grab;user-select:none;transition:box-shadow 0.15s;}
   .order-item.drag-over{border-color:var(--green);background:#f0f8f2;}
@@ -79,18 +99,14 @@
   .order-name{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:0.5px;flex:1;}
   .drag-handle{color:var(--light);font-size:18px;}
   .preview-snake{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;margin-bottom:20px;}
-  .preview-label{font-size:11px;color:var(--light);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;font-family:'DM Mono',monospace;}
   .snake-row{display:flex;gap:4px;align-items:center;margin-bottom:3px;}
   .snake-rlabel{font-size:10px;color:var(--light);min-width:28px;font-family:'DM Mono',monospace;}
   .snake-chip{font-family:'Bebas Neue',sans-serif;font-size:13px;padding:2px 8px;border-radius:4px;color:white;letter-spacing:0.5px;}
-  .rand-btn{flex:1;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);border-radius:6px;cursor:pointer;transition:all 0.15s;}
+  .rand-btn{flex:1;font-size:17px;background:var(--gold-lt);color:#7a5c00;border:2px solid var(--gold);}
   .rand-btn:hover{background:var(--gold);color:white;}
-  .rand-btn:disabled{opacity:0.5;cursor:not-allowed;}
   .rand-btn.spinning{animation:shake 0.08s infinite;}
   @keyframes shake{0%{transform:rotate(-2deg);}50%{transform:rotate(2deg);}100%{transform:rotate(-2deg);}}
-  .wait-msg{text-align:center;padding:20px;font-size:13px;color:var(--mid);font-family:'DM Mono',monospace;}
 
-  /* DRAFT */
   .draft-layout{display:grid;grid-template-columns:1fr 320px;gap:18px;}
   @media(max-width:700px){.draft-layout{grid-template-columns:1fr;}}
   .clock-banner{padding:14px 20px;border-radius:8px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;color:white;}
@@ -117,7 +133,6 @@
   .pick-btn.main:hover{background:var(--dark);}
   .pick-btn.alt:hover{background:var(--gold);color:white;}
 
-  /* BOARD */
   .board-panel{display:flex;flex-direction:column;gap:10px;}
   .round-section{background:var(--white);border:1px solid var(--border);border-radius:8px;overflow:hidden;}
   .round-hdr{padding:7px 14px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:0.5px;color:white;display:flex;align-items:center;justify-content:space-between;background:var(--dark);}
@@ -133,13 +148,8 @@
   @keyframes blink{0%,100%{opacity:1;}50%{opacity:0.35;}}
   .your-turn-banner{background:var(--green);color:white;text-align:center;padding:8px;border-radius:6px;margin-bottom:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;animation:blink 1.2s infinite;}
 
-  /* COMPLETE */
-  .complete-card{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:28px;max-width:600px;margin:0 auto;}
-  .complete-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:1px;color:var(--green);margin-bottom:6px;}
-  .complete-sub{font-size:13px;color:var(--mid);margin-bottom:20px;}
-  .cfg-note{font-size:12px;color:var(--mid);margin-bottom:10px;line-height:1.5;}
   .code-block{background:var(--ink);color:#e8f5ee;padding:18px;border-radius:6px;font-family:'DM Mono',monospace;font-size:12px;line-height:1.7;overflow-x:auto;white-space:pre;}
-  .copy-btn{margin-top:12px;padding:10px 24px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;background:var(--green);color:var(--gold);border:none;border-radius:6px;cursor:pointer;}
+  .copy-btn{margin-top:12px;font-size:16px;background:var(--green);color:var(--gold);border:none;}
   .copy-btn:hover{background:var(--dark);}
   .reset-btn{margin-top:10px;margin-left:10px;padding:10px 20px;font-family:'DM Sans',sans-serif;font-size:13px;background:transparent;color:var(--mid);border:1px solid var(--border);border-radius:6px;cursor:pointer;}
 </style>
@@ -159,33 +169,34 @@
   <div class="screen active" id="screen-lobby">
     <div class="lobby-card">
       <div class="lobby-title">Masters 2026 Draft</div>
-      <div class="lobby-desc">Draft together in real-time. One person hosts the room, everyone else joins with the code.</div>
+      <div class="lobby-desc">Dave always hosts. Everyone else joins. No room code. No typing.</div>
 
       <div class="lobby-section">
-        <div class="lobby-label">Who are you?</div>
+        <div class="lobby-label">Pick your name</div>
         <div class="name-grid" id="name-grid"></div>
+      </div>
+
+      <div class="helper-box">
+        Step 1: Dave opens this page, selects Dave, and clicks Host Draft.<br>
+        Step 2: Everyone else opens the same page, selects their name, and clicks Join Draft.
       </div>
 
       <div id="pre-connect">
         <div class="lobby-actions">
-          <button class="host-btn" id="host-btn" onclick="createRoom()" disabled>Host Draft</button>
-        </div>
-        <div style="text-align:center;font-size:12px;color:var(--light);margin-bottom:12px">-- or join an existing room --</div>
-        <div class="join-row">
-          <input class="code-input" id="join-code" placeholder="CODE" maxlength="4" oninput="this.value=this.value.toUpperCase()">
-          <button class="join-btn" id="join-btn" onclick="joinRoom()" disabled>Join</button>
+          <button class="host-btn" id="host-btn" onclick="createRoom()" disabled>Dave Host Draft</button>
+          <button class="join-btn" id="join-btn" onclick="joinRoom()" disabled>Join Draft</button>
         </div>
       </div>
 
       <div id="room-area" style="display:none">
         <div class="room-display">
-          <div class="room-code" id="room-code-display">----</div>
-          <div class="room-hint">Share this code with everyone</div>
+          <div class="room-code">Fixed room: themen-masters-2026</div>
+          <div class="room-hint">Dave should host first. Then everyone else clicks Join Draft.</div>
         </div>
         <div class="lobby-label">Players</div>
         <div class="members-list" id="members-list"></div>
         <button class="start-btn" id="lobby-start-btn" onclick="hostStartDraft()" style="display:none">Start Draft</button>
-        <div class="wait-msg" id="wait-msg" style="display:none">Waiting for host to start...</div>
+        <div class="wait-msg" id="wait-msg" style="display:none">Waiting for Dave to start...</div>
       </div>
 
       <div class="lobby-error" id="lobby-error"></div>
@@ -196,7 +207,7 @@
   <div class="screen" id="screen-setup">
     <div class="setup-card">
       <div class="setup-title">Set Draft Order</div>
-      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — R1 top-bottom, R2 bottom-top, alternating. Round 5 is the alt pick.</div>
+      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — 4 picks plus 1 alt round at the end.</div>
       <ul class="order-list" id="order-list"></ul>
       <div class="preview-snake">
         <div class="preview-label">Full draft order preview</div>
@@ -208,7 +219,7 @@
         </div>
         <button class="start-btn" onclick="beginDraft()">Start Draft</button>
       </div>
-      <div class="wait-msg" id="setup-wait" style="display:none">Host is setting up the draft order...</div>
+      <div class="wait-msg" id="setup-wait" style="display:none">Dave is setting up the draft order...</div>
     </div>
   </div>
 
@@ -246,16 +257,21 @@
 
 </main>
 <script>
-// ═══════════════════════════════════════════════
-// CONFIG
-// ═══════════════════════════════════════════════
 const BETTORS = ["Dave","TJ","Billy","Nick","Ry","Alex"];
 const COLORS  = {Dave:"#6CABDD",TJ:"#006F71",Billy:"#7d3c98",Nick:"#b7950b",Ry:"#b03a2e",Alex:"#1a237e"};
 const ROUNDS  = 5;
+const HOST_NAME = "Dave";
+const FIXED_ROOM = "themen-masters-2026";
 
-// ═══════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════
+const PEER_OPTIONS = {
+  debug: 2,
+  config: {
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" }
+    ]
+  }
+};
+
 let field      = [];
 let draftOrder = [...BETTORS];
 let sequence   = [];
@@ -265,21 +281,15 @@ let dragSrc    = null;
 
 BETTORS.forEach(b => picks[b] = {picks:[], alt:null});
 
-// ═══════════════════════════════════════════════
-// NETWORK STATE
-// ═══════════════════════════════════════════════
 let peer       = null;
 let isHost     = false;
 let myName     = null;
-let roomCode   = null;
+let roomCode   = FIXED_ROOM;
 let hostConn   = null;
 let guestConns = {};
 let claimed    = new Set();
 let phase      = "lobby";
 
-// ═══════════════════════════════════════════════
-// SEQUENCE
-// ═══════════════════════════════════════════════
 function buildSeq(order) {
   const seq = [];
   for (let r = 0; r < ROUNDS; r++) {
@@ -290,100 +300,24 @@ function buildSeq(order) {
   return seq;
 }
 
-// ═══════════════════════════════════════════════
-// PLAYER FIELD
-// ═══════════════════════════════════════════════
 async function fetchField() {
   field = [
-    "Aaron Rai",
-    "Adam Scott",
-    "Akshay Bhatia",
-    "Alex Noren",
-    "Aldrich Potgieter",
-    "Ángel Cabrera",
-    "Ben Griffin",
-    "Brian Campbell",
-    "Brian Harman",
-    "Bubba Watson",
-    "Cameron Smith",
-    "Cameron Young",
-    "Carlos Ortiz",
-    "Casey Jarvis",
-    "Charl Schwartzel",
-    "Chris Gotterup",
-    "Collin Morikawa",
-    "Corey Conners",
-    "Daniel Berger",
-    "Danny Willett",
-    "Davis Riley",
-    "Dustin Johnson",
-    "Ethan Fang",
-    "Fred Couples",
-    "Gary Woodland",
-    "Harris English",
-    "Harry Hall",
-    "Hideki Matsuyama",
-    "Im Sung-jae",
-    "J. J. Spaun",
-    "Jacob Bridgeman",
-    "Jake Knapp",
-    "Jason Day",
-    "Jhonattan Vegas",
-    "Jon Rahm",
-    "Jordan Spieth",
-    "José María Olazábal",
-    "Justin Rose",
-    "Justin Thomas",
-    "Keegan Bradley",
-    "Kim Si-woo",
-    "Kurt Kitayama",
-    "Ludvig Åberg",
-    "Marco Penge",
-    "Mason Howell",
-    "Mateo Pulcini",
-    "Matt Fitzpatrick",
-    "Matt McCarty",
-    "Maverick McNealy",
-    "Max Greyserman",
-    "Max Homa",
-    "Michael Brennan",
-    "Michael Kim",
-    "Min Woo Lee",
-    "Naoyuki Kataoka",
-    "Nico Echavarría",
-    "Nick Taylor",
-    "Nicolai Højgaard",
-    "Patrick Cantlay",
-    "Rasmus Højgaard",
-    "Rasmus Neergaard-Petersen",
-    "Robert MacIntyre",
-    "Rory McIlroy",
-    "Russell Henley",
-    "Ryan Fox",
-    "Ryan Gerard",
-    "Sami Välimäki",
-    "Sam Burns",
-    "Sam Stevens",
-    "Scottie Scheffler",
-    "Sepp Straka",
-    "Sergio Garcia",
-    "Shane Lowry",
-    "Tom McKibbin",
-    "Tommy Fleetwood",
-    "Tyrrell Hatton",
-    "Vijay Singh",
-    "Viktor Hovland",
-    "Wyndham Clark",
-    "Xander Schauffele",
-    "Zach Johnson"
+    "Aaron Rai","Adam Scott","Akshay Bhatia","Alex Noren","Aldrich Potgieter","Ángel Cabrera","Ben Griffin",
+    "Brian Campbell","Brian Harman","Bubba Watson","Cameron Smith","Cameron Young","Carlos Ortiz","Casey Jarvis",
+    "Charl Schwartzel","Chris Gotterup","Collin Morikawa","Corey Conners","Daniel Berger","Danny Willett","Davis Riley",
+    "Dustin Johnson","Ethan Fang","Fred Couples","Gary Woodland","Harris English","Harry Hall","Hideki Matsuyama",
+    "Im Sung-jae","J. J. Spaun","Jacob Bridgeman","Jake Knapp","Jason Day","Jhonattan Vegas","Jon Rahm","Jordan Spieth",
+    "José María Olazábal","Justin Rose","Justin Thomas","Keegan Bradley","Kim Si-woo","Kurt Kitayama","Ludvig Åberg",
+    "Marco Penge","Mason Howell","Mateo Pulcini","Matt Fitzpatrick","Matt McCarty","Maverick McNealy","Max Greyserman",
+    "Max Homa","Michael Brennan","Michael Kim","Min Woo Lee","Naoyuki Kataoka","Nico Echavarría","Nick Taylor",
+    "Nicolai Højgaard","Patrick Cantlay","Rasmus Højgaard","Rasmus Neergaard-Petersen","Robert MacIntyre",
+    "Rory McIlroy","Russell Henley","Ryan Fox","Ryan Gerard","Sami Välimäki","Sam Burns","Sam Stevens",
+    "Scottie Scheffler","Sepp Straka","Sergio Garcia","Shane Lowry","Tom McKibbin","Tommy Fleetwood","Tyrrell Hatton",
+    "Vijay Singh","Viktor Hovland","Wyndham Clark","Xander Schauffele","Zach Johnson"
   ];
-
   field.sort((a,b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
 }
 
-// ═══════════════════════════════════════════════
-// LOBBY
-// ═══════════════════════════════════════════════
 function renderNameGrid() {
   const el = document.getElementById("name-grid");
   el.innerHTML = BETTORS.map(b => {
@@ -393,9 +327,8 @@ function renderNameGrid() {
     return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken?"disabled":""}>${b}</button>`;
   }).join("");
 
-  const hasName = !!myName;
-  document.getElementById("host-btn").disabled = !hasName;
-  document.getElementById("join-btn").disabled = !hasName;
+  document.getElementById("host-btn").disabled = myName !== HOST_NAME;
+  document.getElementById("join-btn").disabled = !myName || myName === HOST_NAME;
 }
 
 function claimName(name) {
@@ -404,25 +337,14 @@ function claimName(name) {
   renderNameGrid();
 }
 
-function genCode() {
-  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ";
-  let c = "";
-  for (let i = 0; i < 4; i++) c += chars[Math.floor(Math.random()*chars.length)];
-  return c;
-}
-
-// ═══════════════════════════════════════════════
-// HOST: CREATE ROOM
-// ═══════════════════════════════════════════════
 function createRoom() {
-  if (!myName) return;
+  if (myName !== HOST_NAME) return;
   const err = document.getElementById("lobby-error");
   const status = document.getElementById("lobby-status");
   err.textContent = "";
-  status.textContent = "Connecting...";
+  status.textContent = "Dave is hosting...";
 
-  roomCode = genCode();
-  peer = new Peer("themen-" + roomCode, {debug: 0});
+  peer = new Peer(FIXED_ROOM, PEER_OPTIONS);
   isHost = true;
 
   peer.on("open", () => {
@@ -430,7 +352,6 @@ function createRoom() {
     claimed.add(myName);
     document.getElementById("pre-connect").style.display = "none";
     document.getElementById("room-area").style.display = "block";
-    document.getElementById("room-code-display").textContent = roomCode;
     document.getElementById("lobby-start-btn").style.display = "block";
     renderLobby();
   });
@@ -451,20 +372,21 @@ function createRoom() {
   });
 
   peer.on("error", e => {
-    if (e.type === "unavailable-id") {
-      err.textContent = "Room code taken — try again";
-      roomCode = genCode();
-      peer.destroy();
-      createRoom();
-    } else {
-      err.textContent = "Connection error: " + e.type;
-      status.textContent = "";
-    }
+    err.textContent = "Connection error: " + e.type;
+    status.textContent = "";
   });
 }
 
 function handleGuestMsg(conn, msg) {
   if (msg.type === "join") {
+    if (msg.name === HOST_NAME) {
+      conn.send({type:"error", text:"Dave is already the host"});
+      return;
+    }
+    if (!BETTORS.includes(msg.name)) {
+      conn.send({type:"error", text:"Invalid player"});
+      return;
+    }
     if (claimed.has(msg.name) && !guestConns[msg.name]) {
       conn.send({type:"error", text: msg.name + " is already taken"});
       return;
@@ -500,24 +422,17 @@ function broadcastState() {
   broadcast({type:"state", payload: getFullState()});
 }
 
-// ═══════════════════════════════════════════════
-// GUEST: JOIN ROOM
-// ═══════════════════════════════════════════════
 function joinRoom() {
-  if (!myName) return;
-  const code = document.getElementById("join-code").value.trim().toUpperCase();
-  if (code.length !== 4) return;
-
+  if (!myName || myName === HOST_NAME) return;
   const err = document.getElementById("lobby-error");
   const status = document.getElementById("lobby-status");
   err.textContent = "";
-  status.textContent = "Connecting...";
+  status.textContent = myName + " is joining...";
 
-  roomCode = code;
-  peer = new Peer(undefined, {debug: 0});
+  peer = new Peer(undefined, PEER_OPTIONS);
 
   peer.on("open", () => {
-    hostConn = peer.connect("themen-" + code, {reliable: true});
+    hostConn = peer.connect(FIXED_ROOM, {reliable: true});
 
     hostConn.on("open", () => {
       status.textContent = "";
@@ -525,28 +440,17 @@ function joinRoom() {
       claimed.add(myName);
       document.getElementById("pre-connect").style.display = "none";
       document.getElementById("room-area").style.display = "block";
-      document.getElementById("room-code-display").textContent = roomCode;
       document.getElementById("wait-msg").style.display = "block";
       renderLobby();
     });
 
     hostConn.on("data", msg => handleHostMsg(msg));
-
-    hostConn.on("close", () => {
-      err.textContent = "Host disconnected";
-    });
-
-    hostConn.on("error", e => {
-      err.textContent = "Connection failed: " + e.type;
-    });
+    hostConn.on("close", () => { err.textContent = "Dave disconnected"; });
+    hostConn.on("error", e => { err.textContent = "Connection failed: " + e.type; });
   });
 
   peer.on("error", e => {
-    if (e.type === "peer-unavailable") {
-      err.textContent = "Room not found — check the code";
-    } else {
-      err.textContent = "Connection error: " + e.type;
-    }
+    err.textContent = "Connection error: " + e.type;
     status.textContent = "";
   });
 }
@@ -590,9 +494,6 @@ function sendToHost(msg) {
   if (hostConn && hostConn.open) hostConn.send(msg);
 }
 
-// ═══════════════════════════════════════════════
-// LOBBY RENDER
-// ═══════════════════════════════════════════════
 function renderLobby() {
   const el = document.getElementById("members-list");
   el.innerHTML = BETTORS.map(b => {
@@ -608,9 +509,6 @@ function renderLobby() {
   renderNameGrid();
 }
 
-// ═══════════════════════════════════════════════
-// HOST: START DRAFT
-// ═══════════════════════════════════════════════
 function hostStartDraft() {
   phase = "setup";
   showScreen("setup");
@@ -624,9 +522,6 @@ function hostStartDraft() {
   broadcastState();
 }
 
-// ═══════════════════════════════════════════════
-// SETUP
-// ═══════════════════════════════════════════════
 function renderSetup() {
   const list = document.getElementById("order-list");
   const canDrag = isHost;
@@ -646,7 +541,7 @@ function dlv(e){ e.currentTarget.classList.remove("drag-over"); }
 function drp(e,i){
   e.preventDefault();
   e.currentTarget.classList.remove("drag-over");
-  if(dragSrc===null || dragSrc===i) return;
+  if(dragSrc===null||dragSrc===i) return;
   const a=[...draftOrder];
   const m=a.splice(dragSrc,1)[0];
   a.splice(i,0,m);
@@ -703,9 +598,6 @@ function randomizeOrder(){
   },80);
 }
 
-// ═══════════════════════════════════════════════
-// BEGIN DRAFT
-// ═══════════════════════════════════════════════
 function beginDraft(){
   if(!isHost) return;
   phase = "draft";
@@ -719,17 +611,14 @@ function beginDraft(){
   broadcastState();
 }
 
-// ═══════════════════════════════════════════════
-// DRAFT RENDER
-// ═══════════════════════════════════════════════
 function renderDraft(){
-  if(turn >= sequence.length){ finishDraft(); return; }
+  if(turn>=sequence.length){ finishDraft(); return; }
   const t = sequence[turn];
   const banner = document.getElementById("clock-banner");
   banner.style.background = COLORS[t.bettor];
   document.getElementById("clock-name").textContent = t.bettor + "'s pick";
-  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
-  document.getElementById("clock-info").innerHTML   = (sequence.length - turn) + " picks left";
+  document.getElementById("clock-sub").textContent  = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn+1) + " of " + sequence.length;
+  document.getElementById("clock-info").innerHTML   = (sequence.length-turn) + " picks left";
   document.getElementById("search-input").value = "";
 
   const ytm = document.getElementById("your-turn-msg");
@@ -743,9 +632,6 @@ function renderDraft(){
   renderBoard();
 }
 
-// ═══════════════════════════════════════════════
-// PLAYER LIST
-// ═══════════════════════════════════════════════
 function renderPlayerList(){
   const el = document.getElementById("player-list");
   if(turn >= sequence.length){
@@ -818,22 +704,16 @@ function renderPlayerList(){
 
 function setupPlayerListClicks() {
   const el = document.getElementById("player-list");
-
   el.addEventListener("click", function(e) {
     const target = e.target.closest("[data-player]");
     if (!target) return;
-
     const encodedName = target.getAttribute("data-player");
     if (!encodedName) return;
-
     const playerName = decodeURIComponent(encodedName);
     requestPick(playerName);
   });
 }
 
-// ═══════════════════════════════════════════════
-// PICK LOGIC
-// ═══════════════════════════════════════════════
 function requestPick(playerName) {
   if (turn >= sequence.length) return;
   const t = sequence[turn];
@@ -848,26 +728,20 @@ function requestPick(playerName) {
 function applyPick(playerName) {
   if (turn >= sequence.length) return;
   const t = sequence[turn];
-
   if (t.isAlt) {
     picks[t.bettor].alt = playerName;
   } else {
     picks[t.bettor].picks.push(playerName);
   }
-
   turn++;
   if (turn >= sequence.length) phase = "complete";
   renderDraft();
   if (isHost) broadcastState();
 }
 
-// ═══════════════════════════════════════════════
-// BOARD
-// ═══════════════════════════════════════════════
 function renderBoard(){
   const el = document.getElementById("board-panel");
   const rounds = {};
-
   sequence.forEach((s,idx) => {
     if(!rounds[s.round]) rounds[s.round] = [];
     rounds[s.round].push({...s,idx});
@@ -907,9 +781,6 @@ function renderBoard(){
     </div>`).join("");
 }
 
-// ═══════════════════════════════════════════════
-// FINISH
-// ═══════════════════════════════════════════════
 function finishDraft(){
   phase = "complete";
   showScreen("complete");
@@ -927,22 +798,18 @@ ${ab || "    // no alts set"}
 
 function copyConfig(){
   navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(() => {
-    const btn = document.querySelector(".copy-btn");
-    btn.textContent = "Copied!";
-    setTimeout(() => btn.textContent = "Copy CONFIG", 2000);
+    const btn=document.querySelector(".copy-btn");
+    btn.textContent="Copied!";
+    setTimeout(() => btn.textContent="Copy CONFIG",2000);
   });
 }
 
-// ═══════════════════════════════════════════════
-// RESET
-// ═══════════════════════════════════════════════
 function resetDraft(){
   if(!isHost){
-    alert("Only the host can restart the draft.");
+    alert("Only Dave can restart the draft.");
     return;
   }
   if(!confirm("Reset the entire draft? All picks will be cleared.")) return;
-
   BETTORS.forEach(b => picks[b] = {picks:[],alt:null});
   draftOrder = [...BETTORS];
   turn = 0;
@@ -954,17 +821,11 @@ function resetDraft(){
   broadcastState();
 }
 
-// ═══════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════
 function showScreen(id){
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-  document.getElementById("screen-" + id).classList.add("active");
+  document.getElementById("screen-"+id).classList.add("active");
 }
 
-// ═══════════════════════════════════════════════
-// BOOT
-// ═══════════════════════════════════════════════
 setupPlayerListClicks();
 fetchField().then(() => renderNameGrid());
 </script>
