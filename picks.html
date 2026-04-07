@@ -90,6 +90,16 @@
 
   .restart-btn-ui:hover{background:var(--red);color:#fff;border-color:var(--red)}
 
+  .conn-indicator{
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .conn-indicator.connected{background:#163126;color:#8ff0a8}
+  .conn-indicator.disconnected{background:#3a1616;color:#f0a08a}
+  .conn-indicator.reconnecting{background:#3a3016;color:#f0d88a;animation:blink 1.2s infinite}
+
   .status-pill{
     font-family:'DM Mono',monospace;
     font-size:11px;
@@ -592,6 +602,67 @@
   .pick-btn.main:hover{background:var(--green-dark)}
   .pick-btn.alt:hover{background:var(--gold);color:#fff}
 
+  .confirm-overlay{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+  }
+
+  .confirm-box{
+    background:#fff;
+    border-radius:16px;
+    padding:28px 24px;
+    max-width:360px;
+    width:90%;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+  }
+
+  .confirm-box .player-name{
+    font-family:'Playfair Display',serif;
+    font-size:24px;
+    margin:8px 0 4px;
+  }
+
+  .confirm-box .confirm-label{
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:18px;
+  }
+
+  .confirm-box .confirm-actions{
+    display:flex;
+    gap:10px;
+  }
+
+  .confirm-box .confirm-yes{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background:var(--green);
+    color:#fff;
+  }
+
+  .confirm-box .confirm-no{
+    flex:1;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background:#fff;
+    color:var(--ink);
+  }
+
   .code-block{
     background:#1f1d1a;
     color:#edf8f0;
@@ -690,6 +761,7 @@
       <span class="sub">Masters 2026 Draft</span>
     </div>
     <div class="header-actions">
+      <span class="conn-indicator" id="conn-indicator" style="display:none"></span>
       <button class="restart-btn-ui" onclick="resetDraft()" id="restart-btn" style="display:none">Restart Draft</button>
       <span class="status-pill" id="status-pill">Lobby</span>
     </div>
@@ -700,7 +772,7 @@
 
   <div class="screen active" id="screen-lobby">
     <div class="lobby-card card">
-      <div class="lobby-title">The Men’s Masters Draft</div>
+      <div class="lobby-title">The Men's Masters Draft</div>
       <div class="lobby-desc">One link. Dave hosts. Everybody else joins. Nobody gets cut this time.</div>
 
       <div class="lobby-section">
@@ -792,6 +864,8 @@
 
 </main>
 
+<div id="confirm-container"></div>
+
 <script>
 const BETTORS = ["Dave","Billy","Nick","Alex","Ryan","TJ"];
 const COLORS  = {
@@ -805,13 +879,17 @@ const COLORS  = {
 const ROUNDS  = 5;
 const HOST_NAME = "Dave";
 const FIXED_ROOM = "the-men-masters-2026";
+const STORAGE_KEY = "themen-draft-state";
 
 const PEER_OPTIONS = {
-  debug: 2,
+  debug: 1,
   config: {
     iceServers: [
       { urls: "stun:stun.l.google.com:19302" },
-      { urls: "stun:stun1.l.google.com:19302" }
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "turn:openrelay.metered.ca:80", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turn:openrelay.metered.ca:443", username: "openrelayproject", credential: "openrelayproject" },
+      { urls: "turn:openrelay.metered.ca:443?transport=tcp", username: "openrelayproject", credential: "openrelayproject" }
     ]
   }
 };
@@ -831,9 +909,50 @@ let myName = null;
 let hostConn = null;
 let phase = "lobby";
 let claimed = new Set();
+let reconnectTimer = null;
+let reconnectAttempts = 0;
+const MAX_RECONNECT_ATTEMPTS = 20;
 
 const guestConnsByName = {};
 const guestMetaByPeerId = {};
+
+/* ---- Connection status indicator ---- */
+function updateConnIndicator(status, text) {
+  const el = document.getElementById("conn-indicator");
+  el.style.display = "inline-block";
+  el.className = "conn-indicator " + status;
+  el.textContent = text || status;
+}
+
+/* ---- localStorage persistence for host ---- */
+function saveHostState() {
+  if (!isHost) return;
+  try {
+    const s = {
+      phase, draftOrder: [...draftOrder], picks: deepClone(picks),
+      turn, claimed: Array.from(claimed), timestamp: Date.now()
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
+  } catch (e) {}
+}
+
+function loadHostState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
+    const s = JSON.parse(raw);
+    // Expire after 24 hours
+    if (Date.now() - s.timestamp > 24 * 60 * 60 * 1000) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+    return s;
+  } catch (e) { return null; }
+}
+
+function clearHostState() {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+}
 
 function buildSeq(order) {
   const seq = [];
@@ -894,6 +1013,7 @@ function broadcastLobby() {
 function broadcastState() {
   const msg = { type: "state", payload: getFullState() };
   Object.values(guestConnsByName).forEach(conn => sendToConn(conn, msg));
+  saveHostState();
 }
 
 function renderNameGrid() {
@@ -933,6 +1053,43 @@ function createRoom() {
   peer.on("open", () => {
     claimed.add(HOST_NAME);
     status.textContent = "";
+    updateConnIndicator("connected", "Hosting");
+
+    // Restore saved state if any
+    const saved = loadHostState();
+    if (saved && saved.phase !== "lobby") {
+      if (confirm("A previous draft was found. Resume it?")) {
+        phase = saved.phase;
+        draftOrder = saved.draftOrder || [...BETTORS];
+        picks = saved.picks || {};
+        BETTORS.forEach(b => { if (!picks[b]) picks[b] = { picks: [], alt: null }; });
+        turn = saved.turn || 0;
+        claimed = new Set(saved.claimed || [HOST_NAME]);
+        sequence = buildSeq(draftOrder);
+
+        document.getElementById("pre-connect").style.display = "none";
+        document.getElementById("room-area").style.display = "block";
+
+        if (phase === "setup") {
+          showScreen("setup");
+          document.getElementById("status-pill").textContent = "Setup";
+          document.getElementById("setup-host-controls").style.display = "block";
+          document.getElementById("setup-wait").style.display = "none";
+          renderSetup();
+        } else if (phase === "draft") {
+          showScreen("draft");
+          document.getElementById("status-pill").textContent = "Live Draft";
+          document.getElementById("restart-btn").style.display = "inline-block";
+          renderDraft();
+        } else if (phase === "complete") {
+          finishDraft();
+        }
+        return;
+      } else {
+        clearHostState();
+      }
+    }
+
     document.getElementById("pre-connect").style.display = "none";
     document.getElementById("room-area").style.display = "block";
     document.getElementById("lobby-start-btn").style.display = "block";
@@ -952,8 +1109,18 @@ function createRoom() {
     conn.on("error", () => handleGuestDisconnect(conn));
   });
 
+  peer.on("disconnected", () => {
+    updateConnIndicator("reconnecting", "Reconnecting...");
+    // PeerJS auto-reconnects to the signaling server
+    try { peer.reconnect(); } catch (e) {}
+  });
+
   peer.on("error", e => {
-    err.textContent = "Connection error: " + e.type;
+    if (e.type === "unavailable-id") {
+      err.textContent = "Another host is already running. Close other tabs first.";
+    } else {
+      err.textContent = "Connection error: " + e.type;
+    }
     status.textContent = "";
   });
 }
@@ -965,13 +1132,15 @@ function handleGuestDisconnect(conn) {
   const name = meta.name;
   if (name) {
     delete guestConnsByName[name];
-    claimed.delete(name);
+    // Don't remove from claimed during draft — they may reconnect
+    if (phase === "lobby") {
+      claimed.delete(name);
+    }
   }
 
   delete guestMetaByPeerId[conn.peer];
   renderLobby();
   broadcastLobby();
-  broadcastState();
 }
 
 function handleGuestMsg(conn, msg) {
@@ -996,6 +1165,7 @@ function handleGuestMsg(conn, msg) {
 
     renderLobby();
     broadcastLobby();
+    // Always send current full state so reconnecting guests get caught up
     sendToConn(conn, { type: "state", payload: getFullState() });
     broadcastState();
     return;
@@ -1024,6 +1194,14 @@ function joinRoom() {
   const status = document.getElementById("lobby-status");
   err.textContent = "";
   status.textContent = myName + " is joining...";
+  reconnectAttempts = 0;
+
+  doJoin();
+}
+
+function doJoin() {
+  const err = document.getElementById("lobby-error");
+  const status = document.getElementById("lobby-status");
 
   if (peer) {
     try { peer.destroy(); } catch (e) {}
@@ -1037,30 +1215,76 @@ function joinRoom() {
       serialization: "json"
     });
 
+    const connTimeout = setTimeout(() => {
+      err.textContent = "Could not reach Dave's host. Is Dave hosting?";
+      status.textContent = "";
+    }, 10000);
+
     hostConn.on("open", () => {
+      clearTimeout(connTimeout);
       claimed.add(myName);
       status.textContent = "";
+      reconnectAttempts = 0;
+      updateConnIndicator("connected", "Connected");
       document.getElementById("pre-connect").style.display = "none";
       document.getElementById("room-area").style.display = "block";
       document.getElementById("wait-msg").style.display = "block";
       renderLobby();
       sendToHost({ type: "join", name: myName });
-      setTimeout(() => sendToHost({ type: "request_state" }), 400);
     });
 
     hostConn.on("data", msg => handleHostMsg(msg));
+
     hostConn.on("close", () => {
-      err.textContent = "Dave disconnected";
+      updateConnIndicator("disconnected", "Disconnected");
+      attemptReconnect();
     });
+
     hostConn.on("error", e => {
-      err.textContent = "Connection failed: " + e.type;
+      clearTimeout(connTimeout);
+      if (reconnectAttempts === 0) {
+        err.textContent = "Could not connect. Make sure Dave is hosting first.";
+        status.textContent = "";
+      }
     });
   });
 
-  peer.on("error", e => {
-    err.textContent = "Connection error: " + e.type;
-    status.textContent = "";
+  peer.on("disconnected", () => {
+    updateConnIndicator("reconnecting", "Reconnecting...");
+    try { peer.reconnect(); } catch (e) {}
   });
+
+  peer.on("error", e => {
+    if (e.type === "peer-unavailable") {
+      if (reconnectAttempts === 0) {
+        err.textContent = "Dave hasn't started hosting yet. Have him click 'Dave Host Draft' first.";
+        status.textContent = "";
+      } else {
+        attemptReconnect();
+      }
+    } else if (reconnectAttempts === 0) {
+      err.textContent = "Connection error: " + e.type;
+      status.textContent = "";
+    }
+  });
+}
+
+function attemptReconnect() {
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    document.getElementById("lobby-error").textContent = "Lost connection to Dave. Refresh and rejoin.";
+    updateConnIndicator("disconnected", "Disconnected");
+    return;
+  }
+
+  reconnectAttempts++;
+  updateConnIndicator("reconnecting", "Reconnecting (" + reconnectAttempts + ")...");
+
+  if (reconnectTimer) clearTimeout(reconnectTimer);
+  // Exponential backoff: 2s, 4s, 6s... capped at 15s
+  const delay = Math.min(2000 * reconnectAttempts, 15000);
+  reconnectTimer = setTimeout(() => {
+    doJoin();
+  }, delay);
 }
 
 function handleHostMsg(msg) {
@@ -1099,8 +1323,6 @@ function applyIncomingState(s) {
     showScreen("lobby");
     document.getElementById("status-pill").textContent = "Lobby";
     document.getElementById("restart-btn").style.display = "none";
-    document.getElementById("setup-host-controls").style.display = "none";
-    document.getElementById("setup-wait").style.display = "none";
     renderLobby();
     return;
   }
@@ -1320,7 +1542,7 @@ function renderPlayerList() {
 
   const t = sequence[turn];
   const query = document.getElementById("search-input").value.toLowerCase().trim();
-  const canPick = isHost || myName === t.bettor;
+  const canPick = myName === t.bettor;
   const taken = getTakenMap();
   const list = query ? field.filter(n => n.toLowerCase().includes(query)) : field;
 
@@ -1383,8 +1605,41 @@ function setupPlayerListClicks() {
     const encoded = target.getAttribute("data-player");
     if (!encoded) return;
     const playerName = decodeURIComponent(encoded);
-    requestPick(playerName);
+    showPickConfirm(playerName);
   });
+}
+
+function showPickConfirm(playerName) {
+  if (turn >= sequence.length) return;
+  const t = sequence[turn];
+  const taken = getTakenMap();
+  if (taken[playerName]) return;
+
+  const container = document.getElementById("confirm-container");
+  const roundLabel = t.isAlt ? "Alt Round" : "Round " + t.round;
+  container.innerHTML = `
+    <div class="confirm-overlay" onclick="if(event.target===this)dismissConfirm()">
+      <div class="confirm-box">
+        <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'DM Mono',monospace">${roundLabel}</div>
+        <div class="player-name">${playerName}</div>
+        <div class="confirm-label">${t.bettor}'s pick — are you sure?</div>
+        <div class="confirm-actions">
+          <button class="confirm-no" onclick="dismissConfirm()">Cancel</button>
+          <button class="confirm-yes" onclick="confirmPick('${encodeURIComponent(playerName)}')">Confirm Pick</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function dismissConfirm() {
+  document.getElementById("confirm-container").innerHTML = "";
+}
+
+function confirmPick(encoded) {
+  dismissConfirm();
+  const playerName = decodeURIComponent(encoded);
+  requestPick(playerName);
 }
 
 function requestPick(playerName) {
@@ -1483,6 +1738,7 @@ function finishDraft() {
   showScreen("complete");
   document.getElementById("status-pill").textContent = "Complete";
   document.getElementById("restart-btn").style.display = "inline-block";
+  saveHostState();
 
   const pb = BETTORS.map(b => `    ${b.padEnd(6)}: [${picks[b].picks.map(n => `"${n}"`).join(", ")}]`).join(",\n");
   const ab = BETTORS.filter(b => picks[b].alt).map(b => `    ${b.padEnd(6)}: "${picks[b].alt}"`).join(",\n");
@@ -1517,6 +1773,7 @@ function resetDraft() {
   sequence = buildSeq(draftOrder);
   turn = 0;
   phase = "setup";
+  clearHostState();
 
   showScreen("setup");
   document.getElementById("status-pill").textContent = "Setup";
@@ -1531,6 +1788,25 @@ function showScreen(id) {
   document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
   document.getElementById("screen-" + id).classList.add("active");
 }
+
+/* ---- Keepalive: guests ping host every 25s to detect dead connections ---- */
+setInterval(() => {
+  if (!isHost && hostConn) {
+    if (!hostConn.open) {
+      attemptReconnect();
+    } else {
+      sendToHost({ type: "request_state" });
+    }
+  }
+}, 25000);
+
+/* ---- Warn before closing tab during draft ---- */
+window.addEventListener("beforeunload", function(e) {
+  if (phase === "draft" || phase === "setup") {
+    e.preventDefault();
+    e.returnValue = "";
+  }
+});
 
 setupPlayerListClicks();
 fetchField().then(() => {
