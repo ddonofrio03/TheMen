@@ -696,8 +696,8 @@ const CONFIG = {
     Ryan  : "Justin Thomas",
     TJ    : "Wyndham Clark"
   },
-  // Cash per category (winner takes all, ties split)
-  cash: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
+  // Points per category (winner takes all, ties split)
+  points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
   refreshInterval: 60, // seconds
   // Bettor colors
   colors: {
@@ -819,31 +819,12 @@ function teamOverallTotal(bettor) {
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
 function isRoundComplete(roundKey) {
-  // Get the event status detail from ESPN, e.g. "Round 1 - Play Complete" or "Round 2 - In Progress"
-  const eventData = Object.values(scoreMap);
-  if (!eventData.length) return false;
-  
-  // Check if we have cached the event status
-  if (window.espnStatus) {
-    const detail = window.espnStatus?.detail || "";
-    const roundNum = roundKey === "r1" ? 1 : roundKey === "r2" ? 2 : roundKey === "r3" ? 3 : roundKey === "r4" ? 4 : null;
-    if (!roundNum) return false;
-    
-    // Check if this round or a later round is in progress/complete
-    // If we're in round 2, then round 1 is complete
-    // If we're in round 3, then rounds 1 and 2 are complete
-    // Parse the detail to find current round
-    const match = detail.match(/Round (\d)/);
-    if (match) {
-      const currentRound = parseInt(match[1]);
-      // Round is complete if current round is greater than it
-      if (currentRound > roundNum) return true;
-      // Or if current round matches and it says "Play Complete"
-      if (currentRound === roundNum && detail.includes("Play Complete")) return true;
-    }
-  }
-  
-  return false;
+  const entries = Object.values(scoreMap);
+  if (!entries.length) return false;
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+  if (!relevant.length) return false;
+  const holesKey = roundKey + "holes";
+  return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
 
 function isTournamentFinal() {
@@ -882,7 +863,7 @@ function calcPoints() {
 
     const best = Math.min(...valid);
     const winners = CONFIG.bettors.filter(b => totals[b] === best);
-    const share = Math.round((CONFIG.cash[label] / winners.length) * 100) / 100;
+    const share = Math.round((CONFIG.points[label] / winners.length) * 100) / 100;
     winners.forEach(b => pts[b][label] = share);
   });
 
@@ -900,7 +881,7 @@ function calcPoints() {
     if (validO.length) {
       const bestO = Math.min(...validO);
       const winnersO = CONFIG.bettors.filter(b => overalls[b] === bestO);
-      const shareO = Math.round((CONFIG.cash.Overall / winnersO.length) * 100) / 100;
+      const shareO = Math.round((CONFIG.points.Overall / winnersO.length) * 100) / 100;
       winnersO.forEach(b => pts[b].Overall = shareO);
     }
 
@@ -919,13 +900,13 @@ function calcPoints() {
         CONFIG.picks[b].includes(topPickedPlayer)
       );
       if (bettorsWithTop.length) {
-        const shareW = Math.round((CONFIG.cash.Winner / bettorsWithTop.length) * 100) / 100;
+        const shareW = Math.round((CONFIG.points.Winner / bettorsWithTop.length) * 100) / 100;
         bettorsWithTop.forEach(b => pts[b].Winner = shareW);
       }
     }
   }
 
-  const buyIn = CONFIG.cash.R1;
+  const buyIn = CONFIG.points.R1;
 
   CONFIG.bettors.forEach(b => {
     const earned = pts[b].R1 + pts[b].R2 + pts[b].R3 + pts[b].R4 +
@@ -1017,9 +998,6 @@ async function fetchScores() {
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4,
                      r1holes, r2holes, r3holes, r4holes, isCut, isWD };
   });
-
-  // Store the event status so isRoundComplete can check it
-  window.espnStatus = event.status?.type || {};
 
   return newMap;
 }
