@@ -994,17 +994,20 @@ async function fetchScores() {
     let thru = "--";
     if (isCut || isWD) {
       thru = "CUT";
-    } else if (currentRoundData) {
-      const holes = currentRoundData.linescores || [];
-      if (holes.length === 0) {
-        const anyHoleDataInField = sorted.some(q =>
-          (q.linescores || []).some(r => (r.linescores || []).length > 0)
-        );
-        thru = (!anyHoleDataInField && currentRoundData.displayValue) ? "F" : "--";
-      } else if (holes.length < 18) {
-        thru = String(holes.length);
+    } else {
+      // Use the global current round, not the player's last completed round
+      const currentRound = ls[currentRoundIndex];
+      if (currentRound) {
+        const holes = currentRound.linescores || [];
+        if (holes.length === 0) {
+          thru = "--";
+        } else if (holes.length < 18) {
+          thru = String(holes.length);
+        } else {
+          thru = "F";
+        }
       } else {
-        thru = "F";
+        thru = "--";
       }
     }
 
