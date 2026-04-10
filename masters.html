@@ -821,34 +821,10 @@ function teamOverallTotal(bettor) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-
-  const active = entries.filter(p => !p.isCut && !p.isWD);
-  if (!active.length) return false;
-
+  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+  if (!relevant.length) return false;
   const holesKey = roundKey + "holes";
-  const roundOrder = ["r1", "r2", "r3", "r4"];
-  const idx = roundOrder.indexOf(roundKey);
-
-  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
-
-  const allHaveScore = active.every(p => parseRelScore(p[roundKey]) !== null);
-  if (!allHaveScore) return false;
-
-  for (let i = idx + 1; i < roundOrder.length; i++) {
-    const laterKey = roundOrder[i];
-    const laterHolesKey = laterKey + "holes";
-    const laterHasData = active.some(p =>
-      parseRelScore(p[laterKey]) !== null || (p[laterHolesKey] ?? 0) > 0
-    );
-    if (laterHasData) return true;
-  }
-
-  const isLatestRound = !roundOrder.slice(idx + 1).some(laterKey =>
-    active.some(p => parseRelScore(p[laterKey]) !== null)
-  );
-  if (isLatestRound && active.every(p => p.thru === "F")) return true;
-
-  return false;
+  return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
 
 function isTournamentFinal() {
