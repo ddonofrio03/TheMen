@@ -989,7 +989,10 @@ async function fetchScores() {
         break;
       }
     }
-    const today = (isCut || isWD || !currentRoundData) ? "--" : (currentRoundData.displayValue || "--");
+    
+    // Use the global current tournament round, not the player's last completed round
+    const currentRound = ls[currentRoundIndex];
+    const today = (isCut || isWD || !currentRound) ? "--" : (currentRound.displayValue || "--");
 
     let thru = "--";
     if (isCut || isWD) {
