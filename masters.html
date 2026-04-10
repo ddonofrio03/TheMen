@@ -943,6 +943,21 @@ async function fetchScores() {
 
   const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
 
+  // Determine which round is currently active by finding the latest round with any data
+  let currentRoundIndex = -1;
+  sorted.forEach(p => {
+    const ls = p.linescores || [];
+    for (let i = ls.length - 1; i >= 0; i--) {
+      const entry = ls[i];
+      if (entry && (entry.displayValue || (entry.linescores && entry.linescores.length > 0))) {
+        if (i > currentRoundIndex) currentRoundIndex = i;
+        break;
+      }
+    }
+  });
+  // If no one has started any round yet, we're in round 0 (pre-tournament), but assume round 1 will start
+  if (currentRoundIndex === -1) currentRoundIndex = 0;
+
   sorted.forEach((p, idx) => {
     const name = p.athlete?.displayName;
     if (!name) return;
@@ -1009,6 +1024,19 @@ function renderScoreboard() {
   const el  = document.getElementById("scoreboard");
   const pts = calcPoints();
 
+  // Determine which round is currently active based on the highest round with any player data
+  let activeRound = 1;
+  for (let r = 4; r >= 1; r--) {
+    const roundKey = "r" + r;
+    const hasData = Object.values(scoreMap).some(p => 
+      !p.isCut && !p.isWD && parseRelScore(p[roundKey]) !== null
+    );
+    if (hasData) {
+      activeRound = r;
+      break;
+    }
+  }
+
   const sorted = [...CONFIG.bettors].sort((a, b) => {
     const getRoundScore = (bettor) => {
       const r4 = teamRoundTotal(bettor, "r4");
@@ -1033,9 +1061,9 @@ function renderScoreboard() {
     const r3t_h = teamRoundTotal(bettor, "r3");
     const r4t_h = teamRoundTotal(bettor, "r4");
     const todayScore = r4t_h !== null ? r4t_h : r3t_h !== null ? r3t_h : r2t_h !== null ? r2t_h : r1t_h;
-    const todayRound = r4t_h !== null ? "R4" : r3t_h !== null ? "R3" : r2t_h !== null ? "R2" : "R1";
+    const todayRound = "R" + activeRound;
     const overall = todayScore;
-    const overallFmt = todayScore !== null ? todayRound + " " + fmtRel(todayScore) : "--";
+    const overallFmt = todayScore !== null ? todayRound + " " + fmtRel(todayScore) : (activeRound > 1 ? todayRound + " --" : "--");
     const overallCls = relClass(overall);
 
     const r1t = teamRoundTotal(bettor, "r1");
