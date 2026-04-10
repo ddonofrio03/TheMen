@@ -824,7 +824,15 @@ function isRoundComplete(roundKey) {
   const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
   if (!relevant.length) return false;
   const holesKey = roundKey + "holes";
-  return relevant.every(p => (p[holesKey] ?? 0) === 18);
+  const allComplete = relevant.every(p => (p[holesKey] ?? 0) === 18);
+  console.log(`isRoundComplete(${roundKey}):`, {
+    totalPlayers: entries.length,
+    activePlayers: relevant.length,
+    holesKey,
+    samplePlayer: relevant[0] ? `${relevant[0][holesKey]} holes` : 'none',
+    result: allComplete
+  });
+  return allComplete;
 }
 
 function isTournamentFinal() {
