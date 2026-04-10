@@ -993,8 +993,11 @@ async function fetchScores() {
     // Use the global current tournament round, not the player's last completed round
     const currRound = ls[currentRoundIndex];
     const currRoundHoles = currRound?.linescores?.length ?? 0;
-    // Only show today's score if player has started (has hole data) in current round
-    const today = (isCut || isWD || !currRound || currRoundHoles === 0) ? "--" : (currRound.displayValue || "--");
+    // Only show today's score if player has actually started playing (has holes) in current round
+    let today = "--";
+    if (!isCut && !isWD && currRound && currRoundHoles > 0) {
+      today = currRound.displayValue || "--";
+    }
 
     let thru = "--";
     if (isCut || isWD) {
