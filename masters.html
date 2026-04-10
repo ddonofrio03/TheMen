@@ -819,20 +819,31 @@ function teamOverallTotal(bettor) {
 // POINTS CALCULATION
 // ═══════════════════════════════════════════════
 function isRoundComplete(roundKey) {
-  const entries = Object.values(scoreMap);
-  if (!entries.length) return false;
-  const relevant = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
-  if (!relevant.length) return false;
-  const holesKey = roundKey + "holes";
-  const allComplete = relevant.every(p => (p[holesKey] ?? 0) === 18);
-  console.log(`isRoundComplete(${roundKey}):`, {
-    totalPlayers: entries.length,
-    activePlayers: relevant.length,
-    holesKey,
-    samplePlayer: relevant[0] ? `${relevant[0][holesKey]} holes` : 'none',
-    result: allComplete
-  });
-  return allComplete;
+  // Get the event status detail from ESPN, e.g. "Round 1 - Play Complete" or "Round 2 - In Progress"
+  const eventData = Object.values(scoreMap);
+  if (!eventData.length) return false;
+  
+  // Check if we have cached the event status
+  if (window.espnStatus) {
+    const detail = window.espnStatus?.detail || "";
+    const roundNum = roundKey === "r1" ? 1 : roundKey === "r2" ? 2 : roundKey === "r3" ? 3 : roundKey === "r4" ? 4 : null;
+    if (!roundNum) return false;
+    
+    // Check if this round or a later round is in progress/complete
+    // If we're in round 2, then round 1 is complete
+    // If we're in round 3, then rounds 1 and 2 are complete
+    // Parse the detail to find current round
+    const match = detail.match(/Round (\d)/);
+    if (match) {
+      const currentRound = parseInt(match[1]);
+      // Round is complete if current round is greater than it
+      if (currentRound > roundNum) return true;
+      // Or if current round matches and it says "Play Complete"
+      if (currentRound === roundNum && detail.includes("Play Complete")) return true;
+    }
+  }
+  
+  return false;
 }
 
 function isTournamentFinal() {
@@ -1006,6 +1017,9 @@ async function fetchScores() {
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4,
                      r1holes, r2holes, r3holes, r4holes, isCut, isWD };
   });
+
+  // Store the event status so isRoundComplete can check it
+  window.espnStatus = event.status?.type || {};
 
   return newMap;
 }
