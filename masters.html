@@ -935,47 +935,47 @@ async function fetchScores() {
   if (!event) event = data.events?.[0];
   if (!event) throw new Error("No event found");
 
+  // Update event name in header
   document.getElementById("event-name").textContent = event.name || CONFIG.eventName;
 
   const newMap = {};
   const comp = event.competitions?.[0];
   if (!comp) throw new Error("No competition data");
 
+  // Sort by order (leaderboard position)
   const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
-
-  // Determine which round is currently active
-  // The current round is the highest index where any player has linescores (can be in progress)
-  const maxRoundsInField = Math.max(...sorted.map(p => p.linescores?.length ?? 0));
-  let currentRoundIndex = Math.max(0, maxRoundsInField - 1); // -1 because arrays are 0-indexed (R1=0, R2=1, R3=2, R4=3)
 
   sorted.forEach((p, idx) => {
     const name = p.athlete?.displayName;
     if (!name) return;
 
+    // ESPN golf API has no status object — detect CUT by:
+    // 1. Explicit "CUT" in score field
+    // 2. Player has fewer linescore rounds than the max in the field
+    //    (leaders are always in the highest round; CUT players stay at 2 rounds)
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    
-    // A player is cut if:
-    // 1. Explicitly marked "CUT" in score
-    // 2. They have fewer rounds than leaders AND they don't have a R3 score (they finished before R3)
-    const anyoneHasR3 = maxRoundsInField >= 3;
-    const impliedCut = !explicitCut && anyoneHasR3 && playerRounds === 2 && !isWD;
+    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
     const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
+    // Rounds: top-level linescores array, one entry per round
     const ls = p.linescores || [];
     const r1 = ls[0]?.displayValue || "--";
     const r2 = ls[1]?.displayValue || "--";
     const r3 = ls[2]?.displayValue || "--";
     const r4 = ls[3]?.displayValue || "--";
+    // Store hole counts so isRoundComplete can check properly
     const r1holes = ls[0]?.linescores?.length ?? 0;
     const r2holes = ls[1]?.linescores?.length ?? 0;
     const r3holes = ls[2]?.linescores?.length ?? 0;
     const r4holes = ls[3]?.linescores?.length ?? 0;
 
+    // Find the actual current round — last linescore that has a displayValue or hole data
+    // ESPN pre-creates empty future round slots, so we skip those
     let currentRoundData = null;
     for (let i = ls.length - 1; i >= 0; i--) {
       const entry = ls[i];
@@ -984,36 +984,34 @@ async function fetchScores() {
         break;
       }
     }
-    
-    // Use the global current tournament round, not the player's last completed round
-    const currRound = ls[currentRoundIndex];
-    const currRoundHoles = currRound?.linescores?.length ?? 0;
-    // Only show today's score if player has actually started playing (has holes) in current round
-    let today = "--";
-    if (!isCut && !isWD && currRound && currRoundHoles > 0) {
-      today = currRound.displayValue || "--";
-    }
+    const today = (isCut || isWD || !currentRoundData) ? "--" : (currentRoundData.displayValue || "--");
 
+    // Thru: derived from hole-by-hole data inside the current round
+    // holes.length = number of holes completed by this player today
+    // If 0 holes: haven't started yet
+    // If 1-17 holes: currently playing, show hole number  
+    // If 18 holes: finished their round today
     let thru = "--";
     if (isCut || isWD) {
       thru = "CUT";
-    } else {
-      // Use the global current round, not the player's last completed round
-      const currRound = ls[currentRoundIndex];
-      if (currRound) {
-        const holes = currRound.linescores || [];
-        if (holes.length === 0) {
+    } else if (currentRoundData) {
+      const holes = currentRoundData.linescores || [];
+      if (holes.length === 0) {
+        // No hole data — check if this is a completed prior round or not started
+        if (ls.length > 1) {
+          // Has multiple rounds — current round not started yet or no hole data
           thru = "--";
-        } else if (holes.length < 18) {
-          thru = String(holes.length);
         } else {
-          thru = "F";
+          thru = "--";
         }
+      } else if (holes.length < 18) {
+        thru = String(holes.length); // on this hole right now
       } else {
-        thru = "--";
+        thru = "F"; // completed all 18 holes
       }
     }
 
+    // Position from sort order (1-based)
     const pos = (isCut || isWD) ? "CUT" : String(idx + 1);
 
     newMap[name] = { score, today, thru, pos, r1, r2, r3, r4,
