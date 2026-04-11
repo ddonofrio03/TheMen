@@ -945,6 +945,12 @@ async function fetchScores() {
   // Sort by order (leaderboard position)
   const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
 
+  // Debug: Log full raw data for Bryson
+  const bryson = sorted.find(p => p.athlete?.displayName === "Bryson DeChambeau");
+  if (bryson) {
+    console.log("RAW BRYSON DATA:", JSON.stringify(bryson, null, 2));
+  }
+
   sorted.forEach((p, idx) => {
     const name = p.athlete?.displayName;
     if (!name) return;
