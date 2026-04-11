@@ -955,10 +955,12 @@ async function fetchScores() {
     //    (leaders are always in the highest round; CUT players stay at 2 rounds)
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
-    const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
-    const playerRounds = p.linescores?.length ?? 0;
-    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
-    const isCut = explicitCut || impliedCut;
+    
+    // Masters cut line: manually set to +5 (as of R3 Apr 11)
+    const playerScore = parseInt(p.score) || null;
+    const manualCut = playerScore !== null && playerScore >= 5;
+    
+    const isCut = explicitCut || manualCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
