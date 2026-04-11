@@ -961,12 +961,13 @@ async function fetchScores() {
     const roundsCompleted = p.linescores?.length ?? 0;
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     
-    // If maxRounds is 3+, and this player only has 2, they're cut
-    // This works because cut happened after R2, so in-field players have R1+R2+R3 (even if R3 empty)
-    // while cut players only have R1+R2
     const impliedCut = roundsCompleted < maxRoundsInField && !isWD;
     
     const isCut = explicitCut || impliedCut;
+    
+    if (name === "Bryson DeChambeau") {
+      console.log(`${name}: rounds=${roundsCompleted}, max=${maxRoundsInField}, impliedCut=${impliedCut}, isCut=${isCut}`);
+    }
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
