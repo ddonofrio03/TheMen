@@ -943,20 +943,10 @@ async function fetchScores() {
 
   const sorted = [...(comp.competitors || [])].sort((a, b) => (a.order || 999) - (b.order || 999));
 
-  // Determine which round is currently active by finding the latest round with any data
-  let currentRoundIndex = -1;
-  sorted.forEach(p => {
-    const ls = p.linescores || [];
-    for (let i = ls.length - 1; i >= 0; i--) {
-      const entry = ls[i];
-      if (entry && (entry.displayValue || (entry.linescores && entry.linescores.length > 0))) {
-        if (i > currentRoundIndex) currentRoundIndex = i;
-        break;
-      }
-    }
-  });
-  // If no one has started any round yet, we're in round 0 (pre-tournament), but assume round 1 will start
-  if (currentRoundIndex === -1) currentRoundIndex = 0;
+  // Determine which round is currently active
+  // The current round is the highest index where any player has linescores (can be in progress)
+  const maxRoundsInField = Math.max(...sorted.map(p => p.linescores?.length ?? 0));
+  let currentRoundIndex = Math.max(0, maxRoundsInField - 1); // -1 because arrays are 0-indexed (R1=0, R2=1, R3=2, R4=3)
 
   sorted.forEach((p, idx) => {
     const name = p.athlete?.displayName;
@@ -970,8 +960,8 @@ async function fetchScores() {
     // A player is cut if:
     // 1. Explicitly marked "CUT" in score
     // 2. They have fewer rounds than leaders AND they don't have a R3 score (they finished before R3)
-    const r3exists = sorted.some(q => (q.linescores?.[2]?.displayValue || q.linescores?.[2]?.linescores?.length > 0));
-    const impliedCut = !explicitCut && r3exists && playerRounds < 3 && !isWD;
+    const anyoneHasR3 = maxRoundsInField >= 3;
+    const impliedCut = !explicitCut && anyoneHasR3 && playerRounds === 2 && !isWD;
     const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
