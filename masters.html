@@ -956,19 +956,7 @@ async function fetchScores() {
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     
-    // Masters cut line: top 50 and ties make the cut
-    // Anyone at position 51+ is cut
-    // Position can be "T39" (tied) or "39" (solo), extract the number
-    const posStr = String(p.position || "").replace(/^T/, "");
-    const position = parseInt(posStr) || 999;
-    const positionCut = position > 50;
-    
-    const isCut = explicitCut || positionCut;
-    
-    // Debug: Check position-based cut detection
-    if (name === "Bryson DeChambeau" || name === "Harry Hall" || name === "Rory McIlroy") {
-      console.log(`${name}: p.position="${p.position}", parsed=${position}, positionCut=${positionCut}, isCut=${isCut}`);
-    }
+    const isCut = explicitCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
