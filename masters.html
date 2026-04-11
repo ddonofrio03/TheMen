@@ -960,11 +960,17 @@ async function fetchScores() {
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
     const isCut = explicitCut || impliedCut;
     
-    // Debug: log all cut-related info for certain players
-    if (name === "Bryson DeChambeau") {
-      console.log(`${name}: Object keys:`, Object.keys(p));
-      console.log(`${name}: displayValue="${p.displayValue}", status="${p.status}", statusAbbr="${p.statusAbbr}"`);
-      console.log(`${name}: Full object:`, JSON.stringify(p, null, 2));
+    // Debug: Check ESPN fields for cut info
+    if (name === "Bryson DeChambeau" || name === "Harry Hall") {
+      console.log(`${name}:`);
+      console.log(`  score: ${p.score}`);
+      console.log(`  status: ${JSON.stringify(p.status)}`);
+      console.log(`  displayValue: ${p.displayValue}`);
+      console.log(`  total: ${p.total}`);
+      console.log(`  position: ${p.position}`);
+      console.log(`  linescores[0]: ${JSON.stringify(p.linescores?.[0])}`);
+      console.log(`  linescores[1]: ${JSON.stringify(p.linescores?.[1])}`);
+      console.log(`  linescores[2]: ${JSON.stringify(p.linescores?.[2])}`);
     }
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
