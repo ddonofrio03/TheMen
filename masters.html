@@ -961,8 +961,9 @@ async function fetchScores() {
     const isCut = explicitCut || impliedCut;
     
     // Debug: log all cut-related info for certain players
-    if (name === "Bryson DeChambeau" || name === "Harry Hall" || name === "Rory McIlroy") {
-      console.log(`${name}: score="${p.score}", explicit=${explicitCut}, implied=${impliedCut}, rounds=${playerRounds}, max=${maxRoundsInField}, isCut=${isCut}`);
+    if (name === "Bryson DeChambeau") {
+      console.log(`${name}: FULL OBJECT:`, p);
+      console.log(`${name}: score="${p.score}", status="${p.status}", explicit=${explicitCut}, implied=${impliedCut}, rounds=${playerRounds}, max=${maxRoundsInField}, isCut=${isCut}`);
     }
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
