@@ -956,11 +956,17 @@ async function fetchScores() {
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     
-    // Masters cut line: manually set to +5 (as of R3 Apr 11)
-    const playerScore = parseInt(p.score) || null;
-    const manualCut = playerScore !== null && playerScore >= 5;
+    // During active rounds, cut players will have fewer linescore entries
+    // than players still in the field
+    const roundsCompleted = p.linescores?.length ?? 0;
+    const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     
-    const isCut = explicitCut || manualCut;
+    // If maxRounds is 3+, and this player only has 2, they're cut
+    // This works because cut happened after R2, so in-field players have R1+R2+R3 (even if R3 empty)
+    // while cut players only have R1+R2
+    const impliedCut = roundsCompleted < maxRoundsInField && !isWD;
+    
+    const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
