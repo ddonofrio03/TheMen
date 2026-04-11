@@ -966,7 +966,12 @@ async function fetchScores() {
     const explicitCut = p.score === "CUT" || p.score === "cut";
     const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
     const playerRounds = p.linescores?.length ?? 0;
-    const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
+    
+    // A player is cut if:
+    // 1. Explicitly marked "CUT" in score
+    // 2. They have fewer rounds than leaders AND they don't have a R3 score (they finished before R3)
+    const r3exists = sorted.some(q => (q.linescores?.[2]?.displayValue || q.linescores?.[2]?.linescores?.length > 0));
+    const impliedCut = !explicitCut && r3exists && playerRounds < 3 && !isWD;
     const isCut = explicitCut || impliedCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
