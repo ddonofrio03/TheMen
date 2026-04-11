@@ -956,18 +956,11 @@ async function fetchScores() {
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     
-    // During active rounds, cut players will have fewer linescore entries
-    // than players still in the field
-    const roundsCompleted = p.linescores?.length ?? 0;
-    const maxRoundsInField = Math.max(...sorted.map(q => q.linescores?.length ?? 0));
+    // Manual cut detection: anyone at +5 or worse is cut (as of R3 Apr 11)
+    const playerScore = parseInt(p.score) || null;
+    const manualCut = playerScore !== null && playerScore >= 5;
     
-    const impliedCut = roundsCompleted < maxRoundsInField && !isWD;
-    
-    const isCut = explicitCut || impliedCut;
-    
-    if (name === "Bryson DeChambeau") {
-      console.log(`${name}: rounds=${roundsCompleted}, max=${maxRoundsInField}, impliedCut=${impliedCut}, isCut=${isCut}`);
-    }
+    const isCut = explicitCut || manualCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
