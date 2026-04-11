@@ -938,6 +938,17 @@ async function fetchScores() {
   // Update event name in header
   document.getElementById("event-name").textContent = event.name || CONFIG.eventName;
 
+  // Hardcoded cut list: players at +5 or worse after R2 (before R3)
+  // These are marked as cut regardless of R3 performance
+  const cutList = new Set([
+    "Bryson DeChambeau", "Harry Hall", "Ryan Fox", "Danny Willett",
+    "Bubba Watson", "J.J. Spaun", "Nicolai Höjgaard", "Zach Johnson",
+    "Akshay Bhatia", "Robert MacIntyre", "Rasmus Neergaard-Petersen",
+    "Andrew Novak", "Tom McKibbin", "Cameron Smith", "Casey Jarvis",
+    "Daniel Berger", "Jackson Herrington", "Michael Kim", "Ethan Fang",
+    "Fred Couples"
+  ]);
+
   const newMap = {};
   const comp = event.competitions?.[0];
   if (!comp) throw new Error("No competition data");
@@ -956,11 +967,10 @@ async function fetchScores() {
     const isWD  = p.score === "WD"  || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
     
-    // Manual cut detection: anyone at +5 or worse is cut (as of R3 Apr 11)
-    const playerScore = parseInt(p.score) || null;
-    const manualCut = playerScore !== null && playerScore >= 5;
+    // Check against hardcoded cut list from end of R2
+    const listCut = cutList.has(name);
     
-    const isCut = explicitCut || manualCut;
+    const isCut = explicitCut || listCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
