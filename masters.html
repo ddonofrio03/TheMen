@@ -959,6 +959,9 @@ async function fetchScores() {
     const playerRounds = p.linescores?.length ?? 0;
     const impliedCut = maxRoundsInField >= 3 && playerRounds < maxRoundsInField && !isWD;
     const isCut = explicitCut || impliedCut;
+    
+    // Debug: log cut players
+    if (isCut) console.log(`CUT: ${name} (rounds: ${playerRounds}, max: ${maxRoundsInField}, explicit: ${explicitCut}, implied: ${impliedCut})`);
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
