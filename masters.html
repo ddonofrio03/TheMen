@@ -962,8 +962,9 @@ async function fetchScores() {
     
     // Debug: log all cut-related info for certain players
     if (name === "Bryson DeChambeau") {
-      console.log(`${name}: FULL OBJECT:`, p);
-      console.log(`${name}: score="${p.score}", status="${p.status}", explicit=${explicitCut}, implied=${impliedCut}, rounds=${playerRounds}, max=${maxRoundsInField}, isCut=${isCut}`);
+      console.log(`${name}: Object keys:`, Object.keys(p));
+      console.log(`${name}: displayValue="${p.displayValue}", status="${p.status}", statusAbbr="${p.statusAbbr}"`);
+      console.log(`${name}: Full object:`, JSON.stringify(p, null, 2));
     }
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
