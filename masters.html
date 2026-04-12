@@ -825,8 +825,8 @@ function isRoundComplete(roundKey) {
   if (!relevant.length) return false;
   const holesKey = roundKey + "holes";
   
-  // Force R3 to be complete (Apr 11)
-  if (roundKey === "r3") return true;
+  // Force R3 and R4 to be complete - Masters is over (Apr 11)
+  if (roundKey === "r3" || roundKey === "r4") return true;
   
   return relevant.every(p => (p[holesKey] ?? 0) === 18);
 }
