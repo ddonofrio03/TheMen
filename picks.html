@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>The Men — Masters 2026 Draft</title>
+<title>The Men — PGA 2026 Draft</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
@@ -758,7 +758,7 @@
   <div class="hdr">
     <div class="brand">
       <span class="title">The Men</span>
-      <span class="sub">Masters 2026 Draft</span>
+      <span class="sub">PGA 2026 Draft</span>
     </div>
     <div class="header-actions">
       <span class="conn-indicator" id="conn-indicator" style="display:none"></span>
@@ -772,7 +772,7 @@
 
   <div class="screen active" id="screen-lobby">
     <div class="lobby-card card">
-      <div class="lobby-title">The Men's Masters Draft</div>
+      <div class="lobby-title">The Men's PGA Draft</div>
       <div class="lobby-desc">One link. Dave hosts. Everybody else joins. Nobody gets cut this time.</div>
 
       <div class="lobby-section">
@@ -794,7 +794,7 @@
 
       <div id="room-area" style="display:none">
         <div class="room-display">
-          <div class="room-code">Fixed room: the-men-masters-2026</div>
+          <div class="room-code">Fixed room: the-men-pga-2026</div>
           <div class="room-hint">Dave should host first. Then everyone else clicks Join Draft.</div>
         </div>
         <div class="label">Players</div>
@@ -854,7 +854,7 @@
   <div class="screen" id="screen-complete">
     <div class="complete-card card">
       <div class="complete-title">Draft Complete</div>
-      <div class="complete-sub">All picks are in. Copy the block below and paste it into your masters file.</div>
+      <div class="complete-sub">All picks are in. Copy the block below and paste it into pga.html.</div>
       <div class="cfg-note">Find the CONFIG block near the top and replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
       <div class="code-block" id="config-output"></div>
       <button class="copy-btn" onclick="copyConfig()">Copy CONFIG</button>
@@ -878,8 +878,8 @@ const COLORS  = {
 };
 const ROUNDS  = 5;
 const HOST_NAME = "Dave";
-const FIXED_ROOM = "the-men-masters-2026";
-const STORAGE_KEY = "themen-draft-state";
+const FIXED_ROOM = "the-men-pga-2026";
+const STORAGE_KEY = "themen-pga-draft-state";
 
 const PEER_OPTIONS = {
   debug: 1,
