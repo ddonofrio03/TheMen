@@ -748,7 +748,8 @@ function relClass(n) {
 // Penalty pool is the picks of the CURRENT group only.
 function penaltyScore(roundKey, teamPlayers) {
   const teamSet = new Set(teamPlayers);
-  const allPicked = allDrafted();
+  // Main picks only — alts are not part of the penalty pool.
+  const allPicked = new Set(Object.values(CONFIG.picks).flat());
   let worst = null;
   allPicked.forEach(name => {
     if (teamSet.has(name)) return;
