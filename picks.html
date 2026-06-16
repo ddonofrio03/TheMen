@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>The Men — PGA 2026 Draft</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Outfit:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#f6f3eb;
+    --panel:#ffffff;
+    --soft:#f1ece0;
+    --ink:#1e1a17;
+    --muted:#6e655d;
+    --line:#ddd3c3;
+    --green:#1f4d3a;
+    --green-dark:#17392b;
+    --gold:#b99245;
+    --gold-soft:#efe2bf;
+    --red:#b33a2f;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+
+  body{
+    font-family:'Outfit',sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    min-height:100vh;
+    -webkit-text-size-adjust:100%;
+  }
+
+  header{
+    background:linear-gradient(135deg,var(--green-dark),var(--green));
+    border-bottom:3px solid var(--gold);
+  }
+
+  .hdr{
+    max-width:1240px;
+    margin:0 auto;
+    padding:14px 16px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .title{
+    font-family:'Playfair Display',serif;
+    font-size:30px;
+    color:#fff;
+    letter-spacing:.3px;
+  }
+
+  .sub{
+    color:#d9c38d;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.3px;
+    font-weight:600;
+  }
+
+  .header-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+
+  .restart-btn-ui{
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:transparent;
+    color:#ffb0aa;
+    border:1px solid #ffb0aa;
+    cursor:pointer;
+  }
+
+  .restart-btn-ui:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+  .conn-indicator{
+    font-family:'DM Mono',monospace;
+    font-size:10px;
+    padding:5px 10px;
+    border-radius:999px;
+  }
+  .conn-indicator.connected{background:#163126;color:#8ff0a8}
+  .conn-indicator.disconnected{background:#3a1616;color:#f0a08a}
+  .conn-indicator.reconnecting{background:#3a3016;color:#f0d88a;animation:blink 1.2s infinite}
+
+  .status-pill{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:#163126;
+    color:#8ff0a8;
+  }
+
+  main{
+    max-width:1240px;
+    margin:0 auto;
+    padding:18px 14px 70px;
+  }
+
+  .screen{display:none}
+  .screen.active{display:block}
+
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:16px;
+    box-shadow:0 10px 24px rgba(25,20,15,.05);
+  }
+
+  .lobby-card,.setup-card,.complete-card{
+    max-width:700px;
+    margin:0 auto;
+    padding:24px 18px;
+  }
+
+  .lobby-title,.setup-title,.complete-title{
+    font-family:'Playfair Display',serif;
+    letter-spacing:.2px;
+  }
+
+  .lobby-title{font-size:30px;margin-bottom:6px}
+  .setup-title{font-size:28px;margin-bottom:6px}
+  .complete-title{font-size:32px;color:var(--green);margin-bottom:6px}
+
+  .lobby-desc,.setup-desc,.complete-sub,.cfg-note{
+    font-size:14px;
+    color:var(--muted);
+    line-height:1.6;
+  }
+
+  .lobby-desc{margin-bottom:18px}
+  .setup-desc{margin-bottom:20px}
+  .complete-sub{margin-bottom:18px}
+  .cfg-note{font-size:13px;margin-bottom:10px}
+
+  .lobby-section{margin-bottom:18px}
+
+  .label{
+    font-size:11px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:1px;
+    margin-bottom:8px;
+    font-family:'DM Mono',monospace;
+  }
+
+  .name-grid{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+  }
+
+  .name-btn{
+    font-family:'Playfair Display',serif;
+    font-size:17px;
+    padding:9px 14px;
+    border-radius:10px;
+    border:2px solid var(--line);
+    background:#fff;
+    cursor:pointer;
+    transition:.15s;
+    color:var(--ink);
+  }
+
+  .name-btn:hover{border-color:var(--green);background:#f4fbf7}
+  .name-btn.selected{color:#fff;border-color:transparent}
+  .name-btn.taken{opacity:.45;cursor:not-allowed}
+
+  .helper-box{
+    background:var(--soft);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px 16px;
+    margin-bottom:18px;
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.65;
+  }
+
+  .lobby-actions{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+  }
+
+  .host-btn,.join-btn,.start-btn,.rand-btn,.copy-btn{
+    padding:12px;
+    border-radius:10px;
+    cursor:pointer;
+    transition:.15s;
+    font-weight:700;
+    letter-spacing:.4px;
+  }
+
+  .host-btn,.join-btn{flex:1;font-size:16px}
+  .host-btn{background:var(--green);color:#fff;border:none}
+  .host-btn:hover{background:var(--green-dark)}
+  .join-btn{background:var(--gold-soft);color:#7a5a1d;border:2px solid var(--gold)}
+  .join-btn:hover{background:var(--gold);color:#fff}
+  .host-btn:disabled,.join-btn:disabled,.start-btn:disabled,.rand-btn:disabled{opacity:.45;cursor:not-allowed}
+
+  .room-display{
+    background:linear-gradient(135deg,#162c22,#1e4130);
+    border-radius:12px;
+    padding:16px;
+    text-align:center;
+    margin-bottom:16px;
+  }
+
+  .room-code{
+    font-family:'DM Mono',monospace;
+    font-size:18px;
+    letter-spacing:1px;
+    color:#eed48d;
+    font-weight:700;
+    word-break:break-word;
+  }
+
+  .room-hint{
+    font-size:11px;
+    color:#9bb4a4;
+    margin-top:6px;
+  }
+
+  .members-list{
+    margin-bottom:16px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+  }
+
+  .member-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 12px;
+    border-radius:10px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    min-width:0;
+  }
+
+  .member-dot{width:8px;height:8px;border-radius:50%;flex:0 0 auto}
+  .member-dot.online{background:#2ecc71}
+  .member-dot.offline{background:#cfc6ba}
+
+  .member-name{
+    font-family:'Playfair Display',serif;
+    font-size:16px;
+    flex:1;
+    min-width:0;
+  }
+
+  .member-tag{
+    font-size:10px;
+    font-family:'DM Mono',monospace;
+    color:var(--muted);
+    flex:0 0 auto;
+  }
+
+  .start-btn{
+    width:100%;
+    font-size:18px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+  }
+
+  .start-btn:hover{background:var(--green-dark)}
+
+  .lobby-error{
+    color:var(--red);
+    font-size:12px;
+    margin-top:8px;
+    font-family:'DM Mono',monospace;
+  }
+
+  .lobby-status{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:8px;
+    font-family:'DM Mono',monospace;
+    text-align:center;
+  }
+
+  .wait-msg{
+    text-align:center;
+    padding:18px;
+    font-size:13px;
+    color:var(--muted);
+    font-family:'DM Mono',monospace;
+  }
+
+  .order-list{list-style:none;margin-bottom:20px}
+  .order-item{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:11px 14px;
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    margin-bottom:6px;
+    cursor:grab;
+    user-select:none;
+  }
+
+  .order-item.drag-over{border-color:var(--green);background:#f4fbf7}
+  .order-item.readonly{cursor:default}
+
+  .order-num{
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    min-width:18px;
+  }
+
+  .order-name{
+    font-family:'Playfair Display',serif;
+    font-size:18px;
+    flex:1;
+  }
+
+  .drag-handle{color:var(--muted);font-size:18px}
+
+  .preview-snake{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:20px;
+  }
+
+  .snake-row{
+    display:flex;
+    gap:4px;
+    align-items:center;
+    margin-bottom:4px;
+    flex-wrap:wrap;
+  }
+
+  .snake-rlabel{
+    font-size:10px;
+    color:var(--muted);
+    min-width:28px;
+    font-family:'DM Mono',monospace;
+  }
+
+  .snake-chip{
+    font-family:'Playfair Display',serif;
+    font-size:13px;
+    padding:3px 9px;
+    border-radius:999px;
+    color:#fff;
+  }
+
+  .rand-btn{
+    flex:1;
+    font-size:16px;
+    background:var(--gold-soft);
+    color:#7a5a1d;
+    border:2px solid var(--gold);
+  }
+
+  .rand-btn:hover{background:var(--gold);color:#fff}
+  .rand-btn.spinning{animation:shake .08s infinite}
+  @keyframes shake{0%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}100%{transform:rotate(-2deg)}}
+
+  .clock-banner{
+    padding:14px 16px;
+    border-radius:14px;
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#fff;
+    box-shadow:0 10px 20px rgba(0,0,0,.07);
+    gap:10px;
+  }
+
+  .clock-name{
+    font-family:'Playfair Display',serif;
+    font-size:26px;
+    line-height:1.1;
+  }
+
+  .clock-sub{
+    font-size:13px;
+    opacity:.88;
+    margin-top:2px;
+    line-height:1.35;
+  }
+
+  .clock-info{
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    opacity:.9;
+    text-align:right;
+    white-space:nowrap;
+  }
+
+  .your-turn-banner{
+    background:var(--green);
+    color:#fff;
+    text-align:center;
+    padding:10px 12px;
+    border-radius:10px;
+    margin-bottom:10px;
+    font-weight:700;
+    letter-spacing:.2px;
+    animation:blink 1.2s infinite;
+    line-height:1.35;
+  }
+
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
+
+  .draft-layout{
+    display:grid;
+    grid-template-columns:360px minmax(0,1fr);
+    gap:14px;
+    align-items:start;
+  }
+
+  .board-panel{
+    display:grid;
+    grid-template-columns:1fr;
+    gap:10px;
+    align-content:start;
+  }
+
+  .round-section{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+  }
+
+  .round-hdr{
+    padding:8px 12px;
+    font-family:'Playfair Display',serif;
+    font-size:15px;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    background:var(--green-dark);
+  }
+
+  .round-hdr.alt{background:#846222}
+
+  .b-row{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:8px 12px;
+    border-bottom:1px solid #f4efe8;
+  }
+
+  .b-row:last-child{border-bottom:none}
+  .b-row.active{background:#f4fbf7}
+
+  .b-pos{
+    font-family:'DM Mono',monospace;
+    font-size:11px;
+    color:var(--muted);
+    min-width:16px;
+  }
+
+  .b-bettor{
+    font-family:'Playfair Display',serif;
+    font-size:14px;
+    min-width:54px;
+  }
+
+  .b-pick{
+    font-size:12px;
+    color:var(--muted);
+    flex:1;
+    min-width:0;
+  }
+
+  .b-pick.empty{color:#aaa096;font-style:italic}
+  .b-pick.onclock{color:var(--green);font-weight:700;animation:blink 1.2s infinite}
+
+  .search-wrap{position:relative;margin-bottom:10px}
+  .search-icon{
+    position:absolute;
+    left:11px;
+    top:50%;
+    transform:translateY(-50%);
+    color:var(--muted);
+    font-size:12px;
+  }
+
+  .search-input{
+    width:100%;
+    padding:10px 12px 10px 32px;
+    border:1px solid var(--line);
+    border-radius:12px;
+    font-size:14px;
+    font-family:'Outfit',sans-serif;
+    background:#fff;
+    outline:none;
+  }
+
+  .search-input:focus{border-color:var(--green)}
+
+  .player-list{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    max-height:calc(100vh - 235px);
+    overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  .letter-head{
+    padding:5px 10px;
+    background:#f5f0e7;
+    font-size:10px;
+    font-weight:600;
+    color:var(--muted);
+    letter-spacing:1px;
+    text-transform:uppercase;
+    border-bottom:1px solid var(--line);
+    font-family:'DM Mono',monospace;
+    position:sticky;
+    top:0;
+    z-index:1;
+  }
+
+  .p-row{
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:6px;
+    padding:6px 10px;
+    border-bottom:1px solid #f1ece4;
+    min-width:0;
+  }
+
+  .p-row:last-child{border-bottom:none}
+  .p-row.taken{opacity:.45}
+  .p-row.avail:hover{background:#f4fbf7;cursor:pointer}
+  .p-row.avail.altround:hover{background:var(--gold-soft)}
+
+  .p-name{
+    font-size:14px;
+    font-weight:500;
+    margin:0;
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+  }
+
+  .p-name .last{font-weight:700}
+
+  .p-owner{
+    font-size:10px;
+    font-family:'DM Mono',monospace;
+    margin-right:4px;
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+
+  .pick-btn{
+    font-size:11px;
+    padding:3px 9px;
+    border-radius:999px;
+    border:none;
+    cursor:pointer;
+    font-family:'DM Mono',monospace;
+    font-weight:500;
+    flex:0 0 auto;
+    line-height:1.2;
+  }
+
+  .pick-btn.main{background:var(--green);color:#fff}
+  .pick-btn.alt{background:var(--gold-soft);color:#7a5a1d;border:1px solid var(--gold)}
+  .pick-btn.main:hover{background:var(--green-dark)}
+  .pick-btn.alt:hover{background:var(--gold);color:#fff}
+
+  .confirm-overlay{
+    position:fixed;
+    top:0;left:0;right:0;bottom:0;
+    background:rgba(0,0,0,.5);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:1000;
+  }
+
+  .confirm-box{
+    background:#fff;
+    border-radius:16px;
+    padding:28px 24px;
+    max-width:360px;
+    width:90%;
+    text-align:center;
+    box-shadow:0 20px 40px rgba(0,0,0,.15);
+  }
+
+  .confirm-box .player-name{
+    font-family:'Playfair Display',serif;
+    font-size:24px;
+    margin:8px 0 4px;
+  }
+
+  .confirm-box .confirm-label{
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:18px;
+  }
+
+  .confirm-box .confirm-actions{
+    display:flex;
+    gap:10px;
+  }
+
+  .confirm-box .confirm-yes{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background:var(--green);
+    color:#fff;
+  }
+
+  .confirm-box .confirm-no{
+    flex:1;
+    padding:12px;
+    border:1px solid var(--line);
+    border-radius:10px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    background:#fff;
+    color:var(--ink);
+  }
+
+  .code-block{
+    background:#1f1d1a;
+    color:#edf8f0;
+    padding:18px;
+    border-radius:10px;
+    font-family:'DM Mono',monospace;
+    font-size:12px;
+    line-height:1.7;
+    overflow-x:auto;
+    white-space:pre;
+  }
+
+  .copy-btn{
+    margin-top:12px;
+    font-size:16px;
+    background:var(--green);
+    color:#fff;
+    border:none;
+  }
+
+  .copy-btn:hover{background:var(--green-dark)}
+
+  .reset-btn{
+    margin-top:10px;
+    margin-left:10px;
+    padding:10px 20px;
+    font-family:'Outfit',sans-serif;
+    font-size:13px;
+    background:transparent;
+    color:var(--muted);
+    border:1px solid var(--line);
+    border-radius:10px;
+    cursor:pointer;
+  }
+
+  @media (max-width: 980px){
+    .draft-layout{
+      grid-template-columns:320px minmax(0,1fr);
+    }
+  }
+
+  @media (max-width: 820px){
+    .draft-layout{
+      grid-template-columns:1fr;
+    }
+
+    .board-panel{
+      order:1;
+    }
+
+    .player-side{
+      order:2;
+    }
+
+    .player-list{
+      max-height:none;
+    }
+  }
+
+  @media (max-width: 640px){
+    .title{font-size:26px}
+    .sub{font-size:10px}
+    .lobby-title,.setup-title,.complete-title{font-size:26px}
+    .members-list{grid-template-columns:1fr}
+    .clock-banner{
+      flex-direction:column;
+      align-items:flex-start;
+    }
+    .clock-info{
+      text-align:left;
+      white-space:normal;
+    }
+    .name-btn{
+      font-size:16px;
+      padding:8px 12px;
+    }
+    .p-row{
+      gap:5px;
+      padding:6px 8px;
+    }
+    .pick-btn{
+      padding:3px 8px;
+      font-size:10px;
+    }
+    .p-name{
+      font-size:13px;
+    }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="hdr">
+    <div class="brand">
+      <span class="title">The Men</span>
+      <span class="sub">PGA 2026 Draft</span>
+    </div>
+    <div class="header-actions">
+      <span class="conn-indicator" id="conn-indicator" style="display:none"></span>
+      <button class="restart-btn-ui" onclick="resetDraft()" id="restart-btn" style="display:none">Restart Draft</button>
+      <span class="status-pill" id="status-pill">Lobby</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <div class="screen active" id="screen-lobby">
+    <div class="lobby-card card">
+      <div class="lobby-title">The Men's PGA Draft</div>
+      <div class="lobby-desc">Tap your name to join. When everyone’s in, Dave starts the draft. No host to keep open, no room codes — refresh or lose signal and just reopen this page, you’ll land right where you left off. Nobody gets cut this time.</div>
+
+      <div class="lobby-section">
+        <div class="label">Pick your name</div>
+        <div class="name-grid" id="name-grid"></div>
+      </div>
+
+      <div class="label">Players in</div>
+      <div class="members-list" id="members-list"></div>
+      <button class="start-btn" id="lobby-start-btn" onclick="startSetup()" style="display:none">Start Draft</button>
+      <div class="wait-msg" id="wait-msg" style="display:none">Waiting for Dave to start…</div>
+
+      <div class="lobby-error" id="lobby-error"></div>
+      <div class="lobby-status" id="lobby-status"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-setup">
+    <div class="setup-card card">
+      <div class="setup-title">Set Draft Order</div>
+      <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — 4 picks plus 1 alt round at the end.</div>
+      <ul class="order-list" id="order-list"></ul>
+      <div class="preview-snake">
+        <div class="label">Full draft order preview</div>
+        <div id="snake-preview"></div>
+      </div>
+      <div id="setup-host-controls">
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button class="rand-btn" id="rand-btn" onclick="randomizeOrder()">Randomize Order</button>
+        </div>
+        <button class="start-btn" onclick="beginDraft()">Start Draft</button>
+      </div>
+      <div class="wait-msg" id="setup-wait" style="display:none">Dave is setting up the draft order...</div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-draft">
+    <div class="clock-banner" id="clock-banner">
+      <div>
+        <div class="clock-name" id="clock-name">--</div>
+        <div class="clock-sub" id="clock-sub">--</div>
+      </div>
+      <div class="clock-info" id="clock-info">--</div>
+    </div>
+
+    <div id="your-turn-msg"></div>
+
+    <div class="draft-layout">
+      <div class="board-panel" id="board-panel"></div>
+
+      <div class="player-side">
+        <div class="search-wrap">
+          <span class="search-icon">&#x2315;</span>
+          <input class="search-input" id="search-input" placeholder="Search players by name..." oninput="renderPlayerList()">
+        </div>
+        <div class="player-list" id="player-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-complete">
+    <div class="complete-card card">
+      <div class="complete-title">Draft Complete</div>
+      <div class="complete-sub">All picks are in. Copy the block below and paste it into pga.html.</div>
+      <div class="cfg-note">Find the CONFIG block near the top and replace the <strong>picks:</strong> and <strong>alts:</strong> sections with this.</div>
+      <div class="code-block" id="config-output"></div>
+      <button class="copy-btn" onclick="copyConfig()">Copy CONFIG</button>
+      <button class="reset-btn" onclick="resetDraft()">Reset Draft</button>
+    </div>
+  </div>
+
+</main>
+
+<div id="confirm-container"></div>
+
+<script>
+/* CONFIG — The Men */
+const SUPABASE_URL = "https://qxvejtzwtnvackidiqds.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4dmVqdHp3dG52YWNraWRpcWRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTA5MzksImV4cCI6MjA5NzEyNjkzOX0.NGHpw9rXErQDnSdAfU0RsDTXZct8bItCQuOTHkCZk9w";
+const SLUG    = "themen";
+
+const BETTORS = ["Dave","Billy","Nick","Alex","Ryan","TJ"];
+const COLORS  = {Dave:"#6CABDD",Billy:"#7d3c98",Nick:"#b7950b",Alex:"#1a237e",Ryan:"#b03a2e",TJ:"#006F71"};
+const ROUNDS  = 5;            // 4 picks + 1 alt round
+const COMMISH = "Dave";       // sets draft order, starts, and resets
+const NAME_KEY = "themen-draft-myname";
+
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let myName = localStorage.getItem(NAME_KEY) || null;
+let phase="lobby", claimed=[], draftOrder=[], picks={}, turn=0, field=[], sequence=[], dragSrc=null, saving=false, loaded=false;
+BETTORS.forEach(b => picks[b] = { picks: [], alt: null });
+function isCommish(){ return myName === COMMISH; }
+
+function setConn(ok){
+  const el = document.getElementById("conn-indicator");
+  el.style.display = "inline-block";
+  el.className = "conn-indicator " + (ok ? "connected" : "disconnected");
+  el.textContent = ok ? "Live" : "Reconnecting…";
+}
+
+function currentState(){ return { phase, claimed, draftOrder, picks, turn }; }
+function applyState(s){
+  if(!s) return;
+  phase      = s.phase || "lobby";
+  claimed    = Array.isArray(s.claimed) ? s.claimed : [];
+  draftOrder = Array.isArray(s.draftOrder) ? s.draftOrder : [];
+  picks      = (s.picks && typeof s.picks === "object") ? s.picks : {};
+  BETTORS.forEach(b => { if(!picks[b]) picks[b] = { picks: [], alt: null }; });
+  turn       = typeof s.turn === "number" ? s.turn : 0;
+  sequence   = buildSeq(draftOrder.length ? draftOrder : BETTORS);
+  render();
+}
+async function loadState(){
+  const { data, error } = await sb.from("golf_drafts").select("state").eq("slug", SLUG).single();
+  if(error){ showError("Could not load draft: " + error.message); return; }
+  loaded = true; applyState(data.state);
+}
+async function pushState(){
+  saving = true;
+  try{
+    const { error } = await sb.from("golf_drafts")
+      .update({ state: currentState(), updated_at: new Date().toISOString() })
+      .eq("slug", SLUG);
+    if(error) showError("Save failed: " + error.message);
+  }catch(e){ showError("Save failed: " + e); }
+  setTimeout(() => { saving = false; }, 400);
+}
+function subscribe(){
+  sb.channel("draft-" + SLUG)
+    .on("postgres_changes",
+        { event: "UPDATE", schema: "public", table: "golf_drafts", filter: "slug=eq." + SLUG },
+        payload => { if(!saving) applyState(payload.new.state); })
+    .subscribe(status => setConn(status === "SUBSCRIBED"));
+}
+setInterval(() => { if(loaded && !saving) loadState(); }, 4000);
+
+function fetchField(){
+  field = [
+    "Ludvig Åberg","Angel Ayora","Derek Berg","Daniel Berger","Christiaan Bezuidenhout","Akshay Bhatia","Francisco Bide",
+    "Chandler Blanchet","Michael Block","Keegan Bradley","Michael Brennan","Jacob Bridgeman","Daniel Brown","Sam Burns",
+    "Brian Campbell","Patrick Cantlay","Ricky Castillo","Bud Cauley","Stewart Cink","Wyndham Clark","Tyler Collet",
+    "Corey Conners","Pierceson Coody","Jason Day","Bryson DeChambeau","Thomas Detry","Luke Donald","Jesse Droemer",
+    "Jason Dufner","Nico Echavarria","Harris English","Bryce Fisher","Steven Fisk","Alex Fitzpatrick","Matt Fitzpatrick",
+    "Tommy Fleetwood","Rickie Fowler","Ryan Fox","Chris Gabriele","Mark Geddes","Ryan Gerard","Lucas Glover",
+    "Chris Gotterup","Max Greyserman","Ben Griffin","Emiliano Grillo","Jordan Gumberg","Harry Hall","Brian Harman",
+    "Padraig Harrington","Tyrrell Hatton","Zach Haynes","Russell Henley","Kazuki Higa","Garrick Higgo","Joe Highsmith",
+    "Daniel Hillier","Ryo Hisatsune","Rico Hoey","Ian Holt","Max Homa","Billy Horschel","Viktor Hovland",
+    "Austin Hurt","Nicolai Højgaard","Rasmus Højgaard","Sungjae Im","Stephan Jaeger","Casey Jarvis","Dustin Johnson",
+    "Jared Jones","Kota Kaneko","Michael Kartrude","Martin Kaymer","John Keefer","Ben Kern","Michael Kim",
+    "Si Woo Kim","Chris Kirk","Kurt Kitayama","Jake Knapp","Brooks Koepka","Min Woo Lee","Ryan Lenahan",
+    "Haotong Li","Mikael Lindberg","David Lipsky","Shane Lowry","Robert MacIntyre","Hideki Matsuyama","Denny McCarthy",
+    "Matt McCarty","Paul McClure","Max McGreevy","Rory McIlroy","Tom McKibbin","Maverick McNealy","Shaun Micheel",
+    "Keith Mitchell","Collin Morikawa","William Mouw","Rasmus Neergaard-Petersen","Joaquin Niemann","Alex Noren","Andrew Novak",
+    "John Parry","Taylor Pendrith","Marco Penge","Ben Polland","J.T. Poston","Aldrich Potgieter","David Puig",
+    "Andrew Putnam","Jon Rahm","Aaron Rai","Patrick Reed","Kristoffer Reitan","Davis Riley","Patrick Rodgers",
+    "Justin Rose","Adrien Saddier","Garrett Sapp","Jayden Schaper","Xander Schauffele","Scottie Scheffler","Adam Schenk",
+    "Matti Schmid","Adam Scott","Braden Shattuck","Alex Smalley","Cameron Smith","Jordan Smith","Austin Smotherman",
+    "Elvis Smylie","Travis Smyth","Brandt Snedeker","J.J. Spaun","Jordan Spieth","Sam Stevens","Sepp Straka",
+    "Andy Sullivan","Nick Taylor","Sahith Theegala","Justin Thomas","Michael Thorbjornsen","Sami Valimaki","Jhonattan Vegas",
+    "Ryan Vermeer","Jimmy Walker","Matt Wallace","Bernd Wiesberger","Timothy Wiseman","Gary Woodland","Y.E. Yang",
+    "Sudarshan Yellamaraju","Cameron Young"
+  ];
+  field.sort((a, b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
+}
+
+function buildSeq(order){
+  const seq = [];
+  for(let r = 0; r < ROUNDS; r++){
+    const isAlt = r === ROUNDS - 1;
+    const row = r % 2 === 0 ? [...order] : [...order].reverse();
+    row.forEach(b => seq.push({ bettor: b, round: r + 1, isAlt }));
+  }
+  return seq;
+}
+function getTakenMap(){
+  const taken = {};
+  BETTORS.forEach(b => {
+    picks[b].picks.forEach(n => taken[n] = b);
+    if(picks[b].alt) taken[picks[b].alt] = b + " (alt)";
+  });
+  return taken;
+}
+function showError(msg){ const el = document.getElementById("lobby-error"); if(el) el.textContent = msg; console.error(msg); }
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  document.getElementById("screen-" + id).classList.add("active");
+}
+
+function render(){
+  const pill = document.getElementById("status-pill");
+  pill.textContent = phase === "lobby" ? "Lobby" : phase === "setup" ? "Setup" : phase === "draft" ? "Live Draft" : "Complete";
+  document.getElementById("restart-btn").style.display = (isCommish() && phase !== "lobby") ? "inline-block" : "none";
+  if(phase === "lobby"){ showScreen("lobby"); renderLobby(); }
+  else if(phase === "setup"){ showScreen("setup"); renderSetup(); }
+  else if(phase === "draft"){ showScreen("draft"); renderDraft(); }
+  else if(phase === "complete"){ showScreen("complete"); buildConfigOutput(); }
+}
+
+function renderNameGrid(){
+  document.getElementById("name-grid").innerHTML = BETTORS.map(b => {
+    const sel = myName === b ? "selected" : "";
+    const taken = claimed.includes(b) && myName !== b ? "taken" : "";
+    const style = myName === b ? `background:${COLORS[b]};border-color:${COLORS[b]};color:#fff` : "";
+    return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken ? "disabled" : ""}>${b}</button>`;
+  }).join("");
+}
+function renderLobby(){
+  document.getElementById("members-list").innerHTML = BETTORS.map(b => {
+    const online = claimed.includes(b);
+    const tag = b === COMMISH ? "commish" : (b === myName ? "you" : "");
+    return `<div class="member-row">
+      <span class="member-dot ${online ? "online" : "offline"}"></span>
+      <span class="member-name" style="color:${COLORS[b]}">${b}</span>
+      ${tag ? `<span class="member-tag">${tag}</span>` : ""}
+    </div>`;
+  }).join("");
+  renderNameGrid();
+  const startBtn = document.getElementById("lobby-start-btn");
+  const wait = document.getElementById("wait-msg");
+  if(isCommish()){
+    startBtn.style.display = "block";
+    startBtn.textContent = `Start Draft (${claimed.length}/${BETTORS.length} in)`;
+    wait.style.display = "none";
+  } else if(myName){ startBtn.style.display = "none"; wait.style.display = "block"; }
+  else { startBtn.style.display = "none"; wait.style.display = "none"; }
+}
+function claimName(name){
+  if(claimed.includes(name) && name !== myName) return;
+  const prev = myName;
+  myName = name; localStorage.setItem(NAME_KEY, name);
+  if(prev && prev !== name) claimed = claimed.filter(n => n !== prev);
+  if(!claimed.includes(name)) claimed.push(name);
+  render(); pushState();
+}
+function startSetup(){
+  if(!isCommish()) return;
+  phase = "setup"; draftOrder = [...BETTORS]; sequence = buildSeq(draftOrder);
+  render(); pushState();
+}
+
+function renderSetup(){
+  const canDrag = isCommish();
+  document.getElementById("setup-host-controls").style.display = canDrag ? "block" : "none";
+  document.getElementById("setup-wait").style.display = canDrag ? "none" : "block";
+  document.getElementById("order-list").innerHTML = draftOrder.map((b, i) => `
+    <li class="order-item${canDrag ? "" : " readonly"}"
+      ${canDrag ? `draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"` : ""}
+      data-i="${i}">
+      <span class="order-num">${i + 1}</span>
+      <span class="order-name" style="color:${COLORS[b]}">${b}</span>
+      ${canDrag ? '<span class="drag-handle">&#10247;</span>' : ""}
+    </li>`).join("");
+  renderPreview();
+}
+function ds(e, i){ dragSrc = i; e.currentTarget.style.opacity = "0.5"; }
+function dov(e, i){ e.preventDefault(); if(i !== dragSrc) e.currentTarget.classList.add("drag-over"); }
+function dlv(e){ e.currentTarget.classList.remove("drag-over"); }
+function drp(e, i){
+  e.preventDefault(); e.currentTarget.classList.remove("drag-over");
+  if(dragSrc === null || dragSrc === i) return;
+  const a = [...draftOrder]; const moved = a.splice(dragSrc, 1)[0]; a.splice(i, 0, moved);
+  draftOrder = a; dragSrc = null; sequence = buildSeq(draftOrder);
+  renderSetup(); pushState();
+}
+function renderPreview(){
+  const seq = buildSeq(draftOrder.length ? draftOrder : BETTORS);
+  const rows = {}; seq.forEach(s => { (rows[s.round] = rows[s.round] || []).push(s); });
+  document.getElementById("snake-preview").innerHTML = Object.entries(rows).map(([r, arr]) => `
+    <div class="snake-row">
+      <span class="snake-rlabel">${arr[0].isAlt ? "Alt" : "R" + r}</span>
+      ${arr.map(p => `<span class="snake-chip" style="background:${COLORS[p.bettor]}">${p.bettor}</span>`).join("")}
+    </div>`).join("");
+}
+function randomizeOrder(){
+  if(!isCommish()) return;
+  const btn = document.getElementById("rand-btn");
+  btn.disabled = true; btn.classList.add("spinning"); btn.textContent = "Shuffling…";
+  let count = 0; const total = 25;
+  const shuffle = arr => { const a = [...arr]; for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const timer = setInterval(() => {
+    count++; draftOrder = shuffle(draftOrder); sequence = buildSeq(draftOrder); renderSetup();
+    if(count >= total){ clearInterval(timer); btn.classList.remove("spinning"); btn.disabled = false; btn.textContent = "Randomize Again"; pushState(); }
+  }, 80);
+}
+function beginDraft(){
+  if(!isCommish()) return;
+  phase = "draft"; BETTORS.forEach(b => picks[b] = { picks: [], alt: null }); turn = 0; sequence = buildSeq(draftOrder);
+  render(); pushState();
+}
+
+function renderDraft(){
+  if(turn >= sequence.length){ phase = "complete"; render(); return; }
+  const t = sequence[turn];
+  const banner = document.getElementById("clock-banner");
+  banner.style.background = COLORS[t.bettor];
+  document.getElementById("clock-name").textContent = t.bettor + "'s pick";
+  document.getElementById("clock-sub").textContent = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
+  document.getElementById("clock-info").innerHTML = (sequence.length - turn) + " picks left";
+  const ytm = document.getElementById("your-turn-msg");
+  ytm.innerHTML = (t.bettor === myName) ? '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>' : "";
+  renderPlayerList(); renderBoard();
+}
+function renderPlayerList(){
+  const el = document.getElementById("player-list");
+  if(turn >= sequence.length){ el.innerHTML = ""; return; }
+  const t = sequence[turn];
+  const query = document.getElementById("search-input").value.toLowerCase().trim();
+  const canPick = myName === t.bettor;
+  const taken = getTakenMap();
+  const list = query ? field.filter(n => n.toLowerCase().includes(query)) : field;
+  if(!list.length){ el.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);font-size:13px">No players found</div>`; return; }
+  let html = "", lastL = "";
+  list.forEach(name => {
+    const last = name.split(" ").pop(); const letter = last[0].toUpperCase();
+    if(letter !== lastL && !query){ html += `<div class="letter-head">${letter}</div>`; lastL = letter; }
+    const parts = name.split(" "); const ln = parts.pop(); const fn = parts.join(" ");
+    const own = taken[name];
+    if(own){
+      const ownerBase = own.replace(" (alt)", "");
+      html += `<div class="p-row taken"><span class="p-owner" style="color:${COLORS[ownerBase] || '#888'}">${own}</span><div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div></div>`;
+    } else if(canPick){
+      const bc = t.isAlt ? "alt" : "main"; const bl = t.isAlt ? "Alt pick" : "Pick";
+      html += `<div class="p-row avail${t.isAlt ? " altround" : ""}" data-player="${encodeURIComponent(name)}"><button class="pick-btn ${bc}" data-player="${encodeURIComponent(name)}">+ ${bl}</button><div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div></div>`;
+    } else {
+      html += `<div class="p-row"><div class="p-name"><span>${fn} </span><span class="last">${ln}</span></div></div>`;
+    }
+  });
+  el.innerHTML = html;
+}
+function setupPlayerListClicks(){
+  document.getElementById("player-list").addEventListener("click", function(e){
+    const target = e.target.closest("[data-player]"); if(!target) return;
+    const encoded = target.getAttribute("data-player"); if(!encoded) return;
+    showPickConfirm(decodeURIComponent(encoded));
+  });
+}
+function showPickConfirm(playerName){
+  if(turn >= sequence.length) return;
+  const t = sequence[turn];
+  if(myName !== t.bettor) return;
+  if(getTakenMap()[playerName]) return;
+  const roundLabel = t.isAlt ? "Alt Round" : "Round " + t.round;
+  document.getElementById("confirm-container").innerHTML = `
+    <div class="confirm-overlay" onclick="if(event.target===this)dismissConfirm()">
+      <div class="confirm-box">
+        <div style="font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-family:'DM Mono',monospace">${roundLabel}</div>
+        <div class="player-name">${playerName}</div>
+        <div class="confirm-label">${t.bettor}'s pick — are you sure?</div>
+        <div class="confirm-actions">
+          <button class="confirm-no" onclick="dismissConfirm()">Cancel</button>
+          <button class="confirm-yes" onclick="confirmPick('${encodeURIComponent(playerName)}')">Confirm Pick</button>
+        </div>
+      </div>
+    </div>`;
+}
+function dismissConfirm(){ document.getElementById("confirm-container").innerHTML = ""; }
+function confirmPick(encoded){ dismissConfirm(); requestPick(decodeURIComponent(encoded)); }
+function requestPick(playerName){
+  if(turn >= sequence.length) return;
+  const t = sequence[turn];
+  if(myName !== t.bettor) return;
+  if(getTakenMap()[playerName]) return;
+  if(t.isAlt) picks[t.bettor].alt = playerName; else picks[t.bettor].picks.push(playerName);
+  turn++; if(turn >= sequence.length) phase = "complete";
+  render(); pushState();
+}
+function renderBoard(){
+  const el = document.getElementById("board-panel");
+  const rounds = {}; sequence.forEach((s, idx) => { (rounds[s.round] = rounds[s.round] || []).push({ ...s, idx }); });
+  const slotPick = {};
+  sequence.forEach((s, idx) => {
+    if(idx < turn){
+      if(s.isAlt) slotPick[idx] = picks[s.bettor].alt;
+      else { const pi = sequence.slice(0, idx).filter(x => x.bettor === s.bettor && !x.isAlt).length; slotPick[idx] = picks[s.bettor].picks[pi]; }
+    }
+  });
+  el.innerHTML = Object.entries(rounds).map(([r, slots]) => `
+    <div class="round-section">
+      <div class="round-hdr${slots[0].isAlt ? " alt" : ""}">
+        <span>${slots[0].isAlt ? "Alt Round" : "Round " + r}</span>
+        <span style="font-size:11px;opacity:.75;font-family:'DM Mono',monospace">${slots.filter(s => s.idx < turn).length}/${slots.length}</span>
+      </div>
+      ${slots.map((s, index) => {
+        const isDone = s.idx < turn; const isActive = s.idx === turn; const picked = slotPick[s.idx];
+        const dispName = picked ? picked.split(" ").pop() : "";
+        return `<div class="b-row${isActive ? " active" : ""}">
+          <span class="b-pos">${index + 1}</span>
+          <span class="b-bettor" style="color:${COLORS[s.bettor]}">${s.bettor}</span>
+          <span class="b-pick${isDone ? "" : (isActive ? " onclock" : " empty")}">${isDone && picked ? dispName : isActive ? "on the clock…" : "—"}</span>
+        </div>`;
+      }).join("")}
+    </div>`).join("");
+}
+function buildConfigOutput(){
+  const pb = BETTORS.map(b => `    ${b.padEnd(6)}: [${picks[b].picks.map(n => `"${n}"`).join(", ")}]`).join(",\n");
+  const ab = BETTORS.filter(b => picks[b].alt).map(b => `    ${b.padEnd(6)}: "${picks[b].alt}"`).join(",\n");
+  document.getElementById("config-output").textContent =
+`  picks: {
+${pb}
+  },
+  alts: {
+${ab || "    // no alts set"}
+  },`;
+}
+function copyConfig(){
+  navigator.clipboard.writeText(document.getElementById("config-output").textContent).then(() => {
+    const btn = document.querySelector(".copy-btn"); btn.textContent = "Copied!"; setTimeout(() => btn.textContent = "Copy CONFIG", 2000);
+  });
+}
+function resetDraft(){
+  if(!isCommish()){ alert("Only " + COMMISH + " can reset the draft."); return; }
+  if(!confirm("Reset the entire draft? All picks will be cleared.")) return;
+  BETTORS.forEach(b => picks[b] = { picks: [], alt: null });
+  draftOrder = [...BETTORS]; sequence = buildSeq(draftOrder); turn = 0; phase = "setup";
+  render(); pushState();
+}
+
+fetchField();
+sequence = buildSeq(BETTORS);
+setupPlayerListClicks();
+renderNameGrid();
+loadState();
+subscribe();
+</script>
+</body>
+</html>
