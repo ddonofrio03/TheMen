@@ -432,6 +432,9 @@
     line-height:1.35;
   }
 
+  .identity-picker{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+  .identity-prompt{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:10px}
+
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
   .draft-layout{
@@ -794,6 +797,7 @@
     <div class="setup-card card">
       <div class="setup-title">Set Draft Order</div>
       <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — 4 picks plus 1 alt round at the end.</div>
+      <div id="setup-identity"></div>
       <ul class="order-list" id="order-list"></ul>
       <div class="preview-snake">
         <div class="label">Full draft order preview</div>
@@ -980,6 +984,20 @@ function renderNameGrid(){
     return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken ? "disabled" : ""}>${b}</button>`;
   }).join("");
 }
+// Identity picker shown on the setup/draft screens for anyone who hasn't claimed a
+// seat yet (the lobby — the only other place to pick your name — is gone once the
+// draft starts). Taken seats stay clickable here so you can rejoin from a new device.
+function identityPickerHTML(){
+  if(myName) return "";
+  const btns = BETTORS.map(b => {
+    const rejoin = claimed.includes(b) ? ` <span style="font-size:11px;opacity:.65">(rejoin)</span>` : "";
+    return `<button class="name-btn" onclick="claimName('${b}')">${b}${rejoin}</button>`;
+  }).join("");
+  return `<div class="identity-picker">
+    <div class="identity-prompt">Tap your name to join the draft</div>
+    <div class="name-grid">${btns}</div>
+  </div>`;
+}
 function renderLobby(){
   document.getElementById("members-list").innerHTML = BETTORS.map(b => {
     const online = claimed.includes(b);
@@ -1001,7 +1019,9 @@ function renderLobby(){
   else { startBtn.style.display = "none"; wait.style.display = "none"; }
 }
 function claimName(name){
-  if(claimed.includes(name) && name !== myName) return;
+  // No early-out on a taken seat: in the lobby the button is disabled, so this only
+  // fires from the identity picker, where re-claiming your own seat (rejoin from a new
+  // device / after the draft started) must be allowed.
   const prev = myName;
   myName = name; localStorage.setItem(NAME_KEY, name);
   if(prev && prev !== name) claimed = claimed.filter(n => n !== prev);
@@ -1018,6 +1038,7 @@ function renderSetup(){
   const canDrag = isCommish();
   document.getElementById("setup-host-controls").style.display = canDrag ? "block" : "none";
   document.getElementById("setup-wait").style.display = canDrag ? "none" : "block";
+  document.getElementById("setup-identity").innerHTML = identityPickerHTML();
   document.getElementById("order-list").innerHTML = draftOrder.map((b, i) => `
     <li class="order-item${canDrag ? "" : " readonly"}"
       ${canDrag ? `draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"` : ""}
@@ -1073,7 +1094,7 @@ function renderDraft(){
   document.getElementById("clock-sub").textContent = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
   document.getElementById("clock-info").innerHTML = (sequence.length - turn) + " picks left";
   const ytm = document.getElementById("your-turn-msg");
-  ytm.innerHTML = (t.bettor === myName) ? '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>' : "";
+  ytm.innerHTML = identityPickerHTML() + ((t.bettor === myName) ? '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>' : "");
   renderPlayerList(); renderBoard();
 }
 function renderPlayerList(){
