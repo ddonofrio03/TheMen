@@ -432,8 +432,10 @@
     line-height:1.35;
   }
 
-  .identity-picker{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
-  .identity-prompt{font-family:'Playfair Display',serif;font-size:18px;margin-bottom:10px}
+  #identity-modal{display:none}
+  #identity-modal.show{display:flex;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.5);align-items:center;justify-content:center;padding:20px}
+  .identity-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 20px;max-width:440px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+  .identity-prompt{font-family:'Playfair Display',serif;font-size:22px;margin-bottom:14px}
 
   @keyframes blink{0%,100%{opacity:1}50%{opacity:.35}}
 
@@ -797,7 +799,6 @@
     <div class="setup-card card">
       <div class="setup-title">Set Draft Order</div>
       <div class="setup-desc">Drag names to set the order. Snake runs 5 rounds — 4 picks plus 1 alt round at the end.</div>
-      <div id="setup-identity"></div>
       <ul class="order-list" id="order-list"></ul>
       <div class="preview-snake">
         <div class="label">Full draft order preview</div>
@@ -851,6 +852,7 @@
 </main>
 
 <div id="confirm-container"></div>
+<div id="identity-modal"></div>
 
 <script>
 /* CONFIG — The Men */
@@ -974,6 +976,8 @@ function render(){
   else if(phase === "setup"){ showScreen("setup"); renderSetup(); }
   else if(phase === "draft"){ showScreen("draft"); renderDraft(); }
   else if(phase === "complete"){ showScreen("complete"); buildConfigOutput(); }
+
+  updateIdentityGate();
 }
 
 function renderNameGrid(){
@@ -984,16 +988,23 @@ function renderNameGrid(){
     return `<button class="name-btn ${sel} ${taken}" style="${style}" onclick="claimName('${b}')" ${taken ? "disabled" : ""}>${b}</button>`;
   }).join("");
 }
-// Identity picker shown on the setup/draft screens for anyone who hasn't claimed a
-// seat yet (the lobby — the only other place to pick your name — is gone once the
-// draft starts). Taken seats stay clickable here so you can rejoin from a new device.
-function identityPickerHTML(){
-  if(myName) return "";
+// Identity gate: a fixed modal shown to anyone who hasn't claimed a seat once the
+// draft is underway (the lobby — the only other place to pick your name — is gone).
+// It lives OUTSIDE the per-screen render so the 4s poll / realtime re-renders don't
+// tear down its buttons mid-tap or shift it as the board below reflows. We only
+// (re)build it when it isn't already up, so tap targets stay stable. Taken seats stay
+// clickable so you can rejoin from a new device.
+function updateIdentityGate(){
+  const modal = document.getElementById("identity-modal");
+  const needed = !myName && (phase === "setup" || phase === "draft");
+  if(!needed){ modal.className = ""; modal.innerHTML = ""; return; }
+  if(modal.classList.contains("show")) return; // already up — leave it so taps land
   const btns = BETTORS.map(b => {
     const rejoin = claimed.includes(b) ? ` <span style="font-size:11px;opacity:.65">(rejoin)</span>` : "";
     return `<button class="name-btn" onclick="claimName('${b}')">${b}${rejoin}</button>`;
   }).join("");
-  return `<div class="identity-picker">
+  modal.className = "show";
+  modal.innerHTML = `<div class="identity-card">
     <div class="identity-prompt">Tap your name to join the draft</div>
     <div class="name-grid">${btns}</div>
   </div>`;
@@ -1038,7 +1049,6 @@ function renderSetup(){
   const canDrag = isCommish();
   document.getElementById("setup-host-controls").style.display = canDrag ? "block" : "none";
   document.getElementById("setup-wait").style.display = canDrag ? "none" : "block";
-  document.getElementById("setup-identity").innerHTML = identityPickerHTML();
   document.getElementById("order-list").innerHTML = draftOrder.map((b, i) => `
     <li class="order-item${canDrag ? "" : " readonly"}"
       ${canDrag ? `draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event,${i})" ondragleave="dlv(event)" ondrop="drp(event,${i})"` : ""}
@@ -1094,7 +1104,7 @@ function renderDraft(){
   document.getElementById("clock-sub").textContent = t.isAlt ? "Choose your alternate" : "Round " + t.round + " · Pick " + (turn + 1) + " of " + sequence.length;
   document.getElementById("clock-info").innerHTML = (sequence.length - turn) + " picks left";
   const ytm = document.getElementById("your-turn-msg");
-  ytm.innerHTML = identityPickerHTML() + ((t.bettor === myName) ? '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>' : "");
+  ytm.innerHTML = (t.bettor === myName) ? '<div class="your-turn-banner">Your pick. Try not to overthink it like it is the Ryder Cup.</div>' : "";
   renderPlayerList(); renderBoard();
 }
 function renderPlayerList(){
