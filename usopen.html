@@ -979,12 +979,19 @@ async function fetchScores() {
     const fieldNonWD = sorted.filter(p =>
       p.athlete?.displayName && !(p.score === "WD" || p.score === "wd")
     );
-    // R2 is final when essentially every non-WD player has 18 holes recorded in
-    // round 2 (one straggler/late WD tolerated). Per-hole data for R2 is present
-    // here because R3 hasn't begun, so it's the latest round.
-    const r2Done = fieldNonWD.filter(p =>
-      (p.linescores?.[1]?.linescores?.length ?? 0) === 18
-    ).length;
+    // R2 is final when essentially every non-WD player has posted a round-2
+    // total (one straggler/late WD tolerated). ESPN keeps the round total
+    // (`displayValue`) reliably for every round, but its per-hole `linescores`
+    // array is often absent on this scoreboard endpoint — so gate on the round
+    // total and accept per-hole data only as a bonus. (Gating on per-hole alone
+    // left r2Done at 0, so the cut line never computed and missed cuts never
+    // flagged on Saturday morning.) A player still mid-R2 has no round-2 total
+    // yet, so the 95% threshold below won't trip until R2 is genuinely complete.
+    const r2Done = fieldNonWD.filter(p => {
+      const r2 = p.linescores?.[1];
+      return parseRelScore(r2?.displayValue) !== null ||
+             (r2?.linescores?.length ?? 0) === 18;
+    }).length;
     const r2Complete = fieldNonWD.length > 0 &&
       r2Done >= fieldNonWD.length - 1 && r2Done / fieldNonWD.length >= 0.95;
     if (r2Complete) {
