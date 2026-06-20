@@ -782,7 +782,14 @@ function teamRoundTotal(bettor, roundKey) {
 function isRoundComplete(roundKey) {
   const entries = Object.values(scoreMap);
   if (!entries.length) return false;
-  const active = entries.filter(p => !p.isCut && !p.isWD && (p.r1holes ?? 0) > 0);
+
+  // "In the field" = not cut/WD and has actually teed off. Detect this from the
+  // R1 round total (displayValue), which ESPN keeps for every round — NOT from
+  // per-hole linescores, which ESPN drops for earlier rounds once a new round
+  // begins. Gating on per-hole data made `active` empty after R2, stalling every
+  // round's completion and its cash payout.
+  const hasStarted = p => parseRelScore(p.r1) !== null || (p.r1holes ?? 0) > 0;
+  const active = entries.filter(p => !p.isCut && !p.isWD && hasStarted(p));
   if (!active.length) return false;
 
   const holesKey = roundKey + "holes";
@@ -791,10 +798,10 @@ function isRoundComplete(roundKey) {
   const nextHolesKey = "r" + nextRoundIdx + "holes";
   const nextRoundKey = "r" + nextRoundIdx;
 
-  // Signal 1: every active player finished 18 holes this round.
-  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
+  // Signal 0: the cut has been made (some players marked CUT) => R1 and R2 are final.
+  if ((roundKey === "r1" || roundKey === "r2") && entries.some(p => p.isCut)) return true;
 
-  // Signal 2: any active player has data in the next round (started or finished).
+  // Signal 1: any active player has data in the next round => this round is done.
   if (nextRoundIdx <= 4) {
     const nextStarted = active.some(p =>
       (p[nextHolesKey] ?? 0) > 0 || parseRelScore(p[nextRoundKey]) !== null
@@ -802,12 +809,16 @@ function isRoundComplete(roundKey) {
     if (nextStarted) return true;
   }
 
+  // Signal 2: every active player finished 18 holes this round.
+  if (active.every(p => (p[holesKey] ?? 0) === 18)) return true;
+
   // Signal 3 (R4 only): event status reports the tournament is post/completed.
   if (roundKey === "r4" && eventMeta.completed) return true;
 
-  // Signal 4 (R4 only): nearly every active player has 18 holes (≥ all-but-one
-  // and ≥ 90%). Handles ESPN sometimes reporting 17 of 18 holes for stragglers.
-  if (roundKey === "r4") {
+  // Signal 4: nearly every active player finished 18 holes (>= all-but-one and >= 90%).
+  // Handles a lone straggler / unflagged WD / ESPN reporting 17 of 18 holes that
+  // would otherwise stall a round that is really over.
+  {
     const eighteen = active.filter(p => (p[holesKey] ?? 0) === 18).length;
     if (eighteen >= active.length - 1 && eighteen / active.length >= 0.9) return true;
   }
