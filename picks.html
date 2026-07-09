@@ -942,7 +942,30 @@ function fetchField(){
     "Ryan Vermeer","Jimmy Walker","Matt Wallace","Bernd Wiesberger","Timothy Wiseman","Gary Woodland","Y.E. Yang",
     "Sudarshan Yellamaraju","Cameron Young"
   ];
+  sortField();
+  loadLiveField();   // best-effort: swap in the live ESPN field once it's published
+}
+function sortField(){
   field.sort((a, b) => a.split(" ").pop().toLowerCase().localeCompare(b.split(" ").pop().toLowerCase()));
+}
+// Pull the real field from ESPN for the 2026 Open (event 401811957). Only overrides the
+// hardcoded fallback once a genuine field is posted (>=20 players), so an empty/partial
+// pre-tournament feed never wipes the draftable list.
+async function loadLiveField(){
+  try {
+    const EVENT_ID = "401811957", DATES = "20260716-20260719";
+    const res = await fetch("https://site.api.espn.com/apis/site/v2/sports/golf/pga/scoreboard?dates=" + DATES);
+    if(!res.ok) return;
+    const data = await res.json();
+    const ev = (data.events || []).find(e => e.id === EVENT_ID);
+    const comps = ((((ev || {}).competitions || [])[0] || {}).competitors) || [];
+    const names = comps.map(c => (c.athlete || {}).displayName).filter(Boolean);
+    if(names.length >= 20){
+      field = names;
+      sortField();
+      if(typeof renderPlayerList === "function") renderPlayerList();
+    }
+  } catch(e){ /* keep the hardcoded fallback */ }
 }
 
 function buildSeq(order){
