@@ -64,9 +64,12 @@
     gap: 14px;
   }
 
-  /* US Open logo */
+  /* The Open logo */
   .event-logo {
-    width: 56px;
+    /* The mark is a landscape lockup, so height drives the size and width
+       follows; the old 56x56 square squashed it. The white plate stays -- the
+       PNG is transparent and its type is near-black on a dark header. */
+    width: auto;
     height: 56px;
     flex-shrink: 0;
     background: var(--white);
@@ -598,7 +601,7 @@
     main, .tabs-wrap { padding-left: 16px; padding-right: 16px; }
     .board-grid { grid-template-columns: 1fr; }
     .wordmark-event { display: none; }
-    .event-logo { width: 44px; height: 44px; }
+    .event-logo { height: 44px; }
   }
 </style>
 </head>
@@ -607,13 +610,7 @@
 <header>
   <div class="header-inner">
     <div class="wordmark">
-      <svg class="event-logo" viewBox="0 0 48 48" role="img" aria-label="The Open 2026 · Royal Birkdale" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="24" cy="6" r="1.7" fill="var(--gold)"/>
-        <path d="M21 9h6l-.7 5.2h-4.6L21 9Z" fill="var(--gold)" opacity=".85"/>
-        <path d="M18 14.2h12c2.5 3 3.5 7.1 2.7 12.2-.75 4.8-4.1 7.3-8.7 7.3s-8-2.5-8.7-7.3c-.8-5.1.2-9.2 2.7-12.2Z" stroke="var(--gold)" stroke-width="1.5"/>
-        <path d="M30 18.4c3.3.3 5.1 2.2 5.1 4.7s-2 4.1-4.7 4.4" stroke="var(--gold)" stroke-width="1.5" stroke-linecap="round"/>
-        <path d="M19.8 40.2h8.4" stroke="var(--gold)" stroke-width="1.9" stroke-linecap="round"/>
-      </svg>
+      <img class="event-logo" src="assets/theopen-2026.png" alt="The Open 2026 · Royal Birkdale">
       <div>
         <span class="wordmark-title">The Men</span><br>
         <span class="wordmark-event" id="event-name">The Open · Royal Birkdale</span>
