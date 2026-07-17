@@ -660,11 +660,11 @@ const CONFIG = {
   refreshInterval: 60, // seconds
   // Pot per category. Buy-in = 1 round value.
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
-  // Fallback cut threshold for the programmatic detector only. The Open's real
-  // cut fell at +1, but cuts are marked authoritatively via cutList below, so we
-  // keep this conservative at +5 to avoid the fallback wrongly cutting a
-  // made-the-cut player (e.g. Russell Henley at +1) who ties into the weekend.
-  cutScore: 5,
+  // Cut rule: low CUT_PLACES and ties (The Open = low 70 and ties). The engine
+  // computes the actual cut line from the field's 36-hole totals — a fixed score
+  // threshold doesn't work because the line varies by event. cutList below is an
+  // authoritative backstop for any player the live feed can't resolve.
+  cutPlaces: 70,
 
   // ── HARDCODED CUT LIST (the proven rule, same as masters.html) ──
   // Authoritative list of players who missed the cut, captured from the ESPN
@@ -996,41 +996,55 @@ async function fetchScores() {
   // Authoritative hardcoded cut list (the proven rule — see CONFIG.cutList).
   const cutSet = new Set(CONFIG.cutList || []);
 
-  // Pre-pass: figure out the max number of "real" rounds anyone has played.
-  // This drives programmatic cut detection (replaces masters.html's hardcoded list).
-  const realCounts = sorted.map(p => realRoundCount(p.linescores || []));
-  const maxRealRounds = Math.max(0, ...realCounts);
-  // R3 has started if any player has 3+ real rounds of data (i.e. their R3 has data).
-  const r3HasStarted = maxRealRounds >= 3;
+  // 36-hole (R1 + R2) relative-to-par total; null until both rounds are posted.
+  const total36 = (p) => {
+    const a = parseRelScore(p.linescores?.[0]?.displayValue);
+    const b = parseRelScore(p.linescores?.[1]?.displayValue);
+    return (a === null || b === null) ? null : a + b;
+  };
 
-  // ── MISSED-CUT DETECTION ──
-  // The rule we've always used: at the completion of Round 2, anyone at
-  // CONFIG.cutScore or worse (e.g. +5) missed the cut. A player who misses the
-  // cut never plays again, so their `score` field stays their 36-hole total for
-  // the rest of the weekend — which lets ONE rule cover every window:
-  //
-  //     cut  ==  (<= 2 real rounds played)  AND  (36-hole score >= CUT_SCORE)
-  //
-  // The round count separates a missed cut (stuck on 2 rounds) from an active
-  // player who merely scored badly over 3-4 rounds. The score separates a missed
-  // cut from a player who made the cut at +4 or better but simply hasn't teed off
-  // in R3 yet (R3 goes off in waves). We only apply it once the cut is official —
-  // R3 has data somewhere, or R2 is essentially complete — so nobody is cut while
-  // still on the course Friday.
-  const CUT_SCORE = CONFIG.cutScore != null ? CONFIG.cutScore : 5;
+  // Does ESPN itself mark this competitor cut (score field or status object)?
+  // Token-match so we don't trip on words like "cutoff".
+  const espnStatusCut = (p) => {
+    if (p.score === "CUT" || p.score === "cut") return true;
+    const t = p.status?.type || {};
+    const hay = [t.name, t.description, t.shortDetail, t.detail, p.status?.displayValue]
+      .filter(Boolean).join(" ").toLowerCase();
+    return hay.split(/[^a-z]+/).includes("cut");
+  };
+
+  // ── MISSED-CUT DETECTION (cut line: low CUT_PLACES and ties) ──
+  // Key off each player's FROZEN 36-hole total vs the computed cut line, so cuts
+  // stay correct all weekend regardless of ESPN's round padding. A fixed score
+  // threshold can't work — the line varies by event (The Open = low 70 & ties).
+  const r3HasStarted = sorted.some(p =>
+    parseRelScore(p.linescores?.[2]?.displayValue) !== null ||
+    (p.linescores?.[2]?.linescores?.length ?? 0) > 0
+  );
+  const CUT_PLACES = CONFIG.cutPlaces || 70;
   const fieldNonWD = sorted.filter(p =>
     p.athlete?.displayName && !(p.score === "WD" || p.score === "wd")
   );
-  // R2 is complete when essentially every non-WD player has a round-2 total
-  // (`displayValue`), which ESPN keeps reliably; per-hole data is a bonus.
-  const r2Done = fieldNonWD.filter(p => {
-    const r2 = p.linescores?.[1];
-    return parseRelScore(r2?.displayValue) !== null ||
-           (r2?.linescores?.length ?? 0) === 18;
-  }).length;
-  const r2Complete = fieldNonWD.length > 0 &&
-    r2Done >= fieldNonWD.length - 1 && r2Done / fieldNonWD.length >= 0.95;
-  const cutIsOfficial = r3HasStarted || r2Complete;
+  // The cut is "in effect" once R2 is essentially done or R3 has begun — via any
+  // of these signals so a flaky feed can't stall it, and none fire mid-Round-2.
+  const r2DoneByHoles = fieldNonWD.filter(p =>
+    (p.linescores?.[1]?.linescores?.length ?? 0) === 18
+  ).length;
+  const r2DoneByTotal = fieldNonWD.filter(p =>
+    parseRelScore(p.linescores?.[1]?.displayValue) !== null
+  ).length;
+  const cutInEffect =
+    r3HasStarted ||
+    (fieldNonWD.length > 0 && r2DoneByHoles / fieldNonWD.length >= 0.85) ||
+    (fieldNonWD.length > 0 && r2DoneByTotal / fieldNonWD.length >= 0.95) ||
+    sorted.some(espnStatusCut);
+  let cutLine = null;
+  if (cutInEffect) {
+    // Sort 36-hole totals ascending; the CUT_PLACES-th slot is the line, and
+    // "and ties" means only players strictly worse than it miss the cut.
+    const totals = fieldNonWD.map(total36).filter(v => v !== null).sort((a, b) => a - b);
+    if (totals.length > CUT_PLACES) cutLine = totals[CUT_PLACES - 1];
+  }
 
   const newMap = {};
 
@@ -1039,34 +1053,25 @@ async function fetchScores() {
     if (!name) return;
 
     const ls = p.linescores || [];
-    const myRealRounds = realRoundCount(ls);
 
     const isWD = p.score === "WD" || p.score === "wd";
     const explicitCut = p.score === "CUT" || p.score === "cut";
 
-    // Authoritative hardcoded cut list (the proven rule, same as masters.html).
-    // If a name is here, they're cut regardless of what the live feed says.
+    // Authoritative hardcoded cut list — a name here is cut regardless of what
+    // the live feed says. Backstop for players the cut-line rule can't resolve.
     const listCut = cutSet.has(name);
 
-    // Some ESPN payloads carry a cut marker on the competitor's status object
-    // (e.g. "STATUS_CUT"). Harmless when absent. Token-match so we don't trip on
-    // words like "cutoff".
-    const statusCut = (() => {
-      const t = p.status?.type || {};
-      const hay = [t.name, t.description, t.shortDetail, t.detail, p.status?.displayValue]
-        .filter(Boolean).join(" ").toLowerCase();
-      return hay.split(/[^a-z]+/).includes("cut");
+    // ESPN's own cut marker (score field or status object), when present.
+    const statusCut = espnStatusCut(p);
+
+    // Missed the cut: 36-hole total is worse than the cut line (low CUT_PLACES
+    // and ties). Final once the cut is made, so it stays correct through R3/R4.
+    const lineCut = cutLine !== null && !isWD && (() => {
+      const v = total36(p);
+      return v !== null && v > cutLine;
     })();
 
-    // Missed-cut: the cut is official, the player is stuck on <= 2 real rounds,
-    // and their 36-hole score is at/over the cut line (CONFIG.cutScore). See the
-    // rule explanation above the loop.
-    const scoreCut = cutIsOfficial && !isWD && myRealRounds <= 2 && (() => {
-      const v = parseRelScore(p.score);
-      return v !== null && v >= CUT_SCORE;
-    })();
-
-    const isCut = listCut || explicitCut || statusCut || scoreCut;
+    const isCut = listCut || explicitCut || statusCut || lineCut;
 
     const score = isCut ? "CUT" : isWD ? "WD" : (p.score || "E");
 
