@@ -660,8 +660,10 @@ const CONFIG = {
   refreshInterval: 60, // seconds
   // Pot per category. Buy-in = 1 round value.
   points: { R1: 12, R2: 12, R3: 12, R4: 12, Overall: 12, Winner: 12 },
-  // Cut rule: at completion of R2, anyone at this score or worse missed the cut.
-  // The 2026 U.S. Open cut fell at +5 (i.e. +5 or worse is out, +4 and better play).
+  // Fallback cut threshold for the programmatic detector only. The Open's real
+  // cut fell at +1, but cuts are marked authoritatively via cutList below, so we
+  // keep this conservative at +5 to avoid the fallback wrongly cutting a
+  // made-the-cut player (e.g. Russell Henley at +1) who ties into the weekend.
   cutScore: 5,
 
   // ── HARDCODED CUT LIST (the proven rule, same as masters.html) ──
@@ -671,6 +673,20 @@ const CONFIG = {
   // the programmatic detection in fetchScores is only a fallback. Add every cut
   // player (drafted picks matter most) exactly as ESPN spells their name.
   cutList: [
+    // Missed the cut at The Open (Royal Birkdale) — cut line fell at +1
+    // (low 70 and ties), verified against the ESPN leaderboard after R2.
+    // Names must match ESPN's displayName exactly.
+    "Matt Fitzpatrick",   // Dave
+    "Wyndham Clark",      // Dave
+    "Tom Kim",            // Billy
+    "Viktor Hovland",     // Ryan
+    "Justin Rose",        // TJ
+    "Jordan Spieth",      // Alex
+    "Akshay Bhatia",      // Alex
+    // Alternates who also missed the cut (scored only if the alt is used):
+    "Aaron Rai",          // Dave (alt)
+    "Brian Harman",       // Billy (alt)
+    "Billy Horschel"      // Nick (alt)
   ],
 
   bettors: ["Dave", "Billy", "Ryan", "TJ", "Alex", "Nick"],
