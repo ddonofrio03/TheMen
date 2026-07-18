@@ -767,14 +767,19 @@ function relClass(n) {
 // Penalty pool is the picks of the CURRENT group only.
 function penaltyScore(roundKey, teamPlayers) {
   const teamSet = new Set(teamPlayers);
-  const allPicked = allDrafted();
+  // Pool = every bettor's PICKS (starters), minus this cut player's own team.
+  // Alts are deliberately excluded: an alt never contributes to a team's round
+  // total, so it must not set the penalty baseline either. The penalty is +2
+  // over the worst active starter that isn't yours.
   let worst = null;
-  allPicked.forEach(name => {
-    if (teamSet.has(name)) return;
-    const info = scoreMap[name];
-    if (!info || info.isCut || info.isWD) return;
-    const val = parseRelScore(info[roundKey]);
-    if (val !== null && (worst === null || val > worst)) worst = val;
+  bettors().forEach(b => {
+    picksFor(b).forEach(name => {
+      if (teamSet.has(name)) return;
+      const info = scoreMap[name];
+      if (!info || info.isCut || info.isWD) return;
+      const val = parseRelScore(info[roundKey]);
+      if (val !== null && (worst === null || val > worst)) worst = val;
+    });
   });
   if (worst === null) return null;
   return worst + 2;
