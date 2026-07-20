@@ -8,22 +8,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #006747;
-    --green-light: #e4f2ec;
-    --green-mid: #008B5E;
-    --red: #c0392b;
-    --red-light: #fdf0ee;
-    --gold: #c8a951;
-    --gold-light: #fdf6e3;
-    --ink: #1a2e1a;
-    --ink-mid: #3a4a3a;
-    --ink-light: #7a8a7a;
-    --border: #d4ddd4;
-    --surface: #f5f8f5;
+    --green: #1b7a52;
+    --green-light: #e9f4ee;
+    --green-mid: #2e9268;
+    --red: #b4453a;
+    --red-light: #fbf1ef;
+    --gold: #bfa255;
+    --gold-light: #f7f0dd;
+    --ink: #1c241f;
+    --ink-mid: #4b584f;
+    --ink-light: #8b978c;
+    --border: #dce2d8;
+    --surface: #eff3ec;
     --white: #ffffff;
-    --cut: #9a9a94;
-    --augusta-dark: #004d34;
-    --augusta-yellow: #fff2cc;
+    --cut: #9ba69c;
+    --augusta-dark: #12603f;
+    --augusta-yellow: #fff6dc;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -37,7 +37,7 @@
 
   /* ── HEADER ── */
   header {
-    background: var(--augusta-dark);
+    background: var(--green);
     color: var(--white);
     padding: 0;
     position: sticky;
@@ -144,16 +144,16 @@
 
   /* ── COUNTDOWN BAR ── */
   .countdown-bar {
-    background: #003a26;
-    border-bottom: 1px solid #004d34;
-    padding: 4px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 5px 24px;
     text-align: center;
     font-family: 'DM Mono', monospace;
     font-size: 11px;
-    color: #4a7a5a;
+    color: var(--ink-light);
   }
 
-  #countdown { color: #6a9a7a; }
+  #countdown { color: var(--ink-mid); }
 
   /* ── TABS ── */
   .tabs-wrap {

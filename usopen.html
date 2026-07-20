@@ -8,24 +8,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy: #1c2c5b;
-    --navy-deep: #11204a;
-    --navy-mid: #2a4070;
-    --navy-pale: #eef1f8;
-    --navy-line: #c8d0e3;
-    --gold: #c8a951;
-    --gold-light: #f9efd1;
-    --cream: #fdfcf7;
-    --ink: #1a1a24;
-    --ink-mid: #3a3f55;
-    --ink-light: #7a8090;
-    --border: #d8dde6;
-    --surface: #f4f6fa;
+    --navy: #3a6491;
+    --navy-deep: #2a4c71;
+    --navy-mid: #4b7aac;
+    --navy-pale: #edf2f8;
+    --navy-line: #cddae8;
+    --gold: #bfa255;
+    --gold-light: #f4edd9;
+    --cream: #f8f7f1;
+    --ink: #1c241f;
+    --ink-mid: #4b584f;
+    --ink-light: #8b978c;
+    --border: #dce2d8;
+    --surface: #eff3ec;
     --white: #ffffff;
-    --red: #c0392b;
-    --red-light: #fdf0ee;
-    --green: #2d6a4f;
-    --cut: #9a9a94;
+    --red: #b4453a;
+    --red-light: #fbf1ef;
+    --green: #2e7d53;
+    --cut: #9ba69c;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -39,7 +39,7 @@
 
   /* ── HEADER ── */
   header {
-    background: var(--navy-deep);
+    background: var(--navy);
     color: var(--white);
     position: sticky;
     top: 0;
@@ -145,16 +145,16 @@
 
   /* ── COUNTDOWN BAR ── */
   .countdown-bar {
-    background: var(--navy);
-    border-bottom: 1px solid var(--navy-mid);
-    padding: 4px 24px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 5px 24px;
     text-align: center;
     font-family: 'DM Mono', monospace;
     font-size: 11px;
-    color: #7a8aaa;
+    color: var(--ink-light);
   }
 
-  #countdown { color: #a8b6d6; }
+  #countdown { color: var(--ink-mid); }
 
   /* ── NAME WARNING ── */
   .name-warning {
