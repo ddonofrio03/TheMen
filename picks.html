@@ -856,8 +856,10 @@
 
 <script>
 /* CONFIG — The Men */
-const SUPABASE_URL = "https://qxvejtzwtnvackidiqds.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF4dmVqdHp3dG52YWNraWRpcWRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE1NTA5MzksImV4cCI6MjA5NzEyNjkzOX0.NGHpw9rXErQDnSdAfU0RsDTXZct8bItCQuOTHkCZk9w";
+// Shared "TCG-DMD Overall" project; this app's tables live in the golf_bets schema.
+const SUPABASE_URL = "https://utucjtnhdkewcgyvgvsj.supabase.co";
+const SUPABASE_KEY = "sb_publishable_4OrSCnTMRaXai768QwAqeQ_U7w7CPuT";
+const DB_SCHEMA = "golf_bets";
 const SLUG    = "themen";
 
 const BETTORS = ["Dave","Billy","Nick","Alex","Ryan","TJ"];
@@ -866,7 +868,7 @@ const ROUNDS  = 5;            // 4 picks + 1 alt round
 const COMMISH = "Dave";       // sets draft order, starts, and resets
 const NAME_KEY = "themen-draft-myname";
 
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { db: { schema: DB_SCHEMA } });
 
 let myName = localStorage.getItem(NAME_KEY) || null;
 let phase="lobby", claimed=[], draftOrder=[], picks={}, turn=0, field=[], sequence=[], dragSrc=null, saving=false, loaded=false;
@@ -910,7 +912,7 @@ async function pushState(){
 function subscribe(){
   sb.channel("draft-" + SLUG)
     .on("postgres_changes",
-        { event: "UPDATE", schema: "public", table: "golf_drafts", filter: "slug=eq." + SLUG },
+        { event: "UPDATE", schema: DB_SCHEMA, table: "golf_drafts", filter: "slug=eq." + SLUG },
         payload => { if(!saving) applyState(payload.new.state); })
     .subscribe(status => setConn(status === "SUBSCRIBED"));
 }
